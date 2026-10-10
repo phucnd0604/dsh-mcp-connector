@@ -1,72 +1,56 @@
-# MCP连接器 v0.2.45：自然搜索与转化文案包
+# MCP Connector v0.2.45: Natural Search and Conversion Copy Pack
 
-状态：文案与 D0 指标基线已完成；公共文案已随 `0.2.46` 发布，三张新截图和 43 秒演示已于 2026-09-14 完成；D+7/D+14 复盘待到期执行。
+Status: the copy and D0 metric baseline are complete; the public copy shipped with `0.2.46`, the three new screenshots and the 43-second demo were completed on 2026-09-14, and the D+7/D+14 retrospectives are pending their due dates.
 
-更新时间：2026-09-14（Asia/Shanghai）
+Last updated: 2026-09-14 (Asia/Shanghai)
 
-上线记录：Connector [PR #74](https://github.com/duhu2000/dsh-mcp-connector/pull/74) 集成 README/元数据，发布 [PR #75](https://github.com/duhu2000/dsh-mcp-connector/pull/75) 形成 `v0.2.46`，awesome-dsh-plugin [PR #4982](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/4982) 同步公开市场描述。本文件保留 `0.2.45` 活动基线，后续版本只更新落地与复盘状态。
+Ship record: Connector [PR #74](https://github.com/duhu2000/dsh-mcp-connector/pull/74) integrated the README/metadata, release [PR #75](https://github.com/duhu2000/dsh-mcp-connector/pull/75) produced `v0.2.46`, and awesome-dsh-plugin [PR #4982](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/4982) synced the public marketplace description. This file retains the `0.2.45` campaign baseline; later versions only update the rollout and retrospective status.
 
-## 1. 冻结事实与表达边界
+## 1. Frozen Facts and Expression Boundaries
 
-- 产品版本：`dsh-mcp-connector@0.2.45`
-- 合并提交：[`82d2406`](https://github.com/duhu2000/dsh-mcp-connector/commit/82d240601df73b8e704124100ec5771a0cd5514a)
-- 产品 PR：[#73](https://github.com/duhu2000/dsh-mcp-connector/pull/73)
-- Release：[`v0.2.45`](https://github.com/duhu2000/dsh-mcp-connector/releases/tag/v0.2.45)
-- 截至 2026-09-11，公共 Registry 发布 106 条连接器描述；与随包卡片合并去重后，默认市场可浏览 110 张连接器卡片，覆盖 9 类，精选 6 张。动态页面数量以客户端刷新后的徽标为准。
-- 工具页搜索当前范围内已启用连接的“最后成功安全缓存”，支持连接、服务、最近发现状态筛选和分页；搜索/筛选不请求目标 MCP，不执行目标工具。
-- 参数详情显示类型、必填、枚举、常见约束与嵌套摘要，并保留“原始 Schema（安全缓存）”入口；这不是未经裁剪的服务端完整原文。
-- “检查连接”和“重新发现工具”是单连接诊断动作，不是工具执行，也不承诺一键自动修复。
-- 后台按到期与状态变化调度：健康连接五分钟后到期；普通失败从 30 秒指数退避、最长 15 分钟；429 结合 `Retry-After`，鉴权失败暂停自动重试。不能写成永久实时探针或“精确每五分钟刷新”。
-- 缓存可查不代表服务当前可调用；目录缓存/随包回退也不代表断网可调用工具。
-- 连接器卡片数、npm 下载量、clone 数均不是用户数；第三方连接器并非全部免费或免授权。
+- Product version: `dsh-mcp-connector@0.2.45`
+- Merge commit: [`82d2406`](https://github.com/duhu2000/dsh-mcp-connector/commit/82d240601df73b8e704124100ec5771a0cd5514a)
+- Product PR: [#73](https://github.com/duhu2000/dsh-mcp-connector/pull/73)
+- Release: [`v0.2.45`](https://github.com/duhu2000/dsh-mcp-connector/releases/tag/v0.2.45)
+- As of 2026-09-11, the public Registry has published 106 connector descriptions; after merging and deduplicating with the bundled cards, the default marketplace offers 110 browsable connector cards covering 9 categories, with 6 featured. Dynamic page counts defer to the client badge after a refresh.
+- The tools page search reads the "last successful security cache" for connections that are enabled within the current scope, and supports filtering by connection, service, and most recent discovery status as well as pagination; search/filtering does not request the target MCP and does not execute the target tool.
+- Parameter details show the type, required flag, enums, common constraints, and a nested summary, and retain a "Raw Schema (security cache)" entry point; this is not the unredacted full server-side text.
+- "Check connection" and "Rediscover tools" are per-connection diagnostic actions, not tool executions, and do not promise one-click automatic repair.
+- The background scheduler runs on expiry and status change: healthy connections expire after five minutes; ordinary failures back off exponentially from 30 seconds up to a maximum of 15 minutes; 429 responses combine with `Retry-After`, and authentication failures pause automatic retries. This must not be written up as a permanent real-time probe or as "refreshes precisely every five minutes".
+- A viewable cache does not mean the service is currently callable; the catalog cache / bundled fallback also does not mean tools are callable while offline.
+- Connector card counts, npm download counts, and clone counts are not user counts; third-party connectors are not all free or free of authorization requirements.
 
-固定功能证据与教程补丁分别见：
+The fixed feature evidence and tutorial patch are in:
 
 - [`../search-closure/FEATURE-EVIDENCE.md`](../search-closure/FEATURE-EVIDENCE.md)
 - [`../search-closure/README-PATCH.md`](../search-closure/README-PATCH.md)
 - [`../search-closure/SCREENSHOT-ACCEPTANCE.md`](../search-closure/SCREENSHOT-ACCEPTANCE.md)
 
-其中 `README-PATCH.md` 只负责工具教程段；首屏 hero 与统一营销口径以本文为准。三张新素材和最终演示已落在 `docs/screenshots/05`–`07` 与 `docs/demo.gif`。
+Of these, `README-PATCH.md` only covers the tool tutorial section; the hero and the unified marketing positioning are defined by this document. The three new assets and the final demo live in `docs/screenshots/05`–`07` and `docs/demo.gif`.
 
-统一中文术语：`MCP连接器`、`MCP Server`、`工具查找`、`连接排障`、`重新发现工具`、`最后成功缓存时间`。市场独立关键词字段可补空格变体 `MCP 连接器`。
+Unified terminology: `MCP Connector`, `MCP Server`, `tool lookup`, `connection troubleshooting`, `rediscover tools`, `last successful cache time`. If a marketplace has a separate keyword field, the space variant `MCP connector` may be added there.
 
-## 2. 单一文案源
+## 2. Single Copy Source
 
-### 2.1 核心定位
+### 2.1 Core Positioning
 
-**中文版（活动/首屏）**
-
-> 超百个 MCP连接器，一个入口完成 MCP Server 接入、跨连接工具查找与连接排障。
-
-**英文版（活动/首屏）**
+**Campaign / hero**
 
 > 100+ MCP connectors, one place to connect MCP servers, search tools across connections, and troubleshoot connections.
 
-**耐久版（不依赖具体数量）**
-
-> MCP连接器：在 DeepSeek Harness 中接入 MCP Server、跨连接查找工具，并完成连接管理与连接排障。
+**Durable version (not dependent on any specific count)**
 
 > MCP Connector for DeepSeek Harness: connect to MCP servers, search tools across connections, and manage or troubleshoot connections.
 
-### 2.2 短简介
+### 2.2 Short Description
 
-**中文**
-
-DeepSeek Harness 的 MCP连接器：通过持续更新的连接器目录，在一个入口完成 MCP Server 接入、工具查找与连接排障；支持 OAuth 2.0 PKCE、API Key、Streamable HTTP/stdio 和 `mcpServers` JSON 导入。
-
-**English（建议同时作为 npm description 与 GitHub About，241 个 ASCII 字符）**
+**English (recommended for both the npm description and GitHub About, 241 ASCII characters)**
 
 DeepSeek Harness MCP Connector: connect servers, find tools across active connections, and troubleshoot discovery. Includes a continuously updated catalog; supports OAuth 2.0 PKCE, API keys, Streamable HTTP/stdio, and mcpServers JSON import.
 
-说明：当前英文 npm description 为 305 个字符，npm 线上读取结果截断在约 255 字符处；上述 241 字符版本可完整显示，并将用户收益放在协议名之前。
+Note: the current English npm description is 305 characters, and what npm reads online is truncated at roughly 255 characters; the 241-character version above displays in full and puts the user benefit before the protocol names.
 
-### 2.3 长简介
-
-**中文**
-
-MCP连接器帮助 DeepSeek Harness 用户从持续更新的连接器目录接入 MCP Server，并在同一界面查找当前范围内已启用连接的工具、查看参数和来源、定位连接或发现失败。它支持 OAuth 2.0 PKCE、API Key、Streamable HTTP/stdio、`mcpServers` JSON 导入，以及连接检查和单连接工具重新发现。
-
-工具搜索读取最后成功的安全缓存，不执行目标工具；缓存可见不等于服务当前可调用。第三方服务的授权、订阅、运行时、额度和数据许可，以各提供方规则为准。
+### 2.3 Long Description
 
 **English**
 
@@ -74,37 +58,11 @@ MCP Connector helps DeepSeek Harness users connect MCP servers from a continuous
 
 Tool search reads the last successful sanitized cache and never executes a target tool. A visible cache does not guarantee that the remote service is currently callable. Provider authentication, subscriptions, runtimes, quotas, and data licenses remain provider-specific.
 
-## 3. README 首屏与安装引导补丁建议
+## 3. README Hero and Install Guidance Patch Suggestions
 
-以下为供归口会话复制的草稿，不直接修改公共 README。
+The following are drafts for the central session to copy; they do not directly modify the public README.
 
-### 3.1 中文首屏
-
-````markdown
-# MCP连接器：在 DeepSeek Harness 接入、查找和排障 MCP Server
-
-> 超百个 MCP连接器，一个入口完成 MCP Server 接入、跨连接工具查找与连接排障。
-
-从持续更新的连接器目录接入 MCP Server；跨当前范围内已启用连接查找工具，查看易读参数、来源和最后成功缓存时间，并在发现异常时检查连接或重新发现工具。支持 OAuth 2.0 PKCE、API Key、Streamable HTTP/stdio 与 `mcpServers` JSON 导入。
-
-工具查找读取最后成功的安全缓存，不执行目标工具；缓存可查不代表服务当前可调用。
-
-## 30 秒开始
-
-```bash
-dsh plugin --profile web add dsh-mcp-connector
-```
-
-安装或升级后完全退出并重启 DeepSeek Harness Desktop；使用 `dsh web` 时先停止原进程再启动。然后点击左侧“MCP连接器”，或进入“设置 → 插件 → 插件配置 → MCP连接器”，点击“打开 MCP连接器”。
-
-1. 在“市场”选择连接器并完成授权或配置。
-2. 在“工具”跨连接搜索，并按连接、服务或最近发现状态筛选。
-3. 查看参数与来源；异常时展开诊断，按提示检查连接或重新发现工具。
-
-[用户手册](docs/USER-GUIDE.md) · [提交连接器](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/docs/ONBOARDING.md) · [问题反馈](https://github.com/duhu2000/dsh-mcp-connector/issues)
-````
-
-### 3.2 English hero
+### 3.1 English hero
 
 ````markdown
 # Connect, Find, and Troubleshoot MCP Servers in DeepSeek Harness
@@ -128,23 +86,9 @@ Fully quit and restart DeepSeek Harness Desktop after installation or upgrade. F
 3. Inspect parameters and source metadata; when discovery fails, open diagnostics and check the connection or rediscover its tools.
 ````
 
-## 4. 社区内容
+## 4. Community Content
 
-### 4.1 中文短帖
-
-DeepSeek Harness 里的 MCP 工具多起来后，最费时间的往往是：工具在哪、参数怎么填、连接为什么没刷新。
-
-`dsh-mcp-connector v0.2.45` 新增统一“工具”页：跨当前范围内已启用连接搜索，按连接/服务/最近发现状态筛选，查看易读参数、来源和最后成功缓存时间，并可对单连接执行检查或重新发现。
-
-```bash
-dsh plugin --profile web add dsh-mcp-connector
-```
-
-工具查找只读安全缓存，不执行目标工具；缓存可见不代表服务当前可调用。
-
-Release：https://github.com/duhu2000/dsh-mcp-connector/releases/tag/v0.2.45
-
-### 4.2 English short post
+### 4.1 English short post
 
 As MCP tools multiply in DeepSeek Harness, three questions become expensive: Where is the tool? What parameters does it need? Why did discovery stop updating?
 
@@ -156,130 +100,128 @@ dsh plugin --profile web add dsh-mcp-connector
 
 Search reads a sanitized last-success cache and never executes target tools. Cached visibility is not proof of current callability.
 
-### 4.3 更新文章提纲
+### 4.2 Update Article Outline
 
-推荐标题：**接上 MCP Server 之后，怎么快速找到工具并判断连接出了什么问题？**
+Recommended title: **After Connecting an MCP Server, How Do You Find Its Tools and Diagnose Discovery Failures?**
 
-1. 痛点：连接数量增加后，工具分散、参数难读、缓存状态和实时可用性容易混淆。
-2. 版本答案：0.2.45 的统一工具页，把搜索、筛选、参数、来源、缓存时间和排障入口放在同一流程。
-3. 三个场景：
-   - 已知道工具名：精确工具名优先，快速定位来源连接和服务。
-   - 不清楚参数：查看类型/必填/枚举/嵌套摘要，必要时打开原始安全 Schema。
-   - 最近发现失败：继续查看最后成功缓存和诊断，再检查连接或重新发现工具。
-4. 诚实边界：只搜索当前范围内已启用连接的缓存；不执行工具；缓存不等于可调用；后台是有界调度和退避。
-5. 安装与入口：安装命令、重启要求、侧边栏及设置页路径。
-6. 参与方式：Star、提交连接器、提交可复现 Issue 或贡献修复。
+1. Pain point: as the number of connections grows, tools become scattered, parameters are hard to read, and cache state is easily confused with real-time availability.
+2. The version's answer: 0.2.45's unified tools page puts search, filtering, parameters, source, cache time, and troubleshooting entry points into a single flow.
+3. Three scenarios:
+   - You already know the tool name: exact tool name priority quickly locates the source connection and service.
+   - You are unsure of the parameters: view the type/required/enum/nested summary, and open the raw safe Schema if needed.
+   - Recent discovery failed: keep viewing the last successful cache and diagnostics, then check the connection or rediscover the tools.
+4. Honest boundaries: only the cache of connections enabled within the current scope is searched; no tool is executed; a cache does not equal callable; the background is bounded scheduling with backoff.
+5. Install and entry points: install command, restart requirement, sidebar, and settings page paths.
+6. How to participate: Star, submit a connector, submit a reproducible Issue, or contribute a fix.
 
-英文文章可沿用标题：**After Connecting an MCP Server, How Do You Find Its Tools and Diagnose Discovery Failures?**，结构与上述六段一一对应。
+## 5. 30–45 Second Demo Script
 
-## 5. 30–45 秒演示脚本
+Target duration: 43 seconds. All mock scenarios must be clearly labeled "Demo data" on screen. Real authorization time is not included in the demo promise.
 
-目标时长：43 秒。所有 Mock 场景需在画面中显著标注“演示数据 / Demo data”。真实授权时长不纳入演示承诺。
-
-| 时间 | 画面 | 旁白/字幕 |
+| Time | Screen | Narration / subtitle |
 |---|---|---|
-| 0–5 秒 | 从侧边栏打开 MCP连接器，快速扫过市场与“工具”页签 | “超百个 MCP连接器，一个入口完成 MCP Server 接入、跨连接工具查找与连接排障。” |
-| 5–15 秒 | “工具”页展示至少两条连接/服务；输入自然、非敏感关键词，切换连接和服务筛选 | “跨当前范围内已启用连接查找工具，并按连接、服务和最近发现状态筛选。” |
-| 15–24 秒 | 打开一个工具参数详情，依次展示类型、必填、枚举与一个嵌套结构；保留原始安全 Schema 入口 | “参数先给易读摘要；需要时仍可查看经过安全裁剪的原始 Schema。” |
-| 24–35 秒 | 进入明确标注“演示数据”的受控超时状态；显示来源、最后成功缓存时间、诊断建议、“检查连接”“重新发现工具” | “发现异常时，缓存仍可用于定位；再按诊断检查连接或重新发现。缓存不代表当前一定可调用。” |
-| 35–39 秒 | 模拟恢复为成功状态 | “恢复后状态会同步更新。” |
-| 39–43 秒 | 安装命令、Release 与提交连接器入口 | “安装 v0.2.45，或提交你的连接器。” |
+| 0–5s | Open MCP Connector from the sidebar, quickly scan the marketplace and the "Tools" tab | "100+ MCP connectors, one place to connect MCP servers, search tools across connections, and troubleshoot connections." |
+| 5–15s | The "Tools" page shows at least two connections/services; enter a natural, non-sensitive keyword and toggle the connection and service filters | "Find tools across connections enabled in the current scope, and filter by connection, service, and recent discovery state." |
+| 15–24s | Open a tool's parameter details and show the type, required flag, enums, and one nested structure in sequence; keep the raw safe Schema entry point | "Parameters start with a readable summary; when needed you can still view the security-redacted raw Schema." |
+| 24–35s | Enter a controlled timeout state clearly labeled "Demo data"; show source, last successful cache time, diagnostic suggestions, "Check connection", and "Rediscover tools" | "When discovery is abnormal, the cache can still be used to locate the problem; then follow the diagnostics to check the connection or rediscover. The cache does not mean the service is necessarily callable now." |
+| 35–39s | Simulate recovery into a success state | "After recovery the status updates accordingly." |
+| 39–43s | Install command, Release, and the connector submission entry point | "Install v0.2.45, or submit your own connector." |
 
-截图/录屏验收要求：
+Screenshot/screen-recording acceptance requirements:
 
-- 产品面板按真实 800px 宽度录制；桌面市场卡片一行 2 张，不得使用旧 3 列素材。
-- 主图使用成功状态；故障图只能使用显著标注的受控模拟状态，不展示“需重新授权”作为主宣传状态。
-- 不出现 Token、API Key、本机路径、真实用户查询、真实会话、付费账户或未公开结果。
-- “统一找工具”图需同时出现至少两条连接/服务、来源与缓存时间，不能把单服务列表冒充跨连接搜索。
-- “看懂参数”图需出现类型/必填/枚举/嵌套摘要和原始安全 Schema 入口。
-- “状态与排障”图需保留故障标签、最后成功缓存、诊断建议和两个操作入口；不得通过后期美化篡改真实状态。
-- 已完成：上述三张新图与 43 秒视频均来自 `v0.2.46` 无凭据 UI harness，并通过哈希、尺寸、时长和敏感信息门禁；来源见 [`../../../docs/screenshots/README.md`](../../../docs/screenshots/README.md)。
+- Record the product panel at the real 800px width; the desktop marketplace cards must be 2 per row, and the old 3-column assets must not be used.
+- The main image uses a success state; a failure image may only use a clearly labeled controlled mock state, and must not present "needs re-authorization" as the main promotional state.
+- No Token, API Key, local machine path, real user query, real session, paid account, or unpublished result may appear.
+- The "unified tool finding" image must simultaneously show at least two connections/services, the source, and the cache time; a single-service list must not be passed off as a cross-connection search.
+- The "understand parameters" image must show the type/required/enum/nested summary and the raw safe Schema entry point.
+- The "status and troubleshooting" image must retain the failure label, last successful cache, diagnostic suggestions, and both action entry points; real state must not be altered through post-processing beautification.
+- Done: the three new images and the 43-second video both come from the credential-less `v0.2.46` UI harness and passed the hash, dimension, duration, and sensitive-information gates; see [`../../../docs/screenshots/README.md`](../../../docs/screenshots/README.md) for the sources.
 
-## 6. 推广前指标快照
+## 6. Pre-Promotion Metric Snapshot
 
-采集时间：2026-09-12 21:44（Asia/Shanghai）。原始来源为 npm downloads API、GitHub Repository/Traffic API、GitHub Release 与公开搜索快照。
+Collection time: 2026-09-12 21:44 (Asia/Shanghai). The raw sources are the npm downloads API, the GitHub Repository/Traffic API, the GitHub Release, and a public search snapshot.
 
-| 指标 | 2026-08-30 基线 | 2026-09-12 推广前快照 | 说明 |
+| Metric | 2026-08-30 baseline | 2026-09-12 pre-promotion snapshot | Notes |
 |---|---:|---:|---|
-| npm 下载，近 30 天 | 5,406 | 10,991 | 当前窗口 `2026-08-13`～`2026-09-11`；含 CI、重复安装与缓存未命中，不是用户数 |
-| GitHub Stars | 8 | 20 | 累计快照，+12 |
-| GitHub Forks | 2 | 3 | 累计快照，+1 |
-| GitHub Watchers | 1 | 1 | 累计快照 |
-| Open Issues | 1 | 3 | 当前为 #29、#53、#69；不作为负向转化率直接解释 |
-| GitHub views，滚动 14 天 | 646 / 277 unique | 2,361 / 1,161 unique | 当前窗口 `2026-08-29`～`2026-09-11` |
-| GitHub clones，滚动 14 天 | 1,174 / 247 unique | 1,294 / 240 unique | clone 与 unique cloner 均不等于安装用户 |
-| Overview 热门路径 | 444 / 268 unique | 1,658 / 1,145 unique | GitHub popular paths API |
-| 最新 npm / Release | `0.2.29` / `v0.2.29` | `0.2.45` / `v0.2.45` | 0.2.45 发布于 2026-09-12 |
+| npm downloads, last 30 days | 5,406 | 10,991 | Current window `2026-08-13`–`2026-09-11`; includes CI, repeat installs, and cache misses, so it is not a user count |
+| GitHub Stars | 8 | 20 | Cumulative snapshot, +12 |
+| GitHub Forks | 2 | 3 | Cumulative snapshot, +1 |
+| GitHub Watchers | 1 | 1 | Cumulative snapshot |
+| Open Issues | 1 | 3 | Currently #29, #53, #69; not directly interpreted as a negative conversion rate |
+| GitHub views, rolling 14 days | 646 / 277 unique | 2,361 / 1,161 unique | Current window `2026-08-29`–`2026-09-11` |
+| GitHub clones, rolling 14 days | 1,174 / 247 unique | 1,294 / 240 unique | Neither clones nor unique cloners equal installed users |
+| Overview top paths | 444 / 268 unique | 1,658 / 1,145 unique | GitHub popular paths API |
+| Latest npm / Release | `0.2.29` / `v0.2.29` | `0.2.45` / `v0.2.45` | 0.2.45 was released on 2026-09-12 |
 
-当前主要 referrer（views / unique）：`github.com` 172/48、Google 64/32、Baidu 39/4、`awesome-dsh-plugin.com` 23/10、Bing 19/15、`npmjs.com` 10/5。
+Current main referrers (views / unique): `github.com` 172/48, Google 64/32, Baidu 39/4, `awesome-dsh-plugin.com` 23/10, Bing 19/15, `npmjs.com` 10/5.
 
-搜索诊断快照（Codex Web Search 索引；引擎/locale 不透明，因此只作方向性诊断，不替代正式无痕浏览器验收）：
+Search diagnostic snapshot (Codex Web Search index; the engine/locale are opaque, so this is directional diagnosis only and does not replace formal incognito browser acceptance):
 
-| 查询 | 最佳项目相关结果 | 观察位置 |
+| Query | Best project-related result | Observed position |
 |---|---|---:|
-| `DeepSeek Harness MCP connector` | 前 10 条未观察到项目自有落地页 | >10 / 未观察到 |
-| `dsh MCP connector marketplace` | dsh.pub 条目；GitHub 仓库随后出现 | 2；3 |
-| `DeepSeek MCP 连接器` | npm 包页 | 4 |
-| `model context protocol connector DeepSeek Harness` | 前 10 条未观察到项目自有落地页 | >10 / 未观察到 |
+| `DeepSeek Harness MCP connector` | No project-owned landing page observed in the top 10 | >10 / not observed |
+| `dsh MCP connector marketplace` | A dsh.pub entry; the GitHub repository appears after it | 2; 3 |
+| `DeepSeek Harness MCP connector marketplace` | npm package page | 4 |
+| `model context protocol connector DeepSeek Harness` | No project-owned landing page observed in the top 10 | >10 / not observed |
 
-正式推广前仍需由归口会话在签出或全新浏览器中，以固定引擎和 locale 记录前两页；不得把上述方向性位置写成排名承诺。
+Before formal promotion, the central session should still record the first two pages with a fixed engine and locale in a signed-out or brand-new browser; the directional positions above must not be written up as ranking promises.
 
-## 7. D+7 / D+14 复盘方法
+## 7. D+7 / D+14 Retrospective Method
 
-建议复盘日：D+7 为 2026-09-19，D+14 为 2026-09-26。此处只提供方法，不创建自动任务。
+Suggested retrospective dates: D+7 = 2026-09-19, D+14 = 2026-09-26. Only the method is provided here; no automated task is created.
 
-每次在同一时区记录：
+Record the following each time in the same timezone:
 
-1. npm downloads API 返回的 `downloads/start/end`；与 D0 比较仅作为安装意向代理，因为 30 天窗口高度重叠。
-2. GitHub Stars、Forks、Watchers、Open Issues 的累计值与净增量。
-3. GitHub 14 天 views/unique、clones/unique、Overview path 和 top referrers；保存原始 JSON，避免滚动窗口过期。
-4. 固定四组自然搜索词；使用签出/全新浏览器，记录引擎、locale、日期、项目最佳结果、位置和落地页，至少查看前两页。
-5. 首次贡献代理：首次 Issue/PR 数、首次 PR 合并数、`good first issue` 从认领到 PR 的时长。
-6. 活动变更日志：实际改了哪些 README/元数据/截图/外部条目，何时上线；没有上线的草稿不能归因为增长原因。
+1. The `downloads/start/end` returned by the npm downloads API; comparison against D0 serves only as an installation-intent proxy, because the 30-day windows overlap heavily.
+2. Cumulative values and net deltas for GitHub Stars, Forks, Watchers, and Open Issues.
+3. GitHub 14-day views/unique, clones/unique, Overview paths, and top referrers; save the raw JSON to avoid rolling-window expiry.
+4. Four fixed natural search terms; using a signed-out/brand-new browser, record the engine, locale, date, the project's best result, its position, and the landing page, examining at least the first two pages.
+5. First-contribution proxies: first-time Issue/PR counts, first PR merges, and the time from `good first issue` claim to PR.
+6. Campaign change log: which README/metadata/screenshot/external entries were actually changed and when they went live; a draft that never shipped cannot be attributed as a growth cause.
 
-判读规则：
+Interpretation rules:
 
-- **可发现性改善**：项目自有页面在固定查询中新增命中/位置改善，或 Google/Bing/Baidu 的 unique referrer 同向增长。
-- **社区意向改善**：同期 Stars/Forks/首次 Issue 或 PR 至少一个净增，并核对是否为真实社区行为。
-- **安装意向改善**：npm 30 天下载代理上升，但只能与其他信号联合观察，不能换算为用户或真实转化率。
-- **无结论**：仅下载量上升、滚动窗口错位、搜索索引尚未更新或没有明确上线时间时，不宣称文案带来转化。
-- **下一轮选择**：D+7 优先修正未命中关键词/入口；D+14 再决定保留首屏、调整标题，或更换社区渠道。一次只改一个主假设，保留对照记录。
+- **Discoverability improved**: the project's own pages gain new matches/improve positions on the fixed queries, or unique referrers from Google/Bing/Baidu grow in the same direction.
+- **Community intent improved**: Stars/Forks/first Issues or PRs have at least one net increase over the same period, and it is verified as genuine community behavior.
+- **Installation intent improved**: the npm 30-day download proxy rises, but it can only be observed together with other signals and must not be converted into a user or real conversion rate.
+- **No conclusion**: when only download counts rise, the rolling windows are misaligned, the search index has not updated yet, or there is no clear launch time, do not claim that the copy drove conversion.
+- **Next round choice**: at D+7 prioritize fixing non-matching keywords/entry points; at D+14 then decide whether to keep the hero, adjust the title, or switch community channels. Change only one main hypothesis at a time and keep the control record.
 
-复盘表：
+Retrospective table:
 
-| 指标 | D0 | D+7 | D+14 | 数据窗口/时间 | 解释与限制 |
+| Metric | D0 | D+7 | D+14 | Data window/time | Interpretation and limits |
 |---|---:|---:|---:|---|---|
-| npm 下载（近 30 天） | 10,991 |  |  | 2026-08-13～09-11 | 非用户数 |
-| Stars / Forks | 20 / 3 |  |  | 累计 | 记录净增 |
-| views / unique | 2,361 / 1,161 |  |  | 滚动 14 天 | 保存 JSON |
-| clones / unique | 1,294 / 240 |  |  | 滚动 14 天 | 非安装用户 |
-| 自然搜索命中 | 见上表 |  |  | 固定引擎/locale | 不承诺默认排名 |
-| 首次 Issue / PR / merged |  |  |  | 同期 | 人工去重 |
+| npm downloads (last 30 days) | 10,991 |  |  | 2026-08-13–09-11 | Not a user count |
+| Stars / Forks | 20 / 3 |  |  | Cumulative | Record the net increase |
+| views / unique | 2,361 / 1,161 |  |  | Rolling 14 days | Save the JSON |
+| clones / unique | 1,294 / 240 |  |  | Rolling 14 days | Not installed users |
+| Natural search matches | See the table above |  |  | Fixed engine/locale | No default ranking promise |
+| First Issue / PR / merged |  |  |  | Same period | Manual deduplication |
 
-## 8. 公共文件补丁清单（交归口会话串行执行）
+## 8. Public File Patch Checklist (for the central session to execute serially)
 
 1. `marketing/metadata.json`
-   - 将 `npm.description`、`github.description` 改为 2.2 的 241 字符英文短简介。
-   - 将 `readme.heroZh/heroEn` 改为 2.1 活动版定位；`externalListing` 使用 2.3 长简介的单段精简版。
+   - Change `npm.description` and `github.description` to the 241-character English short description from 2.2.
+   - Change `readme.heroZh/heroEn` to the campaign positioning from 2.1; use a condensed single-paragraph version of the long description from 2.3 for `externalListing`.
 2. `package.json`
-   - `description` 与 `marketing/metadata.json:npm.description` 完全一致。
-3. `README.md` / `README.en.md`
-   - 用第 3 节替换标题、hero、收益段与安装后入口；将详细协议能力放在收益之后。
-   - 保留缓存与当前可调用性的显式边界。
+   - `description` must be exactly identical to `marketing/metadata.json:npm.description`.
+3. `README.md`
+   - Use section 3 to replace the title, hero, benefit paragraph, and post-install entry points; place the detailed protocol capabilities after the benefits.
+   - Keep the explicit boundary around the cache and current callability.
 4. `duhu2000__dsh-mcp-connector.yml`
-   - 同步中英文外部 listing；保持单行、事实准确、无最高级表达。
+   - Sync the external listing in both languages; keep it single-line, factually accurate, and free of superlative expressions.
 5. `scripts/check-marketing-metadata.mjs`
-   - 现有断言硬编码 `over one hundred...`、`discover/authorize/manage` 与“统一发现、授权和连接管理”；应改为从结构化定位词校验 `DeepSeek Harness`、连接/接入、工具查找和连接排障，避免新文案被旧口径门禁阻断。
-   - 增加 npm description 字符数上限（建议 `<= 250`），防止线上再次截断。
+   - The existing assertions hardcode `over one hundred...`, `discover/authorize/manage`, and the unified discovery/authorization/connection-management wording; these should be changed to validate `DeepSeek Harness`, connection/onboarding, tool lookup, and connection troubleshooting from the structured positioning terms, so that new copy is not blocked by an old wording gate.
+   - Add an npm description character limit (recommended `<= 250`) to prevent online truncation from recurring.
 6. GitHub About
-   - 与 2.2 英文短简介一致；保留现有 20 个高意图 Topics。本轮不承诺排序变化。
-7. 截图与视频
-   - 已完成：三张新图/43 秒视频通过第 5 节验收，归口已更新 `screenshots.json`、`assets.json` 和双语 README 引用。
-8. 集成验证
-   - 归口分支已通过 `npm run check`（250 项测试、75 个发布文件）、`npm run marketing:check:live` 和 7 张图片的 storefront 门禁。`distribution:check:live` 准确报告外部目录未收敛，并由 Issue #69 继续跟踪。
+   - Make it consistent with the English short description from 2.2; keep the existing 20 high-intent Topics. This round promises no ranking change.
+7. Screenshots and video
+   - Done: the three new images/43-second video passed section 5 acceptance, and the central session updated `screenshots.json`, `assets.json`, and the bilingual README references.
+8. Integration verification
+   - The central branch passed `npm run check` (250 tests, 75 release files), `npm run marketing:check:live`, and the storefront gate for 7 images. `distribution:check:live` accurately reports that the external catalogs have not converged, and tracking continues via Issue #69.
 
-## 9. 交付与阻塞
+## 9. Delivery and Blockers
 
-- 已完成：事实冻结、中英文长短/耐久文案、README 首屏与安装引导、社区短帖、文章提纲、43 秒演示、三张工具工作台截图、D0 指标快照、复盘方法和公共文件集成。
-- 待执行：D+7（2026-09-19）和 D+14（2026-09-26）固定窗口复盘；媒体文章规范 URL 登记后逐篇复核。
-- 本目录保留历史交付说明；实际公共文件与外部上线状态以 [`../LEDGER.md`](../LEDGER.md) 和 [`../PUBLICATION-REGISTER.md`](../PUBLICATION-REGISTER.md) 为准。
+- Done: fact freeze, long/short/durable copy in both languages, README hero and install guidance, community short post, article outline, 43-second demo, three tool workbench screenshots, D0 metric snapshot, retrospective method, and public file integration.
+- Pending: the fixed-window retrospectives at D+7 (2026-09-19) and D+14 (2026-09-26); per-article review once canonical media article URLs are registered.
+- This directory retains the historical delivery description; for the actual public files and external launch status, defer to [`../LEDGER.md`](../LEDGER.md) and [`../PUBLICATION-REGISTER.md`](../PUBLICATION-REGISTER.md).

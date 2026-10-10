@@ -4,18 +4,18 @@
     {
       "schemaVersion": 1,
       "id": "pkulaw-legal",
-      "name": "北大法宝·法律检索",
+      "name": "PKULaw · Legal Search",
       "vendor": "北大法宝 PKULaw",
       "icon": "/mcp-connector/ui/assets/pkulaw-logo.png",
       "category": "法律合规",
-      "summary": "法规 / 法条 / 司法案例检索与引用核验",
-      "description": "接入北大法宝法律法规、司法案例、法条识别与引用核验能力。需使用北大法宝 Access Token，相关服务可能需要单独开通或购买。",
+      "summary": "Statutes / provisions / judicial case search and citation verification",
+      "description": "Access PKULaw's laws and regulations, judicial cases, statutory provision recognition and citation verification. Requires a PKULaw Access Token; some services may need to be activated or purchased separately.",
       "tags": [
-        "法律",
-        "法规",
-        "案例",
-        "法条",
-        "第三方收录"
+        "Law",
+        "Statutes",
+        "Cases",
+        "Statutory provisions",
+        "Third-party listing"
       ],
       "published": true,
       "featured": true,
@@ -23,45 +23,45 @@
       "promptVariables": [
         {
           "name": "topic",
-          "label": "法律主题",
-          "placeholder": "例如：劳动合同解除",
+          "label": "Legal topic",
+          "placeholder": "e.g. 劳动合同解除",
           "required": true,
           "default": "劳动合同解除"
         },
         {
           "name": "caseTopic",
-          "label": "案例主题",
-          "placeholder": "例如：竞业限制违约",
+          "label": "Case topic",
+          "placeholder": "e.g. 竞业限制违约",
           "required": true,
           "default": "竞业限制违约"
         },
         {
           "name": "citation",
-          "label": "法律引用",
-          "placeholder": "例如：《民法典》第五百七十七条",
+          "label": "Legal citation",
+          "placeholder": "e.g. 《民法典》第五百七十七条",
           "required": true,
           "default": "《民法典》第五百七十七条"
         }
       ],
       "prompts": [
         {
-          "title": "法规与法条检索",
-          "text": "用北大法宝 MCP 检索与「{{topic}}」相关的现行法律规定，并给出法条原文和效力信息",
+          "title": "Statute and provision search",
+          "text": "Use the PKULaw MCP to find the currently effective laws and regulations related to \"{{topic}}\", and give the verbatim text and validity information",
           "server": "law-search"
         },
         {
-          "title": "典型司法案例",
-          "text": "用北大法宝 MCP 检索与「{{caseTopic}}」相关的典型司法案例，并列出案号和裁判要点",
+          "title": "Typical judicial cases",
+          "text": "Use the PKULaw MCP to find typical judicial cases related to \"{{caseTopic}}\", and list the case numbers and holdings",
           "server": "case-semantic-search"
         },
         {
-          "title": "法律引用识别",
-          "text": "用北大法宝 MCP 识别并核验 {{citation}} 的标准出处和现行法条原文",
+          "title": "Citation recognition",
+          "text": "Use the PKULaw MCP to identify and verify the standard source of {{citation}} and the currently effective statutory text",
           "server": "law-recognition"
         },
         {
-          "title": "法律引用核验",
-          "text": "用北大法宝 MCP 核验 {{citation}} 是否准确，并说明当前效力状态",
+          "title": "Citation verification",
+          "text": "Use the PKULaw MCP to verify whether {{citation}} is accurate, and explain its current validity status",
           "server": "citation-validator"
         }
       ],
@@ -76,17 +76,17 @@
         "tokenEndpointAuthMethod": "none",
         "apiKeyHeader": "X-Api-Key",
         "grantSharing": "",
-        "credentialName": "北大法宝 Access Token",
-        "credentialPlaceholder": "请输入您的北大法宝 Access Token",
-        "credentialDescription": "用于访问北大法宝 MCP；仅保存在 DSH 本机。",
-        "credentialHelpLabel": "如何获取北大法宝 Token？",
+        "credentialName": "PKULaw Access Token",
+        "credentialPlaceholder": "Enter your PKULaw Access Token",
+        "credentialDescription": "Used to access the PKULaw MCP service; stored only on this DSH machine.",
+        "credentialHelpLabel": "How do I get a PKULaw Token?",
         "credentialFields": [
           {
             "key": "credential",
-            "label": "北大法宝 Access Token",
-            "placeholder": "请输入您的北大法宝 Access Token",
-            "description": "用于访问北大法宝 MCP；仅保存在 DSH 本机。",
-            "helpLabel": "如何获取北大法宝 Token？",
+            "label": "PKULaw Access Token",
+            "placeholder": "Enter your PKULaw Access Token",
+            "description": "Used to access the PKULaw MCP service; stored only on this DSH machine.",
+            "helpLabel": "How do I get a PKULaw Token?",
             "required": true,
             "secret": true
           }
@@ -161,18 +161,18 @@
     {
       "schemaVersion": 1,
       "id": "wind-stock-data",
-      "name": "Wind·股票数据",
+      "name": "Wind · Stock Data",
       "vendor": "Wind 万得",
       "icon": "/mcp-connector/ui/assets/wind-logo.png",
       "category": "金融投资",
-      "summary": "全球股票档案 / 行情 / 技术指标 / 财务与公司事件",
-      "description": "接入万得股票数据服务，覆盖公司档案、股本与股东、行情报价、技术指标、基本面财务、公司事件及风险波动性数据。需使用 Wind Key，服务权限以万得账户实际开通范围为准。",
+      "summary": "Global stock profiles / market quotes / technical indicators / financials and corporate events",
+      "description": "Access the Wind stock data service, covering company profiles, share capital and shareholders, market quotes, technical indicators, fundamentals, financial statements, corporate events, and risk and volatility data. Requires a Wind Key; the available service scopes depend on what your Wind account actually has enabled.",
       "tags": [
-        "股票",
-        "行情",
-        "财务",
-        "技术指标",
-        "第三方收录"
+        "Stocks",
+        "Market quotes",
+        "Financials",
+        "Technical indicators",
+        "Third-party listing"
       ],
       "published": true,
       "featured": true,
@@ -180,31 +180,31 @@
       "promptVariables": [
         {
           "name": "stock",
-          "label": "股票名称或代码",
-          "placeholder": "例如：贵州茅台（600519.SH）",
+          "label": "Stock name or ticker",
+          "placeholder": "e.g. 贵州茅台（600519.SH）",
           "required": true,
           "default": "贵州茅台（600519.SH）"
         }
       ],
       "prompts": [
         {
-          "title": "公司档案与行业",
-          "text": "用 Wind 股票数据 MCP 查询 {{stock}} 的公司档案、主营业务和所属行业",
+          "title": "Company profile and industry",
+          "text": "Use the Wind stock data MCP to look up the company profile, main business and industry of {{stock}}",
           "server": "stock-data"
         },
         {
-          "title": "最新行情",
-          "text": "用 Wind 股票数据 MCP 查询 {{stock}} 的最新价格、成交量、换手率和买卖报价",
+          "title": "Latest quote",
+          "text": "Use the Wind stock data MCP to look up the latest price, volume, turnover rate and bid/ask quotes for {{stock}}",
           "server": "stock-data"
         },
         {
-          "title": "技术与波动指标",
-          "text": "用 Wind 股票数据 MCP 查询 {{stock}} 最近 20 个交易日的 MACD、RSI、波动率和涨跌幅",
+          "title": "Technical and volatility indicators",
+          "text": "Use the Wind stock data MCP to look up the MACD, RSI, volatility and price change of {{stock}} over the last 20 trading days",
           "server": "stock-data"
         },
         {
-          "title": "核心财务指标",
-          "text": "用 Wind 股票数据 MCP 查询 {{stock}} 最新报告期的营业收入、净利润、ROE 和现金流",
+          "title": "Core financial metrics",
+          "text": "Use the Wind stock data MCP to look up the revenue, net profit, ROE and cash flow of {{stock}} for the latest reporting period",
           "server": "stock-data"
         }
       ],
@@ -219,17 +219,17 @@
         "tokenEndpointAuthMethod": "none",
         "apiKeyHeader": "X-Api-Key",
         "grantSharing": "",
-        "credentialName": "Wind API Key（个人密钥）",
-        "credentialPlaceholder": "请输入您的个人 Wind API Key",
-        "credentialDescription": "用于访问 Wind MCP 的个人访问令牌；仅保存在 DSH 本机。",
-        "credentialHelpLabel": "如何获取 Wind API Key？",
+        "credentialName": "Wind API Key (personal key)",
+        "credentialPlaceholder": "Enter your personal Wind API Key",
+        "credentialDescription": "The personal access token for the Wind MCP service; stored only on this DSH machine.",
+        "credentialHelpLabel": "How do I get a Wind API Key?",
         "credentialFields": [
           {
             "key": "credential",
-            "label": "Wind API Key（个人密钥）",
-            "placeholder": "请输入您的个人 Wind API Key",
-            "description": "用于访问 Wind MCP 的个人访问令牌；仅保存在 DSH 本机。",
-            "helpLabel": "如何获取 Wind API Key？",
+            "label": "Wind API Key (personal key)",
+            "placeholder": "Enter your personal Wind API Key",
+            "description": "The personal access token for the Wind MCP service; stored only on this DSH machine.",
+            "helpLabel": "How do I get a Wind API Key?",
             "required": true,
             "secret": true
           }

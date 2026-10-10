@@ -45,7 +45,7 @@
     "countAsOf": "2026-09-11"
   },
   "wording": {
-    "durableZh": "MCP Server 与 MCP连接器市场，收录超百个 MCP连接器并持续更新；统一发现、授权和连接管理。",
-    "datedZh": "截至 2026-09-11，公共 Registry 已发布 106 个连接器；与随包卡片合并去重后，默认市场可浏览 110 张连接器卡片，覆盖 9 个业务分类。"
+    "durableZh": "MCP Server and MCP Connector marketplace, cataloging over a hundred MCP Connectors with continuous updates; unified discovery, authorization, and connection management.",
+    "datedZh": "As of 2026-09-11, the public Registry has published 106 connectors; after merging and deduplicating with the bundled cards, the default marketplace offers 110 browsable connector cards covering 9 business categories."
   }
 }

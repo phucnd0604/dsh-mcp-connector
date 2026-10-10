@@ -42,7 +42,7 @@ test('内置目录加载 + published 过滤', () => {
   assert.equal(published.find((d) => d.id === 'qcc-legal')?.category, '法律合规');
   const qccDocument = published.find((d) => d.id === 'qcc-document');
   assert.equal(qccDocument?.category, '效率工具');
-  assert.equal(qccDocument?.name, '企查查·智能文档解析');
+  assert.equal(qccDocument?.name, 'Qichacha · Smart Document Parsing');
   assert.equal(qccDocument?.homepage, 'https://agent.qcc.com/doc');
   assert.equal(qccDocument?.auth.mode, 'oauth2-pkce');
   assert.equal(qccDocument?.auth.issuer, 'https://agent.qcc.com');
@@ -55,12 +55,12 @@ test('内置目录加载 + published 过滤', () => {
   assert.deepEqual(qccDocument?.servers[1]?.credentialBindings, {});
   const pkulaw = published.find((d) => d.id === 'pkulaw-legal');
   assert.equal(pkulaw?.auth.mode, 'bearer', '北大法宝应以 Bearer Token 方式接入');
-  assert.equal(pkulaw?.auth.credentialName, '北大法宝 Access Token');
+  assert.equal(pkulaw?.auth.credentialName, 'PKULaw Access Token');
   assert.equal(pkulaw?.servers.length, 9, '北大法宝卡片应一次配置官网公开的 9 个 Server');
   assert.equal(pkulaw?.icon, '/mcp-connector/ui/assets/pkulaw-logo.png', '北大法宝应使用内置官网 Logo');
   const wind = published.find((d) => d.id === 'wind-stock-data');
   assert.equal(wind?.auth.mode, 'bearer', 'Wind 股票数据应以 Bearer Wind Key 接入');
-  assert.equal(wind?.auth.credentialName, 'Wind API Key（个人密钥）');
+  assert.equal(wind?.auth.credentialName, 'Wind API Key (personal key)');
   assert.equal(wind?.servers.length, 1, 'Wind 股票数据卡片只接入官网当前公开的股票 MCP Server');
   assert.equal(wind?.servers[0]?.url, 'https://mcp.wind.com.cn/vserver_stock_data/mcp/');
   assert.equal(wind?.servers[0]?.headers.Accept, 'application/json, text/event-stream');

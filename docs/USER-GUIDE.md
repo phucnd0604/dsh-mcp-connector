@@ -1,39 +1,39 @@
-# MCP连接器用户手册
+# MCP Connector User Guide
 
-本手册面向安装和使用 `dsh-mcp-connector` 的 DeepSeek Harness（DSH）用户。服务商或 MCP 原作者如需提交市场卡片，请改看独立 Registry 的[第三方连接器上架指南](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/docs/ONBOARDING.md)。
+This guide is for DeepSeek Harness (DSH) users who install and use `dsh-mcp-connector`. Service providers or MCP authors who want to submit a Market card should read the separate Registry's [third-party connector onboarding guide](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/docs/ONBOARDING.md) instead.
 
-## 按任务开始
+## Start by task
 
-第一次使用请从[统一首次成功入口](tutorials/README.md)开始：安装并重启正确 profile，只选一种连接方式，确认工具来源，再回到正常 DSH 会话完成服务商许可的首次只读调用。
+If this is your first time, start with the [unified first-success entry point](tutorials/README.md): install and restart the correct profile, choose exactly one connection method, confirm the tool source, then return to a normal DSH session to complete the first provider-permitted read-only call.
 
-- 已有其他客户端配置：从[迁移 `mcpServers` JSON](tutorials/JSON-MIGRATION.md)开始，逐项验证配置保存、工具发现/注册和只读调用。
-- OAuth 卡在注册、授权或刷新：看[OAuth 连接诊断](tutorials/OAUTH-DIAGNOSTICS.md)，先按阶段与稳定代码排查，不反复提交未获授权的账号。
-- 已连接多个服务却找不到工具：看[跨连接找工具与发现失败恢复](tutorials/TOOL-SEARCH-RECOVERY.md)。缓存可查不等于当前可调用。
-- 需要一条可复核任务：从[三个首次成功场景包](tutorials/FIRST-SUCCESS-SCENARIOS.md)选择企业信息、本地文档或授权办公数据的只读场景，并按[可信状态文案](tutorials/TRUSTED-STATUS-COPY.md)记录未知项和证据。
+- You already have another client's configuration: start from [migrate `mcpServers` JSON](tutorials/JSON-MIGRATION.md) and verify configuration saving, tool discovery/registration and the read-only call one by one.
+- OAuth is stuck at registration, authorization or refresh: see [OAuth connection diagnostics](tutorials/OAUTH-DIAGNOSTICS.md), investigate by stage and stable code first, and do not repeatedly submit an account you are not authorized for.
+- You connected multiple services but cannot find tools: see [cross-connection tool search and discovery failure recovery](tutorials/TOOL-SEARCH-RECOVERY.md). A queryable cache does not mean it is callable right now.
+- You need one reviewable task: choose a read-only scenario for company information, local documents or authorized office data from the [three first-success scenario packs](tutorials/FIRST-SUCCESS-SCENARIOS.md), and record unknown items and evidence according to the [trusted status copy](tutorials/TRUSTED-STATUS-COPY.md).
 
-这些操作教程和场景包不代表对所有服务商完成了真实业务调用验收；正式调用仍受服务商权限、费用与 DSH Host 审批约束。
+These operation tutorials and scenario packs do not represent completed real business call acceptance for every provider; formal calls remain subject to provider permissions, cost and DSH Host approval.
 
-## 1. 安装、升级与重启
+## 1. Install, upgrade and restart
 
-要求：DSH Desktop 或 `web` profile，Node.js 20 或更高版本。
+Requirements: DSH Desktop or the `web` profile, Node.js 20 or later.
 
 ```bash
 dsh plugin --profile web add dsh-mcp-connector
 ```
 
-也可以运行一键安装脚本：
+You can also run the one-click install script:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/duhu2000/dsh-mcp-connector/main/install.sh)
 ```
 
-重复执行同一安装命令即可升级。安装或升级后必须让 DSH **完全退出并重新启动**，仅刷新浏览器页面不足以替换已经加载的插件代码。
+Just run the same install command again to upgrade. After installing or upgrading, DSH must **fully exit and restart**; refreshing the browser page alone is not enough to replace already-loaded plugin code.
 
-- DSH Desktop：退出应用后重新打开。
-- `dsh web`：停止原进程，再运行 `dsh web`。
-- 浏览器访问：默认打开 `http://127.0.0.1:3080`。
+- DSH Desktop: quit the app and reopen it.
+- `dsh web`: stop the original process, then run `dsh web`.
+- Browser access: opens `http://127.0.0.1:3080` by default.
 
-如果重新运行 `dsh web` 出现 `EADDRINUSE 127.0.0.1:3080`，说明已有 DSH 进程正在监听 3080 端口，并不表示插件安装失败。可以直接打开现有页面；若确实要重启，先在原终端停止进程，或用下面的只读命令确认监听者，再正常结束对应 PID：
+If re-running `dsh web` produces `EADDRINUSE 127.0.0.1:3080`, a DSH process is already listening on port 3080; this does not mean the plugin failed to install. You can open the existing page directly; if you really do need to restart, stop the process in the original terminal first, or use the read-only command below to confirm the listener, then end the corresponding PID normally:
 
 ```bash
 lsof -nP -iTCP:3080 -sTCP:LISTEN
@@ -41,117 +41,117 @@ kill <PID>
 dsh web
 ```
 
-不要同时启动两个 `dsh web` 实例。
+Do not start two `dsh web` instances at the same time.
 
-## 2. 打开 MCP连接器
+## 2. Open the MCP Connector
 
-重启后，可以用以下任一方式打开：
+After restarting, you can open it in any of these ways:
 
-- 在 DSH 左侧主导航点击“MCP连接器”。DSH `>=0.2.0-rc.2` 使用宿主原生面板行，展开、折叠、选中态和键盘操作均与其他主导航一致；DSH `0.1.x` 自动使用左侧底部兼容入口。
-- 打开“设置 → 插件 → 插件配置 → MCP连接器”，展开卡片并点击“打开 MCP连接器”。该按钮直接复用同一个连接器弹框，不要求侧边栏入口可见；关闭弹框后仍回到设置页。
+- Click "MCP Connector" in DSH's left main navigation. DSH `>=0.2.0-rc.2` uses the host's native panel row, so expand, collapse, selected state and keyboard operation behave like the other main navigation entries; DSH `0.1.x` automatically uses the compatibility entry at the bottom left.
+- Open "Settings → Plugins → Plugin configuration → MCP Connector", expand the card and click "Open MCP Connector". This button reuses the same connector modal directly and does not require the sidebar entry to be visible; closing the modal still returns to the settings page.
 
-如需腾出侧边栏空间，可在同一配置卡片关闭“在侧边栏显示 MCP连接器”。该偏好作用于当前 DSH profile，并在重启后保留；它只隐藏快捷入口，不停用插件、已连接 MCP Server 或工具。如果隐藏时正在原生连接器面板，页面会先返回当前会话；之后仍可从该配置卡片直接打开弹框，或重新开启入口。旧版 DSH 没有 Settings 能力时，插件保持入口可见，不会因设置功能进入 Safe Mode。
+To free up sidebar space, you can turn off "Show MCP Connector in sidebar" on the same configuration card. This preference applies to the current DSH profile and persists after a restart; it only hides the shortcut entry and does not disable the plugin, connected MCP Servers or tools. If you hide it while the native connector panel is open, the page first returns to the current session; afterwards you can still open the modal directly from that configuration card, or re-enable the entry. On older DSH versions without Settings capability, the plugin keeps the entry visible and does not enter Safe Mode because of this feature.
 
-页面顶部提供：
+The top of the page provides:
 
-- **市场**：浏览内置目录与远程 Registry 合并后的公开连接器，页签徽标显示当前卡片数。
-- **已安装**：查看已经保存到本机的连接，页签徽标显示连接数。
-- **搜索**：按名称、服务商、简介和标签查找。
-- **添加连接**：导入 JSON、手动配置 HTTP/stdio，或从市场描述 URL 安装。
-- **版本与更新提示**：标题旁显示当前插件版本，版本检查不依赖安装所用的插件市场。检测到 npm 有新版本且当前宿主存在兼容 Update Provider 时，可在当前页面一键更新并查看进度、失败原因和可用回滚。DSH Market API v1 是当前首个 Provider；无可用 Provider 时显示“查看更新方式”，宿主没有插件市场分区时会打开 npm 安装说明。
-- **刷新连接器目录**：重新拉取 Registry 卡片，并更新连接健康状态；该操作不会升级 MCP连接器插件本身。
+- **Market**: browse the public connectors merged from the built-in catalog and the remote Registry; the tab badge shows the current card count.
+- **Installed**: view connections already saved on this machine; the tab badge shows the connection count.
+- **Search**: find by name, provider, summary and tags.
+- **Add connection**: import JSON, manually configure HTTP/stdio, or install from a Market descriptor URL.
+- **Version and update notice**: the current plugin version is shown next to the title, and the version check does not depend on the plugin marketplace used for installation. When a newer npm version is detected and the current host has a compatible Update Provider, you can update in one click on the current page and view progress, failure causes and available rollback. The DSH Market API v1 is the current first Provider; when no Provider is available, it shows "View update options", and when the host has no plugin marketplace section it opens the npm installation instructions.
+- **Refresh connector catalog**: re-fetches the Registry cards and updates connection health status; this action does not upgrade the MCP Connector plugin itself.
 
-## 3. 浏览市场与分类
+## 3. Browse the Market and categories
 
-默认选择“全部”，页面按以下顺序分章节展示：推荐、企业数据、金融投资、法律合规、开发工具、办公协作、调研分析、设计创意、效率工具、其他。
+"Recommended" is selected by default, and the page displays sections in this order: Recommended, Enterprise Data, Finance & Investment, Legal & Compliance, Developer Tools, Office & Collaboration, Research & Analysis, Design & Creative, Productivity, Other.
 
-- 推荐位固定为 6 张精选卡片；其他卡片仍会出现在各自业务分类中。
-- 每个章节先展示最多 4 张卡片；数量更多时可点击“查看全部”，再点击“收起”。
-- 点击某个分类标签后，只展示该分类的全部卡片。
-- 分类栏固定在页面 Header 内，滚动卡片时不会遮挡内容；切换到“已安装”后自动隐藏。
-- 远程目录不可用时，插件会继续使用上次缓存或随包内置目录，不影响已有连接。
+- The featured slot is fixed at 6 curated cards; other cards still appear in their own business categories.
+- Each section shows at most 4 cards first; when there are more, click "View all N" and then "Collapse".
+- After clicking a category tab, only all cards of that category are shown.
+- The category bar is fixed inside the page header and never covers content while scrolling cards; it hides automatically after switching to "Installed".
+- When the remote catalog is unavailable, the plugin keeps using the last cache or the bundled catalog, which does not affect existing connections.
 
-## 4. 连接市场卡片
+## 4. Connect a Market card
 
-新连接提交前会显示目标范围。已在 DSH 中选择 Workspace 时默认为“当前项目”；选择“所有项目（全局）”后，当前 profile 的每个 Workspace 都会继承该连接。OAuth、免密、Bearer/API Key、JSON 导入和 URL 安装使用相同规则。
+Before a new connection is submitted, the target scope is displayed. When a Workspace is already selected in DSH the default is "Current project"; after choosing "All projects (global)", every Workspace in the current profile inherits that connection. OAuth, no-auth, Bearer/API Key, JSON import and URL installation all use the same rule.
 
-卡片右侧按钮会根据鉴权方式和当前状态变化：
+The button on the right of a card changes according to the auth method and current status:
 
-| 按钮/状态 | 含义 | 操作 |
+| Button/status | Meaning | Action |
 |---|---|---|
-| `连接` | OAuth 或免密连接器尚未连接 | 点击后按页面提示完成授权或连通性检查 |
-| `配置` | 需要 Bearer Token 或 API Key | 录入服务商签发的凭据并验证 |
-| `需重新授权` | OAuth 授权过期、被撤销或不可用 | 点击后重新完成 OAuth 授权 |
-| `自动重试中` | OAuth Token 刷新遇到网络或服务端暂时故障 | 无需重新授权；保持 DSH 运行，插件会按退避策略自动恢复 |
-| `状态未知` | 本机已有配置，但本进程尚未观察到可用性检查结果；不代表健康或异常 | 点击“刷新连接器目录”或进入详情检查 |
-| `已连接` | 最近一次健康检查通过 | 可直接在会话中使用对应 MCP 工具 |
-| `部分异常` / `连接异常` | 一个或多个 Server 未通过检查 | 打开详情查看提示，核对网络、权限和服务状态 |
+| `Connect` | An OAuth or no-auth connector is not yet connected | Click it and complete authorization or the connectivity check as the page instructs |
+| `Configure` | A bearer token or API key is required | Enter the provider-issued credential and validate it |
+| `Reauthorize` | The OAuth authorization has expired, been revoked or is unavailable | Click it to complete OAuth authorization again |
+| `Auto-retrying` | The OAuth token refresh hit a temporary network or server-side failure | No reauthorization is needed; keep DSH running and the plugin recovers automatically with a backoff policy |
+| `Status unknown` | A local configuration exists, but this process has not yet observed an availability check result; it does not mean healthy or error | Click "Refresh connector catalog" or open the details to check |
+| `Connected` | The most recent health check passed | The corresponding MCP tools can be used directly in a session |
+| `Partially degraded` / `Connection error` | One or more servers failed the check | Open the details to read the hint, and check the network, permissions and service status |
 
-Bearer/API Key 连接器会先执行 MCP `initialize` 验证。所有 Server 通过后，凭据才会保存并出现在“已安装”中；验证失败不会写入新凭据。
+Bearer/API Key connectors first run an MCP `initialize` validation. Only after all servers pass are the credentials saved and shown in "Installed"; a failed validation never writes new credentials.
 
-stdio 市场卡片也可能显示一个或多个凭据字段，例如 API Token、区域或租户标识。卡片目录只声明字段名称及其环境变量映射；提交后，真实值仅保存到 DSH 本机连接记录，并由插件注入该 stdio 进程的 `env`。市场、状态页和日志不会返回这些值。插件会等待 Host 完成首次 MCP 初始化与工具同步后再保存连接；失败或超时不会增加已安装数量，卡片也不会提前显示“已连接”。
+stdio Market cards may also show one or more credential fields, such as an API token, region or tenant identifier. The card catalog only declares the field names and their environment variable mapping; after submitting, the real values are stored only in the DSH local connection record and injected by the plugin into that stdio process's `env`. The Market, status pages and logs never return these values. The plugin waits for the Host to finish the first MCP initialization and tool sync before saving the connection; a failure or timeout does not increase the installed count, and the card never shows "Connected" early.
 
-“企查查·智能文档解析”会通过一次 OAuth 一键授权配置两个互不冲突的入口：
+"Qichacha · Intelligent Document Parsing" configures two non-conflicting entry points through a single one-click OAuth authorization:
 
-- `qcc-document`：远程 Agent，解析公网可访问的在线文档或图片 URL。
-- `qcc-document-mcp`：本地 Agent，通过 `npx -y qcc-document-mcp` 读取对话中上传、粘贴或指定路径的本机文件，自动上传并提交解析；要求 Node.js 20+。
+- `qcc-document`: a remote Agent that parses online document or image URLs reachable from the public internet.
+- `qcc-document-mcp`: a local Agent that reads local files uploaded or pasted in the conversation, or at a specified path, via `npx -y qcc-document-mcp`, then uploads them automatically and submits the parse; requires Node.js 20+.
 
-点击“连接”后只需完成一次企查查 OAuth 授权，插件会同时注册上述两个 Server。OAuth Access Token 仅在运行时注入本地子进程的 `QCC_DOCUMENT_AUTHORIZATION`，不会写入市场目录、连接记录、页面状态或日志；Token 刷新后本地 Agent 会自动更新。从旧版手工 API Key 配置升级时，点击“升级一键授权”，只有在新授权与两个 Server 都启动成功后才会原子替换旧连接；失败会保留原配置。
+After clicking "Connect" you only need to complete one Qichacha OAuth authorization, and the plugin registers both servers above. The OAuth access token is injected only at runtime as `QCC_DOCUMENT_AUTHORIZATION` in the local subprocess, and is never written to the Market catalog, connection records, page status or logs; after the token refreshes, the local Agent updates automatically. When upgrading from an older manual API Key configuration, click "Upgrade to one-click authorization"; the old connection is atomically replaced only after the new authorization and both servers have started successfully; a failure keeps the original configuration.
 
-旧版本只配置过远程入口时，卡片会显示“升级一键授权”，不会把单入口误报为完整连接。完成 OAuth 后，插件先验证两个 Server，再原子保存；任一入口失败都不会留下半套配置。
+If an older version only configured the remote entry point, the card shows "Upgrade to one-click authorization" and never misreports a single entry point as a complete connection. After OAuth completes, the plugin first validates both servers and then saves atomically; if either entry point fails, no half-configuration is left behind.
 
-OAuth 一键连接要求服务商支持标准 OAuth 2.1/PKCE 和公开元数据发现。动态客户端注册既支持无需客户端密钥的 `none`，也支持服务商签发密钥的 `client_secret_post` 与 `client_secret_basic`。客户端密钥仅与 OAuth Grant 一同保存在 DSH 本机，用于换取、刷新和撤销 Token；插件不会要求用户把 OAuth Token 或客户端密钥复制到聊天中。如服务商在动态客户端注册阶段返回 HTTP 403，页面会明确提示“客户端注册被拒绝、尚未进入浏览器授权”；这通常需要服务商审核或登记客户端，重试用户授权无法绕过。
+One-click OAuth connection requires the provider to support standard OAuth 2.1/PKCE and public metadata discovery. Dynamic client registration supports both `none` without a client secret and the provider-issued `client_secret_post` and `client_secret_basic`. The client secret is stored only on the DSH machine together with the OAuth grant, and is used to exchange, refresh and revoke tokens; the plugin never asks users to paste OAuth tokens or client secrets into chats. If the provider returns HTTP 403 during dynamic client registration, the page clearly states "client registration rejected, browser authorization not yet reached"; this usually requires provider review or client registration, and retrying user authorization cannot bypass it.
 
-当市场描述声明 `grantSharing: "issuer"` 时，同一账号下相同 issuer、scope 和客户端鉴权方式的卡片共享一组 Grant。首次授权仍只启用用户点击的卡片；之后连接同组卡片会直接复用现有授权，不再重复打开 OAuth 页面。升级时会验证并自动归并旧版本留下的同 issuer 多份 Grant；Desktop 与 `dsh web` 并发时，插件使用跨进程锁串行轮换，并从每 Grant 独立原子日志读取最新 Token，避免 DSH 整文件 storage 的旧进程快照覆盖新凭据。网络、OAuth 元数据发现或服务端 5xx 等暂时故障只进入“自动重试中”；确认 journal 中也没有更新 Token，且明确收到 Refresh Token/客户端失效错误时，才进入“需重新授权”。
+When the Market descriptor declares `grantSharing: "issuer"`, cards under the same account with the same issuer, scope and client authentication method share one set of grants. The first authorization still enables only the card the user clicked; afterwards, connecting a card in the same group reuses the existing authorization directly without reopening the OAuth page. On upgrade it validates and automatically merges the duplicate same-issuer grants left by older versions; when Desktop and `dsh web` run concurrently, the plugin uses a cross-process lock to serialize rotation and reads the latest token from each grant's independent atomic journal, avoiding a stale process snapshot of DSH's whole-file storage overwriting new credentials. Temporary failures such as network problems, OAuth metadata discovery errors or server-side 5xx only enter "Auto-retrying"; it enters "Reauthorize" only after confirming that the journal also has no newer token and that an explicit refresh-token/client-invalidation error was received.
 
-## 5. 查看详情、Prompt 与工具
+## 5. View details, prompts and tools
 
-点击卡片或“详情”可打开连接器详情：
+Click a card or "Details" to open the connector details:
 
-1. 阅读服务说明、鉴权方式、数据范围与可能产生的费用或副作用。
-2. 在“试试这样用”中选择示例 Prompt；带变量的模板会先要求补齐查询主体等信息。
-3. 展开“工具详情”查看 Server 数量、工具名称与描述，并可搜索工具；点击“参数详情”可按需查看输入 schema；连接后还可按 Connection、Server、Tool 设置治理规则。
-4. 点击“去试试”或 Prompt 的发送按钮，在当前工作区创建或复用空白会话并写入草稿。
+1. Read the service description, auth method, data scope and any possible cost or side effects.
+2. Choose a sample prompt in "Try it like this"; templates with variables will first ask you to fill in the query subject and similar details.
+3. Expand "Tool details" to see the number of servers, tool names and descriptions, and to search tools; click "Parameter details" to view the input schema on demand; after connecting you can also set governance rules by Connection, Server and Tool.
+4. Click "Try it" or the prompt's send button to create or reuse a blank session in the current workspace and write the draft.
 
-连接成功后，工具按 `mcp__<serverName>__*` 前缀提供给模型。工具清单来自服务端，实际数量会随服务商权限和版本变化。成功发现后，插件会在当前 profile 保存一份安全裁剪的工具元数据；实时发现失败时仍显示这份“最后成功缓存”，但保持连接失败/未知状态并标注缓存时间，超过 24 小时还会显示陈旧提示。详情与“已安装”列表会展示最近一次诊断的阶段、稳定错误码、说明、建议动作和最近成功时间。
+After a successful connection, tools are provided to the model with the `mcp__<serverName>__*` prefix. The tool list comes from the server, and the actual count varies with provider permissions and versions. After a successful discovery, the plugin saves a safely truncated copy of the tool metadata in the current profile; when live discovery fails it still shows this "last successful cache", but keeps the connection in a failed/unknown state and labels the cache time, and shows a stale notice beyond 24 hours. The details and "Installed" list show the most recent diagnostic stage, stable error code, description, suggested action and last success time.
 
-对话中可用 `mcp_connector_tool_search` 按名称、标题或描述搜索缓存，再用 `mcp_connector_tool_detail` 精确读取某个工具的参数 schema。两者只用于发现，不代理或执行 MCP 调用。
+In a conversation you can use `mcp_connector_tool_search` to search the cache by name, title or description, then `mcp_connector_tool_detail` to read a specific tool's parameter schema precisely. Both are for discovery only; they do not proxy or execute MCP calls.
 
-### 5.1 工具工作台：统一查找工具
+### 5.1 Tool workbench: unified tool search
 
-1. 先连接所需 MCP 服务，打开顶部“工具”页；工具发现会在后台进行，无需先打开每个连接的详情。
-2. 输入工具名或描述中的关键词。精确工具名优先；同名工具仍可能来自不同连接，请核对来源。
-3. 使用“连接”“服务”“发现状态”筛选缩小范围，点击“清除筛选”恢复。结果按页展示。
-4. 工具页搜索的是已启用且当前范围可见连接的成功缓存，不是市场中所有未安装连接器的工具。未选择 Workspace 时仅显示全局连接。
-5. 没有结果时先清除筛选，并确认连接已启用、范围正确且至少成功发现过一次；首次发现可能仍在等待。
+1. Connect the required MCP services first and open the "Tools" page at the top; tool discovery runs in the background, and you do not need to open each connection's details first.
+2. Enter a keyword from the tool name or description. An exact tool name takes priority; tools with the same name may still come from different connections, so check the source.
+3. Use the "Connection", "Service" and "Discovery status" filters to narrow the range, and click "Clear filters" to restore. Results are shown page by page.
+4. The Tools page searches the successful cache of enabled connections visible in the current scope, not the tools of every uninstalled connector in the Market. Without a selected Workspace, only global connections are shown.
+5. When there are no results, clear the filters first and confirm the connection is enabled, the scope is correct and at least one discovery has succeeded; the first discovery may still be pending.
 
-### 5.2 查看参数与来源
+### 5.2 Inspect parameters and sources
 
-每条结果展示连接器、连接、服务、最近发现状态和最后成功缓存时间。点击“参数详情”查看类型、必填、说明、枚举和嵌套结构。
+Each result shows the connector, connection, service, most recent discovery status and last successful cache time. Click "Parameter details" to see the type, required flag, description, enums and nested structure.
 
-复杂引用、组合规则或过大结构会提示摘要限制；可展开“原始 Schema（安全缓存）”继续查看。这里的原始 Schema 仍是安全裁剪后的缓存，不含被移除的默认值或示例，也不保证保留超限字段。此页不执行工具。
+Complex references, composition rules or oversized structures will show a summary-limit notice; expand "Raw schema (safe cache)" to keep reading. The raw schema here is still a safely truncated cache; it excludes removed defaults or examples and does not guarantee that over-limit fields are preserved. This page never executes tools.
 
-### 5.3 发现状态和最后成功缓存
+### 5.3 Discovery status and the last successful cache
 
-“尚未发现”表示还没有当前发现状态；“Host 状态未知”表示宿主状态无法确认；“最近发现成功/失败”仅代表最近一次发现，不保证随后调用的结果。
+"Not discovered yet" means there is no current discovery status yet; "Host status unknown" means the host status cannot be confirmed; "Last discovery succeeded/failed" only refers to the most recent discovery and does not guarantee the result of a subsequent call.
 
-失败时已有的最后成功工具缓存仍可查看；超过 24 小时会提示陈旧。没有成功记录则无法提供缓存，成功空列表也不代表故障。连接改配、停用或断开可能使原结果不再可见。
+On failure, the existing last successful tool cache is still viewable; beyond 24 hours a stale notice appears. Without a success record there is no cache to provide, and a successful empty list does not indicate a fault. Reconfiguring, disabling or disconnecting a connection may make the original results no longer visible.
 
-### 5.4 检查连接与重新发现
+### 5.4 Check the connection and rediscover
 
-展开“连接状态与故障处理”，先阅读阶段与建议。“检查连接”执行该连接的健康检查；“重新发现工具”重新获取该连接的工具元数据。两者不是目标工具试运行，也不保证自动修复。
+Expand "Connection status and troubleshooting" and read the stage and suggestion first. "Check connection" runs a health check for that connection; "Rediscover tools" re-fetches that connection's tool metadata. Neither is a dry run of the target tool, and neither guarantees an automatic fix.
 
-同连接进行中的操作会合并，频繁操作有冷却；工具页操作不能绕过有效限流等待。鉴权失败请到“已安装”页更新凭据或重新授权。
+Concurrent operations on the same connection are merged and frequent operations have a cooldown; actions on the Tools page cannot bypass a valid rate-limit wait. For an authentication failure, go to the "Installed" page to update credentials or reauthorize.
 
-健康后台发现五分钟后到期；页面保持 SSE 连接时按调度检查到期项，普通故障指数退避，限流结合 `Retry-After` 等待，鉴权失败暂停自动重试。不要把“刷新工具视图”误认为强制访问所有服务，它只刷新缓存视图。
+Healthy background discovery expires after five minutes; while the page keeps its SSE connection, due items are checked on schedule, ordinary faults use exponential backoff, rate limiting honours `Retry-After`, and authentication failures pause automatic retries. Do not mistake "Refresh the tools view" for forcing a visit to every service — it only refreshes the cached view.
 
-## 6. 添加自定义连接
+## 6. Add a custom connection
 
-点击“＋ 添加连接”后有三种方式。
+After clicking "＋ Add connection" there are three options.
 
-### 6.1 导入 `mcpServers` JSON
+### 6.1 Import `mcpServers` JSON
 
-支持 Streamable HTTP、历史 `sse` 配置和 stdio。历史 `sse` 会自动归一为 Streamable HTTP。
+Streamable HTTP, historical `sse` configurations and stdio are supported. Historical `sse` is automatically normalized to Streamable HTTP.
 
 ```json
 {
@@ -175,153 +175,153 @@ OAuth 一键连接要求服务商支持标准 OAuth 2.1/PKCE 和公开元数据�
 }
 ```
 
-导入前请把示例占位符替换为自己的值。凭据只应在本机导入，不要把含真实 Token、API Key、密码或 Cookie 的 JSON 提交到 Git、Issue 或聊天。导入私有 IP 的明文 HTTP 端点时，必须在对应 Server 条目中显式增加 `"allowInsecurePrivateNetwork": true`；该标记会跟随脱敏导出保留。
+Replace the sample placeholders with your own values before importing. Credentials should only be imported locally; do not commit JSON containing real tokens, API keys, passwords or cookies to Git, issues or chats. When importing a cleartext HTTP endpoint on a private IP, you must explicitly add `"allowInsecurePrivateNetwork": true` in the corresponding server entry; this flag is preserved in redacted exports.
 
-### 6.2 手动配置
+### 6.2 Manual setup
 
-- **HTTP**：填写名称、HTTPS MCP URL、可选 Header 和传输方式。回环 HTTP 可直接使用；局域网私有 IP 明文 HTTP 需勾选风险确认。
-- **stdio**：填写本机命令、参数、环境变量和可选工作目录。
+- **HTTP**: enter a name, an HTTPS MCP URL, optional headers and the transport. Loopback HTTP can be used directly; cleartext HTTP on a private LAN IP requires ticking the risk confirmation.
+- **stdio**: enter the local command, arguments, environment variables and an optional working directory.
 
-stdio 进程由 `@deepseek-ai/dsh-mcp-client` 管理，插件透传 `command`、`args`、`env`、`cwd`，并等待 Host 完成首次 MCP 初始化和工具同步。stdio 会以当前用户权限启动本机进程，只运行你信任的软件包和命令。手动 HTTP 配置也会在保存前执行 `initialize` 校验；验证失败时表单内容仍保留，且不会生成无效连接记录。
+stdio processes are managed by `@deepseek-ai/dsh-mcp-client`; the plugin passes through `command`, `args`, `env` and `cwd`, and waits for the Host to complete the first MCP initialization and tool sync. stdio starts the local process with the current user's permissions and only runs packages and commands you trust. Manual HTTP configuration also runs an `initialize` validation before saving; when validation fails, the form contents are retained and no invalid connection record is created.
 
-### 6.3 市场卡片 URL
+### 6.3 Market card URL
 
-填写一个公开的 HTTPS Connector Descriptor URL。描述文件只能携带公开元数据，不应包含任何凭据；安装后仍由用户在本机完成 OAuth 或录入 Key。
+Enter a public HTTPS Connector Descriptor URL. The descriptor may only carry public metadata and must not contain any credentials; after installation the user still completes OAuth or enters a key locally.
 
-## 7. 管理已安装连接
+## 7. Manage installed connections
 
-在“已安装”中可以：
+In "Installed" you can:
 
-- 查看连接状态和 Server 数量；
-- 编辑自定义或 JSON 导入连接的标准化 JSON，并保存后重新连接；
-- 修改自定义或 JSON 导入连接的显示名，无需先停用连接；
-- 选择“始终注入”或“按会话启用（实验）”；
-- 启用或停用连接；
-- 重新授权 OAuth，或重新录入 Token/API Key；
-- 执行健康检查；
-- 断开连接并删除该连接的本机配置。
+- view connection status and the number of servers;
+- edit the normalized JSON of a custom or JSON-imported connection and reconnect after saving;
+- change the display name of a custom or JSON-imported connection without disabling it first;
+- choose "Always inject" or "Enable per session (experimental)";
+- enable or disable a connection;
+- reauthorize OAuth, or re-enter a token/API key;
+- run a health check;
+- disconnect and delete that connection's local configuration.
 
-OAuth 断开时，插件会尽力调用服务商的撤销端点；无撤销端点时仍会删除 DSH 本机授权记录。连接状态发生变化后，可点击“刷新连接器目录”重新检查。
+When disconnecting OAuth, the plugin makes a best effort to call the provider's revocation endpoint; when there is no revocation endpoint it still deletes the DSH local authorization record. After the connection status changes, you can click "Refresh connector catalog" to re-check.
 
-“重命名”只修改用户看到的连接显示名，不会改变 connection key、`serverName`、`mcp__<serverName>__*` 工具前缀、连接范围、凭据或启停状态，也不会重新挂载 MCP Server。市场连接器的名称继续由公共目录维护。
+"Rename" only changes the connection display name the user sees; it does not change the connection key, `serverName`, the `mcp__<serverName>__*` tool prefix, the connection scope, the credentials or the enabled state, and it does not remount the MCP Server. The names of Market connectors continue to be maintained by the public catalog.
 
-“编辑配置”会展示一条标准化的 `connections` JSON，不保证恢复最初导入文本的排版、注释或字段别名。`serverName` 与 connection key 共同标识现有连接，因此不能在此修改；如需新的工具前缀，请另建连接。Token/API Key、Header/env 值、stdio 参数、本地目录以及可能含凭据的 URL 不会返回页面，而是显示 `<KEEP_EXISTING>`：保留标记表示继续使用本机原值，替换标记可录入新值，删除对应字段可清除该项。
+"Edit configuration" shows one normalized `connections` JSON; it does not guarantee restoring the layout, comments or field aliases of the originally imported text. `serverName` together with the connection key identifies the existing connection, so neither can be changed here; if you need a new tool prefix, create a separate connection. Tokens/API keys, header/env values, stdio arguments, local directories and URLs that may contain credentials are never returned to the page and instead appear as `<KEEP_EXISTING>`: the keep marker means continue using the original local value, the replace marker lets you enter a new value, and deleting the field clears the entry.
 
-启用中的连接点击“保存并重连”后会先验证新配置、创建快照，再原子更新 Host 与本机记录；任何校验、启动或持久化失败都会保留原连接。停用连接可以保存配置但仍保持停用。连接范围和启停状态均不会被 JSON 静默改变。市场/OAuth 连接继续使用卡片的“配置”或“重新授权”流程。
+For an enabled connection, clicking "Save and reconnect" first validates the new configuration and creates a snapshot, then atomically updates the Host and the local record; any validation, startup or persistence failure keeps the original connection. A disabled connection can save its configuration while remaining disabled. Neither the connection scope nor the enabled state is silently changed by JSON. Market/OAuth connections continue to use the card's "Configure" or "Reauthorize" flow.
 
-### 7.1 配置备份与恢复
+### 7.1 Config backup and restore
 
-“已安装”页的“配置备份”提供两种互补能力：
+"Config backup" on the "Installed" page provides two complementary capabilities:
 
-- **脱敏导出**：复制或下载可携带 JSON。Token/API Key、静态 Header/env 值、stdio 参数、本地目录以及可能含凭据的 URL 会变成明确占位符；目标设备导入前必须重填。OAuth 只导出连接引用，必须从市场重新授权。
-- **本机快照**：连接、配置、导入、重命名、启停或断开前自动保存变更范围，也可手动创建；最多保留 20 个。恢复前可查看将恢复和移除的 key，恢复过程中任一 Server 或持久化步骤失败会整体回到恢复前状态。
+- **Redacted export**: copy or download portable JSON. Tokens/API keys, static header/env values, stdio arguments, local directories and URLs that may contain credentials become explicit placeholders that must be refilled on the target device before importing. OAuth exports only a connection reference and must be reauthorized from the Market.
+- **Local snapshot**: automatically saves the changed scope before connecting, configuring, importing, renaming, enabling/disabling or disconnecting, and can also be created manually; at most 20 are kept. Before restoring you can review which keys will be restored and removed, and if any server or persistence step fails during the restore, everything rolls back to the pre-restore state.
 
-快照可能包含用于原样恢复的本机凭据，因此只保存在当前 profile 的 storage domain，不会通过 Web API、对话工具或日志原样返回。断开并撤销 OAuth 后，快照不能重建服务端 Grant，会明确要求重新授权。完整边界见[配置备份说明](CONFIG-BACKUP.md)。
+A snapshot may contain local credentials used for an exact restore, so it is stored only in the current profile's storage domain and is never returned verbatim through the Web API, conversation tools or logs. After disconnecting and revoking OAuth, a snapshot cannot recreate the server-side grant and explicitly requires reauthorization. For the full boundaries, see the [config backup notes](CONFIG-BACKUP.md).
 
-### 7.2 Connection、Server 与 Tool 治理
+### 7.2 Connection, Server and Tool governance
 
-连接器详情的“工具详情”支持三层 allow/deny：Tool 规则优先于 Server，Server 优先于 Connection，没有显式规则时默认允许。“已安装”页的连接停用是物理下线状态，不能被下级 allow 覆盖。
+"Tool details" in the connector details supports three layers of allow/deny: a Tool rule takes priority over a Server, a Server takes priority over a Connection, and without an explicit rule the default is allow. Disabling a connection on the "Installed" page is a physical offline state and cannot be overridden by a lower-level allow.
 
-每次修改先显示 Host 已观察工具的影响预览，确认后按 revision 提交；策略并发变化时会要求重新预览。最近 20 个 revision 可回滚。拒绝规则同时通过 DSH Host 的逐 Agent restriction 和最终执行 Guard 生效，不是只隐藏页面。
+Every change first shows a preview of the impact on Host-observed tools, and is submitted by revision once confirmed; if the policy changes concurrently you will be asked to preview again. The most recent 20 revisions can be rolled back. Deny rules take effect through the DSH Host's per-Agent restrictions and the final execution Guard, not merely by hiding the page.
 
-工具尚未被 Host 观察时显示“未观察”，不会报告为“已禁用”或“健康”。工具删除或重命名后，旧规则标记为失效但不会误伤新工具；新注册工具自动继承 Server/Connection 规则。完整语义见[治理说明](TOOL-GOVERNANCE.md)。
+When a tool has not yet been observed by the Host it shows "Not observed", and is never reported as "Disabled" or "Healthy". After a tool is deleted or renamed, the old rules are marked invalid but do not harm the new tool; newly registered tools automatically inherit the Server/Connection rules. For the full semantics, see the [governance notes](TOOL-GOVERNANCE.md).
 
-### 7.3 按会话启用工具
+### 7.3 Enabling tools per session
 
-“始终注入”是旧连接的兼容默认值。当某条连接工具较多、但只在少数会话使用时，可在“已安装”将它改为“按会话启用（实验）”。连接和 OAuth/API Key 生命周期保持不变，Host 只是在每个 Agent 中默认隐藏该连接的业务工具。
+"Always inject" is the backwards-compatible default for existing connections. When a connection has many tools but is only used in a few sessions, you can switch it to "Enable per session (experimental)" in "Installed". The connection and OAuth/API key lifecycles are unchanged; the Host simply hides that connection's business tools by default in each Agent.
 
-在对话中，`mcp_connector_session_tools` 先使用 `search` 定位精确 `publicName`，再使用 `preview-activate` 获取 revision；只有用户明确指定后才可 `activate`。默认 TTL 为 30 分钟，可设为 1–30 分钟；激活从下一次模型推理边界生效。会话结束、过期、插件重启或 DSH 重启后均回到休眠状态。
+In a conversation, `mcp_connector_session_tools` first uses `search` to locate the exact `publicName`, then uses `preview-activate` to get the revision, and `activate` is only allowed after the user explicitly specifies it. The default TTL is 30 minutes and can be set to 1–30 minutes; activation takes effect from the next model inference boundary. After the session ends, the TTL expires, the plugin restarts or DSH restarts, it returns to the dormant state.
 
-会话激活不能覆盖 project/global 范围、Connection/Server/Tool `deny`、连接停用或 Host 审批。插件不会保存会话正文、触发词或工具参数，当前版本也不根据关键词自动激活。完整流程与排障见[按会话启用说明](SESSION-TOOL-INJECTION.md)。
+Session activation cannot override project/global scope, Connection/Server/Tool `deny`, connection disabling or Host approval. The plugin does not store session text, trigger words or tool parameters, and the current version does not auto-activate based on keywords. For the full flow and troubleshooting, see the [enable per session notes](SESSION-TOOL-INJECTION.md).
 
-### 7.4 project/global 连接范围
+### 7.4 project/global connection scope
 
-“已安装”会在每条连接上显示范围。点击“范围”可选择：
+"Installed" shows the scope on each connection. Click "Scope" to choose:
 
-- “复制”增加当前项目或全局绑定，保留原范围；
-- “移动”用所选范围替换原绑定。
+- "Copy" adds a binding for the current project or globally, keeping the original scope;
+- "Move" replaces the original binding with the selected scope.
 
-提交前页面会列出受影响的 Server 和已知工具。确认后才按 revision 写入，可使用“回滚上次范围变更”恢复。范围变更不复制 Token、API Key 或 OAuth Grant；不同连接管理同一 `serverName` 时会拒绝静默覆盖。完整执行和失败边界见 [project/global 作用域](CONNECTION-SCOPES.md)。
+Before submitting, the page lists the affected servers and known tools. It is only written by revision after confirmation, and "Roll back the last scope change" can restore it. A scope change does not copy tokens, API keys or OAuth grants; when different connections manage the same `serverName`, silent overwrite is refused. For the full behaviour and failure boundaries, see [project/global scopes](CONNECTION-SCOPES.md).
 
-### 7.5 如何理解连接诊断
+### 7.5 How to understand connection diagnostics
 
-诊断结果只陈述插件实际观察到的事实，不把“配置已保存”当作“连接健康”：
+Diagnostic results only state facts the plugin actually observed, and never treat "configuration saved" as "connection healthy":
 
-- `unknown` / `状态未知`：没有本进程内的主动检查结果，或 Host 暂时无法提供 stdio 工具注册状态。它既不是成功，也不是失败。
-- `stage` / `stageLabel`：失败或未知发生在哪一层，例如鉴权、网络与传输、MCP 初始化、Host 启动、Host 状态观测或工具发现。
-- `code`：便于 Issue、自动化和排障引用的稳定代码，例如 `auth`、`dns`、`protocol`、`host-tools-pending`。
-- `message` / `action`：当前观察结果与下一步建议；不会包含 Token、API Key 或 OAuth 客户端密钥。
-- `checkedAt`：最近一次观察时间；`lastSuccessfulAt`：当前插件进程内最近一次确认可用的时间。插件重启后，如果还没有重新检查，时间为空并回到“状态未知”，不会沿用未经本进程验证的健康状态。
+- `unknown` / `Status unknown`: there is no active check result within this process, or the Host temporarily cannot provide the stdio tool registration status. It is neither success nor failure.
+- `stage` / `stageLabel`: which layer the failure or unknown state occurred in, for example auth, network and transport, MCP initialization, Host startup, Host status observation or tool discovery.
+- `code`: a stable code that is convenient to reference in issues, automation and troubleshooting, for example `auth`, `dns`, `protocol`, `host-tools-pending`.
+- `message` / `action`: the current observation and the suggested next step; they never contain tokens, API keys or OAuth client secrets.
+- `checkedAt`: the most recent observation time; `lastSuccessfulAt`: the most recent time confirmed available within the current plugin process. After the plugin restarts, if it has not re-checked yet, the time is empty and the state returns to "Status unknown" — an unverified healthy state from a previous process is never carried over.
 
-多 Server 连接器只要部分 Server 可用、部分异常，就显示“部分异常”；每条已安装连接仍保留自己的诊断。OAuth Access Token 暂时刷新失败显示“自动重试中”，只有明确的永久授权失败才显示“需重新授权”。
+For a multi-server connector, as long as some servers are available and some are degraded, it shows "Partially degraded"; each installed connection still keeps its own diagnostics. A temporary OAuth access token refresh failure shows "Auto-retrying"; only an explicit permanent authorization failure shows "Reauthorize".
 
-## 8. 兼容性、架构与责任边界
+## 8. Compatibility, architecture and responsibility boundaries
 
-### 8.1 兼容矩阵
+### 8.1 Compatibility matrix
 
-| 能力 | 当前支持 | 说明 |
+| Capability | Currently supported | Notes |
 |---|---|---|
-| DSH 宿主 | Desktop / `web` profile | Node.js 20+；连接保存于当前 profile |
-| 官方 MCP 客户端 | `@deepseek-ai/dsh-mcp-client` `^0.1.1-rc.2` | 负责连接生命周期、stdio 进程和工具注册 |
-| 传输 | Streamable HTTP、stdio | 历史 `sse` 配置归一为 Streamable HTTP |
-| 鉴权 | 无鉴权、Bearer、API Key、OAuth 2.0 PKCE | OAuth 支持动态客户端注册和 Grant 共享 |
-| 配置交换 | JSON 导入、脱敏导出、本机快照 | 占位符需重填；恢复原子执行；OAuth 撤销后需重新授权 |
-| 作用域 | Workspace project / profile global | 全局由所有 Workspace 继承；project-only 工具由 Host restriction + guard 强制隔离 |
-| 治理 | 连接生命周期启停；Connection / Server / Tool allow/deny | 规则作用于当前 profile，支持预览、revision 提交与回滚 |
-| 工具能力 | 工具清单与描述发现 | 暂无工具试运行按钮；不会绕过 Host 权限/审批链调用工具 |
+| DSH host | Desktop / `web` profile | Node.js 20+; connections are saved in the current profile |
+| Official MCP client | `@deepseek-ai/dsh-mcp-client` `^0.1.1-rc.2` | Owns the connection lifecycle, stdio processes and tool registration |
+| Transport | Streamable HTTP, stdio | Historical `sse` configurations are normalized to Streamable HTTP |
+| Auth | No auth, Bearer, API key, OAuth 2.0 PKCE | OAuth supports dynamic client registration and grant sharing |
+| Config exchange | JSON import, redacted export, local snapshot | Placeholders must be refilled; restore is atomic; revoked OAuth requires reauthorization |
+| Scope | Workspace project / profile global | Global is inherited by all Workspaces; project-only tools are isolated by Host restriction + guard |
+| Governance | Connection lifecycle enable/disable; Connection / Server / Tool allow/deny | Rules apply to the current profile and support preview, revision submission and rollback |
+| Tool capability | Tool list and description discovery | There is no tool dry-run button; tools are never invoked by bypassing the Host permission/approval chain |
 
-### 8.2 谁负责什么
+### 8.2 Who is responsible for what
 
-- **MCP连接器插件**：市场目录、配置录入、OAuth/Key 生命周期、连接记录、治理规则、向官方 MCP 客户端创建条目、只读健康检查、工具发现和诊断展示。
-- **DSH Host 与 `@deepseek-ai/dsh-mcp-client`**：HTTP/stdio 传输、stdio 子进程环境清理和启动、MCP 生命周期、工具注册、正式工具执行，以及宿主提供的权限与审批流程。
-- **MCP Server / 服务商**：工具定义、账户权限、配额、费用、数据新鲜度和实际副作用。
-- **用户与模型**：确认调用目的、参数与影响；涉及写入、付费、发布、删除等副作用时，遵循 Host 的确认/审批流程。
+- **The MCP Connector plugin**: the Market catalog, configuration entry, OAuth/key lifecycles, connection records, governance rules, creating entries in the official MCP client, read-only health checks, tool discovery and diagnostic display.
+- **The DSH Host and `@deepseek-ai/dsh-mcp-client`**: HTTP/stdio transport, stdio subprocess environment cleanup and startup, the MCP lifecycle, tool registration, real tool execution, and the permission and approval flows provided by the host.
+- **The MCP Server / service provider**: tool definitions, account permissions, quotas, cost, data freshness and actual side effects.
+- **The user and the model**: confirming the purpose, parameters and impact of a call; for side effects such as writing, paying, publishing or deleting, follow the Host's confirmation/approval flow.
 
-插件不会自行重写官方 MCP transport，也不会从浏览器直接调用 MCP 工具。DSH 已提供正式 ToolRuntime 执行、取消、超时和一次性审批契约；但详情页直接试运行仍缺少 out-of-turn 用户编排入口，官方 MCP bridge 也未传递工具副作用 annotations。安全门槛与版本证据见[工具试运行设计](TOOL-TRIAL-DESIGN.md)。
+The plugin never rewrites the official MCP transport and never calls MCP tools directly from the browser. DSH already provides formal ToolRuntime execution, cancellation, timeout and one-time approval contracts; however, a direct dry run on the details page still lacks an out-of-turn user orchestration entry point, and the official MCP bridge does not pass through tool side-effect annotations. For the security thresholds and version evidence, see the [tool trial design](TOOL-TRIAL-DESIGN.md).
 
-### 8.3 当前限制
+### 8.3 Current limitations
 
-- 健康摘要和最近成功时间目前只保留在插件进程内；重启后先显示“状态未知”，直至重新检查。
-- HTTP 工具清单使用只读 MCP `tools/list` 发现；stdio 工具清单读取 Host 已注册工具。Host 不提供可观测状态时只能报告未知。
-- 最后成功工具缓存只保存名称、标题、描述和安全裁剪后的输入 schema，不保存调用参数、调用结果、原始错误或凭据；断开、修改连接配置或恢复快照会清理相关缓存。
-- 页面实时状态使用同源 SSE，事件只发送变化类别、序号和时间；断线时浏览器按 EventSource 规则自动重连，页面重新可见时主动刷新一次。
-- 连接凭据、快照、治理规则和作用域历史都存储在当前 profile；project/global 不跨 profile 同步。
-- Workspace 被删除后，原 project-only 绑定保持 fail closed，需手动移动到当前项目或全局。
-- 连接级停用可逆；断开会删除本机连接，并在授权不再共享时尽力撤销 OAuth。非 OAuth 配置可用断开前快照恢复；已撤销的 OAuth 必须重新授权。
+- The health summary and last success time are currently kept only inside the plugin process; after a restart it shows "Status unknown" until re-checked.
+- The HTTP tool list is discovered with the read-only MCP `tools/list`; the stdio tool list reads the tools already registered by the Host. When the Host provides no observable status, only unknown can be reported.
+- The last successful tool cache only stores names, titles, descriptions and a safely truncated input schema; it never stores call parameters, call results, raw errors or credentials; disconnecting, changing the connection configuration or restoring a snapshot clears the related cache.
+- Live page status uses same-origin SSE, and events only send the change category, sequence number and time; on a dropped connection the browser reconnects automatically per EventSource rules, and the page actively refreshes once when it becomes visible again.
+- Connection credentials, snapshots, governance rules and scope history are all stored in the current profile; project/global do not sync across profiles.
+- After a Workspace is deleted, the original project-only binding stays fail-closed and must be moved manually to the current project or globally.
+- Connection-level disabling is reversible; disconnecting deletes the local connection and makes a best effort to revoke OAuth when the authorization is no longer shared. Non-OAuth configurations can be restored from a pre-disconnect snapshot; revoked OAuth must be reauthorized.
 
-## 9. 安全边界
+## 9. Security boundaries
 
-- 凭据仅保存在 DSH storage domain，不进入市场目录、Git 仓库或对话历史。
-- stdio 目录只能声明凭据字段与 env 映射，不能给出真实值；Registry 探针不会执行目录中的本地命令。
-- OAuth 动态注册返回的 `client_secret` 不出现在目录、连接状态或日志中；断开连接时与 Refresh Token 一起尽力撤销并删除本机记录。
-- 外部地址默认必须使用 HTTPS，本机回环地址允许 HTTP。用户自建连接只有在显式确认风险后，才允许 RFC1918 IPv4（`10/8`、`172.16/12`、`192.168/16`）或 RFC4193 IPv6 ULA 字面量使用明文 HTTP。域名、公网 HTTP、链路本地与云元数据地址仍拒绝；开启后凭据和工具数据可能被同网段监听或篡改。
-- Registry 健康探针不持有用户凭据，也绝不会执行目录里的 stdio 命令。
-- 连接器能看到的数据和能执行的操作取决于你授予的账户权限；优先使用最小权限 Token/API Key。
-- 生成、付费、写入、发布、删除、停止任务等有副作用的工具，应在执行前再次确认参数和影响。
+- Credentials are stored only in the DSH storage domain, and never enter the Market catalog, Git repositories or chat history.
+- A stdio catalog can only declare credential fields and env mappings, never real values; the Registry probe never executes local commands from the catalog.
+- The `client_secret` returned by OAuth dynamic registration never appears in the catalog, connection status or logs; when disconnecting, it is revoked together with the refresh token on a best effort and the local record is deleted.
+- External addresses must use HTTPS by default, and HTTP is allowed for local loopback addresses. A user's own connection may use cleartext HTTP with an RFC1918 IPv4 literal (`10/8`, `172.16/12`, `192.168/16`) or an RFC4193 IPv6 ULA literal only after explicitly confirming the risk. Domains, public HTTP, link-local and cloud metadata addresses are still refused; once enabled, credentials and tool data may be sniffed or tampered with on the same network segment.
+- The Registry health probe holds no user credentials and never executes stdio commands from the catalog.
+- The data the connector can see and the operations it can perform depend on the account permissions you grant; prefer a least-privilege token/API key.
+- For side-effecting tools such as generating, paying, writing, publishing, deleting or stopping tasks, confirm the parameters and impact again before execution.
 
-## 10. 常见问题
+## 10. FAQ
 
-### 安装后没有入口，或界面仍是旧版
+### No entry point after install, or the UI is still the old version
 
-确认安装目标是 `web` profile，然后完全退出并重启 DSH。浏览器强制刷新只能刷新静态页面，不能替换仍在运行的旧插件进程。
+Confirm that the install target is the `web` profile, then fully quit and restart DSH. A browser hard refresh only reloads static pages and cannot replace the old plugin process that is still running.
 
-### 市场里没有最新卡片
+### The latest cards are missing from the Market
 
-点击“刷新连接器目录”。如果远程 Registry 暂时不可用，页面会继续显示缓存或内置目录；稍后恢复网络再刷新即可。
+Click "Refresh connector catalog". If the remote Registry is temporarily unavailable, the page keeps showing the cache or bundled catalog; restore the network and refresh later.
 
-### Token/API Key 一直验证失败
+### A token/API key keeps failing validation
 
-核对凭据是否过期、是否具备目标 MCP Server 权限、Header 类型是否正确，以及服务商是否要求单独开通或付费。失败的候选凭据不会覆盖本机原有可用配置。
+Check whether the credential has expired, whether it has permission for the target MCP Server, whether the header type is correct, and whether the provider requires separate activation or payment. A failed candidate credential never overwrites the existing working local configuration.
 
-### stdio 启动失败
+### stdio fails to start
 
-页面会在有限时间内结束等待，并区分命令不存在、进程退出、初始化失败或启动超时。先在终端确认命令本身可执行、软件包可信、Node/运行时版本满足要求，并检查 `cwd`、参数和环境变量；随后查看 Host 日志并点击“重新检查”。不要把本机凭据写入公开 Registry descriptor。
+The page ends its wait within a bounded time and distinguishes a missing command, a process exit, an initialization failure or a startup timeout. First confirm in the terminal that the command itself is executable, the package is trusted and the Node/runtime version meets the requirement, and check `cwd`, arguments and environment variables; then look at the Host logs and click "Recheck". Do not write local credentials into a public Registry descriptor.
 
-#### 1. 确认命令与运行环境
+#### 1. Confirm the command and runtime environment
 
-stdio 会以当前用户权限在 DSH 所在机器上启动进程，只运行你信任的软件包和命令。先从连接配置记录 `command`、每个 `args` 元素、`cwd` 和所需环境变量名称；不要复制或公开凭据值。以下使用 Node 演示，其他运行时请替换为实际命令。
+stdio starts the process on the machine running DSH with the current user's permissions, and only runs packages and commands you trust. First record `command`, each `args` element, `cwd` and the required environment variable names from the connection configuration; do not copy or publish credential values. The example below uses Node — replace it with the actual command for other runtimes.
 
-macOS / Linux（终端）：
+macOS / Linux (terminal):
 
 ```sh
 command -v node
@@ -329,7 +329,7 @@ node --version
 pwd
 ```
 
-Windows（PowerShell）：
+Windows (PowerShell):
 
 ```powershell
 Get-Command node -All | Select-Object CommandType, Source
@@ -337,13 +337,13 @@ node --version
 Get-Location
 ```
 
-若找不到命令，先按可信软件的官方安装说明配置运行时，再重新打开终端和 DSH。核对服务要求的运行时版本。终端能找到命令，不代表桌面启动的 DSH 具有相同的 `PATH`；版本管理器、别名或 shell 函数也不一定对 DSH 可见。此时可将 `command` 改为本机实际可执行文件的绝对路径，不要填终端别名。
+If the command cannot be found, configure the runtime according to the trusted software's official installation instructions first, then reopen the terminal and DSH. Verify the runtime version the service requires. A terminal finding the command does not mean a desktop-launched DSH has the same `PATH`; version managers, aliases or shell functions may not be visible to DSH either. In that case you can change `command` to the absolute path of the actual local executable — do not put a terminal alias in it.
 
-#### 2. 在相同目录复现同一 command + args
+#### 2. Reproduce the same command + args in the same directory
 
-以下路径是占位符，必须替换为本机已安装、可信服务的实际路径；示例不下载软件、不需要账号或凭据。假设配置的 `command` 是 Node 的绝对路径，`args` 仅包含服务入口文件的绝对路径：
+The paths below are placeholders and must be replaced with the real paths of a trusted service installed on your machine; the example downloads no software and needs no account or credentials. Assume the configured `command` is the absolute path of Node and `args` contains only the absolute path of the service entry file:
 
-macOS / Linux：
+macOS / Linux:
 
 ```sh
 (
@@ -354,7 +354,7 @@ macOS / Linux：
 )
 ```
 
-Windows PowerShell：
+Windows PowerShell:
 
 ```powershell
 Push-Location -LiteralPath 'C:\path\to\trusted-server' -ErrorAction Stop
@@ -366,37 +366,37 @@ try {
 }
 ```
 
-按自己的配置逐项替换参数，不要把整条终端命令塞进 `command`，也不要把所有参数合并成一个字符串。带空格的路径在终端中需要引用；在配置的 `command` 或 `args` 字符串值中保留路径本身，不额外添加 shell 引号。只有服务依赖相对路径时，才需特别核对配置中的 `cwd` 是否存在、可访问且符合服务要求。所需环境变量应在本机安全配置，不要在反馈中粘贴完整 `env` 或包含密钥的命令行。
+Replace the arguments one by one according to your own configuration. Do not paste a whole terminal command into `command`, and do not merge all arguments into a single string. Paths containing spaces need quoting in the terminal; keep the path itself in the configured `command` or `args` string value without adding extra shell quotes. Only when the service depends on relative paths do you need to specifically verify that `cwd` in the configuration exists, is accessible and meets the service's requirements. Required environment variables should be configured securely on your machine; do not paste the complete `env` or a command line containing secrets into feedback.
 
-Windows 下 `.cmd` / `.bat` 是脚本包装器，不等同于可直接启动的 `.exe`；PowerShell 中能运行包装器，不代表无 shell 的进程启动也能运行它。若诊断指向包装器，按该服务文档选择原生可执行文件，或用 Node 运行其可信 JavaScript 入口。不要通过设置 `shell: true`、关闭安全检查或执行策略绕过来解决。
+On Windows, `.cmd` / `.bat` are script wrappers and are not equivalent to a directly launchable `.exe`; being able to run a wrapper in PowerShell does not mean a shell-less process launch can run it too. If the diagnostics point at a wrapper, choose a native executable according to that service's documentation, or run its trusted JavaScript entry with Node. Do not work around this by setting `shell: true`, disabling security checks or execution policies.
 
-#### 3. 根据结果定位，再回到页面复查
+#### 3. Locate the cause from the results, then re-check on the page
 
-| 观察结果 | 排查方法 |
+| Observed result | How to investigate |
 |---|---|
-| 命令不存在 / 路径不存在 | 核对运行时安装、绝对路径及 DSH 进程的 `PATH`；同时确认 `cwd` 存在 |
-| 进程立即非零退出 | 查看本地标准错误输出和退出码，核对参数、依赖、运行时版本、文件权限及所需环境变量 |
-| 进程退出码为 0，但没有工具 | 确认启动的是 MCP stdio 服务，不是版本查询、安装器或一次性命令；退出成功不代表 MCP 初始化成功 |
-| 进程一直等待、没有输出 | stdio 服务可能正在等待客户端输入，这是正常可能性；终端启动只能验证进程，不证明 MCP 握手成功。可按 Ctrl+C 结束，再由 DSH 发起检查 |
-| 终端能启动，页面初始化失败 / 超时 | 对比 DSH 的 command/args/env/cwd，查看 Host 日志；确认服务支持 MCP stdio，且普通日志未污染用于协议通信的 stdout（日志应写 stderr） |
+| Command not found / path not found | Check the runtime installation, the absolute path and the DSH process's `PATH`; also confirm that `cwd` exists |
+| Process exits non-zero immediately | Inspect local stderr and the exit code, and check the arguments, dependencies, runtime version, file permissions and required environment variables |
+| Process exit code is 0, but no tools | Confirm that what started is an MCP stdio service, not a version query, installer or one-off command; a successful exit does not mean MCP initialization succeeded |
+| The process waits forever with no output | The stdio service may be waiting for client input, which is a normal possibility; starting it from the terminal only verifies the process and does not prove the MCP handshake succeeded. You can end it with Ctrl+C and then let DSH run the check |
+| It starts in the terminal but initialization fails/times out on the page | Compare DSH's command/args/env/cwd and check the Host logs; confirm the service supports MCP stdio and that ordinary logs do not pollute the stdout used for protocol traffic (logs should go to stderr) |
 
-修正后重新启动 DSH（如变更了进程环境），在连接详情点击“重新检查”，确认工具发现结果。反馈时只提交版本、脱敏后的诊断代码、退出码和必要日志；不要上传 Token、API Key、完整环境变量或个人路径。
+Restart DSH after fixing it (if the process environment changed), click "Recheck" on the connection details and confirm the tool discovery result. When reporting, submit only versions, redacted diagnostic codes, exit codes and necessary logs; never upload tokens, API keys, complete environment variables or personal paths.
 
-### 为什么显示“状态未知”
+### Why does it show "Status unknown"
 
-这表示插件没有足够证据确认健康或失败，常见于 DSH 刚重启、尚未执行健康检查，或当前 Host 无法读取 stdio 工具注册状态。点击“刷新连接器目录”或进入详情重新检查；若仍为未知，根据诊断的 `code` 和建议查看 Host 日志或升级 Host。不要把“状态未知”理解为“已连接”。
+This means the plugin lacks sufficient evidence to confirm health or failure, which is common right after DSH restarts before a health check runs, or when the current Host cannot read the stdio tool registration status. Click "Refresh connector catalog" or open the details to re-check; if it is still unknown, follow the diagnostic `code` and suggestion to check the Host logs or upgrade the Host. Do not read "Status unknown" as "Connected".
 
-### 如何按诊断代码排查
+### How to troubleshoot by diagnostic code
 
-| 代码示例 | 先检查什么 |
+| Code example | Check first |
 |---|---|
-| `auth` | Token/API Key 是否过期、账号是否有目标 Server 权限；OAuth 是否需要重新授权 |
-| `refresh` | 网络、OAuth 服务状态和自动重试时间；不要立即重复授权 |
-| `dns` / `tls` / `timeout` / `http` | DNS、代理、VPN/专线、证书、IP 白名单、URL 和服务状态 |
-| `protocol` | URL 是否为兼容的 MCP Streamable HTTP 端点 |
-| `process-not-found` / `process-exit` / `startup` | 本地运行时、command/args/env/cwd、退出码和 Host 日志 |
-| `host-tools-pending` / `host-status-unavailable` | Host 是否完成工具注册、Host 版本是否支持状态读取 |
+| `auth` | Whether the token/API key has expired, whether the account has permission for the target Server, and whether OAuth needs reauthorization |
+| `refresh` | The network, the OAuth service status and the automatic retry time; do not reauthorize repeatedly immediately |
+| `dns` / `tls` / `timeout` / `http` | DNS, proxy, VPN/dedicated line, certificates, IP allowlist, URL and service status |
+| `protocol` | Whether the URL is a compatible MCP Streamable HTTP endpoint |
+| `process-not-found` / `process-exit` / `startup` | The local runtime, command/args/env/cwd, exit code and Host logs |
+| `host-tools-pending` / `host-status-unavailable` | Whether the Host completed tool registration and whether the Host version supports status reading |
 
-### 如何反馈问题
+### How to report a problem
 
-提交 [GitHub Issue](https://github.com/duhu2000/dsh-mcp-connector/issues) 时，请提供 DSH 版本、插件版本、连接器名称、复现步骤和已脱敏的错误信息。不要附带 Token、API Key、Cookie、授权码或包含真实凭据的配置文件。
+When submitting a [GitHub Issue](https://github.com/duhu2000/dsh-mcp-connector/issues), please provide the DSH version, plugin version, connector name, reproduction steps and redacted error information. Do not attach tokens, API keys, cookies, authorization codes or configuration files containing real credentials.

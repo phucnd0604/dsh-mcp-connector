@@ -1,40 +1,40 @@
-# 市场发布后搜索与排序验收
+# Post-Publish Search and Ranking Acceptance
 
-## 验收前置条件
+## Acceptance Prerequisites
 
-- [ ] 用户已明确批准对外提交。
-- [ ] 描述 PR 已合并，awesome-dsh-plugin 已完成站点重建。
-- [ ] 中文与英文目标条目均显示新文案。
-- [ ] 浏览器使用无登录、无历史筛选影响的页面；分类为“全部”，关闭“可从 npm 安装”和“近 7 天新增”。
-- [ ] 排序下拉框保持默认“下载量”。
+- [ ] The user has explicitly approved external submission.
+- [ ] The description PR is merged and awesome-dsh-plugin has completed its site rebuild.
+- [ ] Both the Chinese and English target entries show the new copy.
+- [ ] The browser uses a page with no login and no leftover filter effects; the category is "All", and "Installable from npm" and "Added in the last 7 days" are both off.
+- [ ] The sort dropdown remains at the default "Downloads".
 
-## 当前基线（提交前）
+## Current Baseline (Before Submission)
 
-核对时间：`2026-09-12T21:56:47+08:00`。
+Verification time: `2026-09-12T21:56:47+08:00`.
 
-| 查询 | 页面 | 当前命中数 | 目标位置 | 当前状态 |
+| Query | Page | Current matches | Target position | Current status |
 |---|---|---:|---:|---|
-| `mcp` | 中文 | 171 | 2 | 通过 |
-| `MCP连接器` | 中文 | 0 | — | 未通过；现有文案只有带空格写法 |
-| `连接器` | 中文 | 5 | 1 | 通过 |
-| `mcp server` | 中文 | 17 | 1 | 通过 |
-| `连接管理` | 中文 | 1 | 1 | 通过 |
-| 清空查询 | 中文 | 3,561 | 62 | 已记录；不设名次目标 |
+| `mcp` | Chinese | 171 | 2 | Pass |
+| `MCP连接器` | Chinese | 0 | — | Fail; the existing copy only has the spaced form |
+| `连接器` | Chinese | 5 | 1 | Pass |
+| `mcp server` | Chinese | 17 | 1 | Pass |
+| `连接管理` | Chinese | 1 | 1 | Pass |
+| Cleared query | Chinese | 3,561 | 62 | Recorded; no rank target set |
 
-补充：英文页 `mcp` 为第 2/174，`mcp server` 为第 1/67。
+Supplemental: on the English page `mcp` is 2nd of 174 and `mcp server` is 1st of 67.
 
-## 发布后执行步骤
+## Post-Publish Execution Steps
 
-对每个查询分别执行，不复用旧结果计数：
+Execute each query separately, and do not reuse old result counts:
 
-1. 打开中文首页 `https://awesome-dsh-plugin.com/zh/`。
-2. 确认分类“全部”、默认排序“下载量”、两个附加筛选均关闭。
-3. 输入查询，等待页面计数稳定。
-4. 确认 `duhu2000/dsh-mcp-connector` 卡片可见，记录“目标位置/全部命中数”。
-5. 打开目标详情页，确认中英文描述与已批准稿一致。
-6. 清空查询，记录默认位置、近 30 天下载量、Stars、市场显示版本和目录总数。
+1. Open the Chinese homepage `https://awesome-dsh-plugin.com/zh/`.
+2. Confirm the category "All", the default sort "Downloads", and that both additional filters are off.
+3. Enter the query and wait for the page count to stabilize.
+4. Confirm the `duhu2000/dsh-mcp-connector` card is visible and record "target position / total matches".
+5. Open the target detail page and confirm the Chinese and English descriptions match the approved copy.
+6. Clear the query and record the default position, downloads in the last 30 days, Stars, the version shown in the marketplace, and the total catalog count.
 
-建议使用可分享 URL：
+Recommended shareable URLs:
 
 - <https://awesome-dsh-plugin.com/zh/?q=mcp>
 - <https://awesome-dsh-plugin.com/zh/?q=MCP%E8%BF%9E%E6%8E%A5%E5%99%A8>
@@ -42,26 +42,25 @@
 - <https://awesome-dsh-plugin.com/zh/?q=mcp+server>
 - <https://awesome-dsh-plugin.com/zh/?q=%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86>
 
-## 发布后记录表
+## Post-Publish Record Table
 
-| 查询 | 验收时间 | 目录总数 | 命中数 | 目标位置 | 卡片可见 | 文案正确 | 备注 |
+| Query | Acceptance time | Total catalog entries | Matches | Target position | Card visible | Copy correct | Notes |
 |---|---|---:|---:|---:|---|---|---|
 | `mcp` | TODO | TODO | TODO | TODO | TODO | TODO | |
 | `MCP连接器` | TODO | TODO | TODO | TODO | TODO | TODO | |
 | `连接器` | TODO | TODO | TODO | TODO | TODO | TODO | |
 | `mcp server` | TODO | TODO | TODO | TODO | TODO | TODO | |
 | `连接管理` | TODO | TODO | TODO | TODO | TODO | TODO | |
-| 清空查询（默认） | TODO | TODO | 目录总数 | TODO | TODO | TODO | 只记录 |
+| Cleared query (default) | TODO | TODO | Total catalog entries | TODO | TODO | TODO | Recorded only |
 
-## 通过标准
+## Pass Criteria
 
-- 五组查询都能显示目标卡片；其中 `MCP连接器` 从当前 0 命中变为可见，是本次文案更新的主要搜索验收点。
-- 目标卡片名称、仓库链接、分类、安装命令和中英文描述均正确。
-- 默认排序仍为“下载量”；记录当时位置即可，不以高于第 62 或任何绝对名次作为通过条件。
-- 目标版本最终同步为 `0.2.45`。若描述已更新但版本仍为 `0.2.44`，标记“自动探测待同步”，不把它误判为描述 PR 失败，也不向 YAML 添加无效的 `version` 字段。
-- 若已更新产品仓库截图，市场详情页应按新顺序展示 `v0.2.45` 素材；截图同步失败与描述搜索失败分别记录。
+- All five query groups show the target card; among them, `MCP连接器` going from the current 0 matches to visible is the main search acceptance point of this copy update.
+- The target card's name, repository link, category, install command, and Chinese/English descriptions are all correct.
+- The default sort remains "Downloads"; just record the position at the time, and do not use a position above 62 or any absolute rank as a pass condition.
+- The target version eventually syncs to `0.2.45`. If the description is updated but the version is still `0.2.44`, mark it "auto-detection pending sync", do not misjudge it as a description PR failure, and do not add an invalid `version` field to the YAML.
+- If the product repository screenshots have been updated, the marketplace detail page should display the `v0.2.45` assets in the new order; a screenshot sync failure and a description search failure are recorded separately.
 
-## 排名解释模板
+## Ranking Explanation Template
 
-> 本次文案更新补齐了 `MCP连接器` 等自然搜索词，并使市场介绍反映 0.2.45 已发布能力。awesome-dsh-plugin 的搜索是字面子串过滤，默认顺序由近 30 天 npm 下载量及并列时的 Stars 决定；因此这里只报告实际可见位置，不承诺或归因默认排名提升。
-
+> This copy update completes natural search terms such as `MCP连接器` and makes the marketplace introduction reflect the capabilities released in 0.2.45. awesome-dsh-plugin's search is a literal substring filter, and the default order is determined by npm downloads in the last 30 days and, on ties, by Stars; therefore only the actually visible position is reported here, with no promise of or attribution for a default ranking improvement.

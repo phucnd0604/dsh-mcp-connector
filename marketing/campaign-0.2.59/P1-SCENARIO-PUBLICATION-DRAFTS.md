@@ -1,46 +1,46 @@
-# 0.2.59 首次成功场景推广草稿（未发布）
+# 0.2.59 First-Success Scenario Promotion Drafts (Not Published)
 
-状态：**仅本地/仓库草稿**。截至 2026-09-29，未指定发布平台、账号、审批人或发布日期；不得自动公开发布。正式入口统一指向 [`docs/tutorials/FIRST-SUCCESS-SCENARIOS.md`](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md)，安装与连接入口为 [`docs/tutorials/README.md`](../../docs/tutorials/README.md)。
+Status: **Local/repository draft only**. As of 2026-09-29, no publishing platform, account, approver, or publication date has been assigned; **do not publish publicly automatically**. The canonical entry point is [`docs/tutorials/FIRST-SUCCESS-SCENARIOS.md`](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md), and the install-and-connect entry point is [`docs/tutorials/README.md`](../../docs/tutorials/README.md).
 
-文案沿用可核验能力和核心检索短语：MCP连接器、MCP Server、连接管理、跨连接工具搜索、连接排障。不得承诺永久排名、全部账号可用、全部连接器免费或场景已真实调用成功。
+The copy reuses verifiable capabilities and core search phrases: MCP Connector, MCP Server, connection management, cross-connection tool search, connection troubleshooting. Do not promise permanent rankings, availability for every account, free access for every connector, or that any scenario has already been successfully invoked for real.
 
-## 草稿一：企业信息只读查询
+## Draft 1: Read-Only Company Information Lookup
 
-**标题**：用 MCP连接器完成一条可验收的企业信息只读查询
+**Title**: Complete one acceptable read-only company information lookup with the MCP Connector
 
-在 DeepSeek Harness 中连接 MCP Server 后，不要把“卡片已连接”当作业务成功。先在 MCP连接器核对连接范围和授权，再跨连接搜索企业工商只读工具，确认来源与参数，最后回到正常 DSH 会话，经 Host 审批查询一个公开测试主体。账号权限、组织开通和费用仍以服务商为准；没有真实调用证据时明确标记待验收。
+After connecting an MCP Server in DeepSeek Harness, do not treat "the card shows connected" as business success. First verify the connection scope and authorization in the MCP Connector, then search across connections for a read-only company registry tool, confirm the source and parameters, and finally return to a normal DSH session and query one public test entity with Host approval. Account permissions, organization provisioning, and cost remain the service provider's decision; without evidence of a real invocation, mark the result explicitly as pending acceptance.
 
-操作与证据清单：[企业信息只读查询场景包](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md#场景一企业信息只读查询)。遇到工具未发现或授权异常，按统一入口的连接管理与连接排障步骤恢复。
+Operations and evidence checklist: [Read-only company information lookup scenario pack](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md). If a tool is not found or authorization behaves abnormally, recover by following the connection management and connection troubleshooting steps in the canonical entry point.
 
-## 草稿二：本地智能文档解析
+## Draft 2: Local Intelligent Document Parsing
 
-**标题**：本地文件入口不等于数据不离开设备
+**Title**: A local file entry point does not mean the data stays on your device
 
-“企查查·智能文档解析”的本机 Agent 可读取对话上传或指定路径的文件，但文件随后会上传到企查查远程服务处理。验收时只使用合成或公开测试 PDF/图片，先确认 OAuth、Node/npm、本机与远程两个 Server、费用/配额，再经 DSH Host 审批执行只读解析。不要用客户文件、合同原件或个人信息试错。
+The local Agent of "Qichacha · Intelligent Document Parsing" can read files uploaded in the conversation or at a specified path, but the file is then uploaded to Qichacha's remote service for processing. For acceptance testing, use only synthetic or public test PDF/image files; first confirm OAuth, Node/npm, both the local and the remote Server, and cost/quota, then perform a read-only parsing run with DSH Host approval. Do not experiment with customer files, original contracts, or personal information.
 
-操作与证据清单：[本地智能文档解析场景包](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md#场景二本地智能文档解析)。MCP连接器负责连接管理、工具搜索和连接排障，不把本机入口宣传为纯离线处理。
+Operations and evidence checklist: [Local intelligent document parsing scenario pack](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md). The MCP Connector is responsible for connection management, tool search, and connection troubleshooting; do not advertise the local entry point as purely offline processing.
 
-## 草稿三：授权办公文档或日程查询
+## Draft 3: Authorized Office Document or Schedule Lookup
 
-**标题**：只在获授权测试范围内读取办公文档或日程
+**Title**: Read office documents or schedules only within an authorized test scope
 
-连接办公 MCP Server 后，先核对 OAuth/CLI 登录范围、组织管理员政策、数据去向和服务套餐，再跨连接搜索明确的只读文档或日历工具。首次验收只读取专用测试文档的标题/更新时间，或测试日历未来三条事件的标题/时间；不读取真实正文、附件、参会人，也不创建、修改、评论、邀请或删除。
+After connecting an office MCP Server, first verify the OAuth/CLI login scope, organization administrator policy, data destination, and service plan, then search across connections for an explicit read-only document or calendar tool. For first-time acceptance, read only the title/last-updated time of a dedicated test document, or the title/time of the next three events in a test calendar; do not read real body text, attachments, or attendees, and do not create, modify, comment on, invite to, or delete anything.
 
-操作与证据清单：[办公文档或日程查询场景包](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md#场景三授权办公文档或日程查询)。没有隔离测试租户或管理员批准时保持待验收，不用生产账号替代。
+Operations and evidence checklist: [Authorized office document or schedule lookup scenario pack](../../docs/tutorials/FIRST-SUCCESS-SCENARIOS.md). Without an isolated test tenant or administrator approval, keep the result pending acceptance; do not substitute a production account.
 
-## 发布前检查
+## Pre-Publication Checklist
 
-- [ ] 用户指定平台、账号、审批人、语种和发布日期。
-- [ ] 链接指向 `main` 上已合并的场景包，不指向未合并分支。
-- [ ] 对应场景的授权、费用、管理员前提和数据去向没有被删减。
-- [ ] 没有把目录卡片、工具缓存、截图/GIF 或 npm 下载写成真实调用成功。
-- [ ] 图片不含 Token、Cookie、授权码、真实账号/组织、客户数据或本机路径。
-- [ ] 如引用真实调用，附带脱敏证据和验证日期；没有证据则保留“待验收”。
+- [ ] The user has specified the platform, account, approver, language, and publication date.
+- [ ] Links point to the merged scenario pack on `main`, not to an unmerged branch.
+- [ ] The scenario's authorization, cost, administrator prerequisites, and data destination have not been trimmed.
+- [ ] No catalog card, tool cache, screenshot/GIF, or npm download has been written up as a real successful invocation.
+- [ ] Images contain no tokens, cookies, authorization codes, real accounts/organizations, customer data, or local machine paths.
+- [ ] If a real invocation is cited, redacted evidence and a verification date are attached; without evidence, "pending acceptance" is retained.
 
-## 复盘占位
+## Retrospective Placeholder
 
-| 检查点 | 日期 | 发布事实 | 场景调用证据 | 说明 |
+| Checkpoint | Date | Publication fact | Scenario invocation evidence | Notes |
 |---|---|---|---|---|
-| T0 | 2026-09-25 | 未发布这些草稿 | 无数据/待验收 | 0.2.59 发布与场景调用是不同验收层 |
-| T+7 | 2026-10-02 | 待到期后填写 | 待到期后填写 | 不提前填未来结果 |
-| T+14 | 2026-10-09 | 待到期后填写 | 待到期后填写 | 不从下载量推算连接或首次调用 |
+| T0 | 2026-09-25 | These drafts were not published | No data / pending acceptance | The 0.2.59 release and the scenario invocation are separate acceptance layers |
+| T+7 | 2026-10-02 | Fill in after the due date | Fill in after the due date | Do not fill in future results early |
+| T+14 | 2026-10-09 | Fill in after the due date | Fill in after the due date | Do not infer connections or first calls from download counts |

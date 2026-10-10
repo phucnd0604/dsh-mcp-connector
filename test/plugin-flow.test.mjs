@@ -153,7 +153,7 @@ test('configure 无顶层 anyOf 时仍拒绝缺失参数且不创建连接、快
       [{}, /name 必填/],
       [{ name: 'Missing URL' }, /invalid url/],
       [{ name: 'Missing command', transport: 'stdio' }, /command 必填/],
-      [{ connectorId: 'nonexistent-issue-89' }, /不存在/],
+      [{ connectorId: 'nonexistent-issue-89' }, /does not exist/],
     ]) {
       const result = await tools.defs.get('mcp_connector_configure').execute(args);
       assert.equal(result.ok, false);
@@ -1090,7 +1090,7 @@ test('检测到旧企查查 OAuth 插件仍启用时阻断同名 Server，避免
   assert.equal(result.ok, false);
   assert.equal(result.detail.kind, 'plugin-conflict');
   assert.equal(result.detail.pluginId, 'qcc-mcp-oauth');
-  assert.match(result.message, /停用旧插件并重启 DSH/);
+  assert.match(result.message, /disable the legacy plugin, restart DSH and then connect/);
   assert.ok(logs.some((line) => line.includes('legacy OAuth plugin conflict')));
   assert.equal(extractAuthorizeUrls(logs).length, 0);
 });
@@ -1139,7 +1139,7 @@ test('无鉴权 / api-key 连接器：none 直连、api-key 引导 configure', {
     assert.equal(status.detail.items[0].canRename, false);
     const rejectedRename = await tools.defs.get('mcp_connector_rename').execute({ key: 'none-demo-a', name: '本机别名' });
     assert.equal(rejectedRename.ok, false);
-    assert.match(rejectedRename.message, /市场连接器名称由目录维护/);
+    assert.match(rejectedRename.message, /maintained by the catalog/);
 
     const scopeTool = tools.defs.get('mcp_connector_scope');
     const preview = await scopeTool.execute({
@@ -1191,7 +1191,7 @@ test('无鉴权 / api-key 连接器：none 直连、api-key 引导 configure', {
       name: 'Duplicate server owner', serverName: 'none-a', url, authMode: 'none', scope: 'global',
     });
     assert.equal(duplicate.ok, false);
-    assert.match(duplicate.message, /不能静默覆盖/);
+    assert.match(duplicate.message, /instead of silently overwriting/);
 
     const restarted = makePluginContext({ shared });
     await apply(restarted.ctx, baseConfig({ connectors }));
@@ -1252,7 +1252,7 @@ test('自定义 configure + JSON 导入 + 无中断重命名 + 停用/断开', {
       key: 'json-vendor', json: JSON.stringify(rejectedDocument),
     });
     assert.equal(rejectedUpdate.ok, false);
-    assert.match(rejectedUpdate.message, /已保留原连接和配置/);
+    assert.match(rejectedUpdate.message, /original connection and configuration were preserved/);
     assert.equal(loader.entries.get('mcp-json-vendor').options.config.headers.Authorization, 'Bearer vtok');
 
     const updatedDocument = JSON.parse(editable.detail.json);
@@ -1318,7 +1318,7 @@ test('自定义 configure + JSON 导入 + 无中断重命名 + 停用/断开', {
     });
     assert.equal(disabledUpdate.ok, true, disabledUpdate.message);
     assert.equal(disabledUpdate.detail.enabled, false);
-    assert.match(disabledUpdate.message, /连接保持停用/);
+    assert.match(disabledUpdate.message, /the connection stays disabled/);
     assert.equal(loader.entries.get(`mcp-${key}`).disabled, true);
     assert.equal(loader.entries.get(`mcp-${key}`).options.config.headers['X-Mode'], 'disabled-edit');
 
@@ -1406,8 +1406,8 @@ test('手动 HTTP initialize 失败时不保存、不启用且保留可操作错
       authMode: 'none',
     });
     assert.equal(configured.ok, false);
-    assert.match(configured.message, /连接验证失败/);
-    assert.match(configured.message, /未保存连接/);
+    assert.match(configured.message, /Connection validation failed/);
+    assert.match(configured.message, /No connection was saved/);
     assert.equal(loader.entries.size, 0);
     assert.equal((await tools.defs.get('mcp_connector_status').execute({})).detail.items.length, 0);
     assert.equal([...tables.get('connections').entries()].length, 0);
@@ -1438,8 +1438,8 @@ test('stdio Host 启动失败时不保存且返回进程诊断', { timeout: 1500
   }, { signal: undefined });
   assert.equal(connected.ok, false);
   assert.equal(connected.detail.kind, 'process-not-found');
-  assert.match(connected.message, /启动命令不存在/);
-  assert.match(connected.message, /未保存连接/);
+  assert.match(connected.message, /launch command does not exist/);
+  assert.match(connected.message, /No connection was saved/);
   assert.equal(loader.entries.size, 0);
   assert.equal((await tools.defs.get('mcp_connector_status').execute({})).detail.items.length, 0);
   assert.equal([...tables.get('connections').entries()].length, 0);
@@ -1570,7 +1570,7 @@ test('stdio 市场凭据绑定：多字段只在本机注入 env，目录和状�
     credentialValues: { apiToken: 'stdio-local-secret' },
   });
   assert.equal(missing.ok, false);
-  assert.match(missing.message, /区域 必填/);
+  assert.match(missing.message, /区域 is required/);
   assert.equal([...tables.get('connections').entries()].length, 0);
 
   const configured = await tools.defs.get('mcp_connector_configure').execute({
@@ -1721,8 +1721,8 @@ test('市场凭据校验失败时不进入已安装、不持久化 Key', { timeo
   try {
     const configured = await tools.defs.get('mcp_connector_configure').execute({ connectorId: 'wind-invalid', bearerToken: 'wrong-key' });
     assert.equal(configured.ok, false);
-    assert.match(configured.message, /连接验证失败/);
-    assert.match(configured.message, /未保存连接/);
+    assert.match(configured.message, /Connection validation failed/);
+    assert.match(configured.message, /No connection was saved/);
     assert.equal(loader.entries.size, 0);
     assert.equal((await tools.defs.get('mcp_connector_status').execute({})).detail.items.length, 0);
     assert.equal([...tables.get('connections').entries()].length, 0);
@@ -1763,7 +1763,7 @@ test('多 Server 严格启动中途失败时原子回滚已创建条目与连接
       connectorId: 'batch-startup', bearerToken: 'batch-token',
     });
     assert.equal(configured.ok, false);
-    assert.match(configured.message, /未保存连接/);
+    assert.match(configured.message, /No connection was saved/);
     assert.equal(loader.entries.size, 0, '首个已创建 Host 条目必须回滚');
     assert.equal([...tables.get('connections').entries()].length, 0);
     assert.equal([...tables.get('snapshots').entries()].length, 0, '失败操作不保留无效的预变更快照');
@@ -1814,7 +1814,7 @@ test('多 Server 快照恢复中途失败时原子保留恢复前 Host 与持久
     failRestore = true;
     const restored = await tools.defs.get('mcp_connector_snapshot').execute({ action: 'restore', snapshotId: changed.detail.snapshotId });
     assert.equal(restored.ok, false);
-    assert.match(restored.message, /快照恢复失败/);
+    assert.match(restored.message, /Snapshot restore failed/);
     for (const id of ['mcp-batch-restore-first', 'mcp-batch-restore-second']) {
       assert.equal(loader.entries.get(id).options.config.headers.Authorization, 'Bearer new-token');
     }
@@ -1984,7 +1984,7 @@ test('未配置远程目录时刷新市场也返回正常用户提示', async ()
   await apply(ctx, baseConfig());
   const refreshed = await tools.defs.get('mcp_connector_refresh_catalog').execute({});
   assert.equal(refreshed.ok, true);
-  assert.match(refreshed.message, /^市场已刷新，共 \d+ 个连接器$/);
+  assert.match(refreshed.message, /^The Market has been refreshed; \d+ connectors in total$/);
   assert.doesNotMatch(refreshed.message, /catalogUrl|无远程目录/);
 });
 

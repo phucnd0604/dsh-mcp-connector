@@ -1,19 +1,19 @@
-# 把已有 `mcpServers` JSON 迁移到 MCP连接器
+# Migrating an existing `mcpServers` JSON to the MCP Connector
 
-返回[首次成功统一入口](README.md)。
+Back to the [first-success unified entry point](README.md).
 
-适用场景：你已经有其他客户端的 `mcpServers` 配置，希望在 DeepSeek Harness 中统一管理，而不是逐个重新录入。本文只演示受信任的 HTTP/stdio MCP Server；不会把普通 API 或 CLI 自动变成 MCP Server。
+When this applies: you already have another client's `mcpServers` configuration and want to manage it centrally in DeepSeek Harness instead of re-entering it one by one. This document only demonstrates trusted HTTP/stdio MCP Servers; it does not turn an ordinary API or CLI into an MCP server automatically.
 
-## 迁移前：先确认什么
+## Before migrating: what to confirm first
 
-1. 按统一入口安装 `dsh-mcp-connector`：默认布局下 DSH Desktop 与 `dsh web` 都从本机 `web` profile 加载插件。安装后只需重启正在使用的宿主；自定义 profile 布局以宿主配置为准。
-2. 核对原配置的每个 Server：远端 URL 是否为 MCP Streamable HTTP 端点；本地 `command`、`args` 和运行时是否可信且可在 **DSH 所在机器** 启动。
-3. 对每个连接决定“当前项目”或“所有项目（全局）”。全局仅指当前 DSH profile，并非跨 profile 共享。
-4. 在本机保存原配置的安全备份。不要把含 Token、API Key、Cookie 或本机路径的原文发到 Issue、聊天或公开仓库。
+1. Install `dsh-mcp-connector` following the unified entry point: in the default layout, both DSH Desktop and `dsh web` load the plugin from the local `web` profile. After installing, only restart the host you are using; for a customized profile layout, follow your host configuration.
+2. Check every server in the original configuration: whether the remote URL is an MCP Streamable HTTP endpoint; whether the local `command`, `args` and runtime are trusted and can start on **the machine that runs DSH**.
+3. Decide between "current project" and "all projects (global)" for each connection. "Global" only means the current DSH profile; it does not mean sharing across profiles.
+4. Save a safe backup of the original configuration locally. Do not post the raw text containing tokens, API keys, cookies or local paths into issues, chats or public repositories.
 
-## 导入一个最小示例
+## Importing a minimal example
 
-打开左侧“MCP连接器”（或“设置 → 插件 → 插件配置 → MCP连接器 → 打开 MCP连接器”），点击“＋ 添加连接 → 导入 JSON”，在本机粘贴：
+Open "MCP Connector" in the left sidebar (or "Settings → Plugins → Plugin configuration → MCP Connector → Open MCP Connector"), click "＋ Add connection → Import JSON", and paste this locally:
 
 ```json
 {
@@ -33,25 +33,25 @@
 }
 ```
 
-以上地址、路径和凭据都是占位示例，不能直接连接。请在本机替换为服务商文档给出的值；如没有可信的本地服务，可删除 `example-local`。历史 `sse` 会被归一为 Streamable HTTP，不代表任何旧 SSE 地址都兼容。外部 URL 默认应使用 HTTPS；对私有 IP 明文 HTTP 的显式风险确认及限制见[用户手册](../USER-GUIDE.md#61-导入-mcpservers-json)。
+The addresses, paths and credentials above are placeholder examples and cannot be connected to as-is. Replace them locally with the values from the provider's documentation; if you have no trusted local service, you can delete `example-local`. Historical `sse` is normalized to Streamable HTTP, which does not mean every old SSE address is compatible. External URLs should use HTTPS by default; for the explicit risk confirmation and the restrictions on cleartext HTTP to private IPs, see the [user guide](../USER-GUIDE.md).
 
-提交前确认目标范围，提交后在“已安装”查看连接。导入和启动失败时先看诊断；不要仅凭“列表里出现配置”判断可用。自定义 HTTP 会在保存前校验 MCP `initialize`；stdio 会等待 Host 首次初始化和工具同步。
+Confirm the target scope before submitting, and view the connection in "Installed" after submitting. If the import or startup fails, check the diagnostics first; never judge availability from "the configuration appears in the list" alone. A custom HTTP server is validated against the MCP `initialize` handshake before saving; stdio waits for the Host's first initialization and tool sync.
 
-## 首次成功使用的三个验收点
+## Three acceptance points for first successful use
 
-| 验收点 | 在哪里看 | 通过条件 |
+| Acceptance point | Where to look | Pass condition |
 |---|---|---|
-| 配置已保存 | “已安装”页 | 目标连接存在，名称与项目/全局范围正确 |
-| 工具已发现并注册 | “工具”页与 DSH Host | 当前范围内出现预期工具和来源；必要时检查 `mcp__<serverName>__*` 注册状态 |
-| 业务调用成功 | 正常 DSH 会话 | 经 Host 的权限/审批链调用一个服务商允许的只读工具，并得到可辨认结果 |
+| Configuration saved | The "Installed" page | The target connection exists, with the correct name and project/global scope |
+| Tool discovered and registered | The "Tools" page and the DSH Host | The expected tool and its source appear in the current scope; check the `mcp__<serverName>__*` registration status if necessary |
+| Business call succeeds | A normal DSH session | A read-only tool allowed by the provider is invoked through the Host permission/approval chain and returns a recognizable result |
 
-前两项不能替代第三项；工具缓存可查也不证明服务此刻能调用。涉及付费、写入、删除等操作时，不要用它们做首次验收。
+The first two cannot replace the third; the fact that a tool cache is queryable does not prove the service is callable right now. Do not use paid, write or delete operations for first-time acceptance.
 
-## 迁移后的维护与回退
+## Maintenance and rollback after migrating
 
-- 在“已安装 → 编辑配置”可修改**自定义或 JSON 导入**连接的标准化单连接 JSON，并保存重连。这里不会恢复原 JSON 的排版/注释，也不能改 connection key 或 `serverName`。敏感值以 `<KEEP_EXISTING>` 表示本机保留，不要把真实值复制到聊天。
-- “配置备份”可导出脱敏 JSON，迁移到另一设备前需在目标设备重填占位符；OAuth Grant 不能携带，须从市场重新授权。
-- 当前 profile 的本机快照可预览和恢复连接变更，但可能含凭据，不能作为可公开分享的备份；服务端已撤销的 OAuth Grant 不能靠快照恢复。
-- 如果原客户端仍在管理同一 `serverName`，先确认是否会双重连接或工具名冲突，再决定停用旧配置。不要在确认新路径通过第三个验收点之前删除原配置。
+- Under "Installed → Edit configuration" you can modify the normalized single-connection JSON of a **custom or JSON-imported** connection and save + reconnect. This does not restore the original JSON's layout/comments, and it cannot change the connection key or `serverName`. Sensitive values are represented by `<KEEP_EXISTING>`, meaning they are kept locally — do not paste real values into chats.
+- "Config backup" can export redacted JSON; before migrating to another device you must refill the placeholders on the target device. OAuth grants cannot be carried over and must be re-authorized from the Market.
+- Local snapshots of the current profile can preview and restore connection changes, but they may contain credentials and cannot be treated as a shareable public backup; OAuth grants revoked server-side cannot be restored from a snapshot.
+- If the original client still manages the same `serverName`, first confirm whether there will be double connections or tool name conflicts, then decide whether to disable the old configuration. Do not delete the original configuration before the new path has passed the third acceptance point.
 
-更多细节见[用户手册：JSON 导入](../USER-GUIDE.md#61-导入-mcpservers-json)、[配置备份与恢复](../CONFIG-BACKUP.md)和[连接作用域](../CONNECTION-SCOPES.md)。
+For more details, see the [user guide: JSON import](../USER-GUIDE.md), [config backup and restore](../CONFIG-BACKUP.md) and [connection scopes](../CONNECTION-SCOPES.md).

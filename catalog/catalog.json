@@ -3,19 +3,19 @@
   "connectors": [
     {
       "id": "qcc-company",
-      "name": "企查查·企业工商",
+      "name": "Qichacha · Business Registration",
       "vendor": "企查查 Qichacha",
       "icon": "/mcp-connector/ui/assets/qcc-logo.svg",
       "category": "企业数据",
-      "summary": "一站式企业工商 / 股权 / 经营信息查询",
-      "description": "覆盖工商注册、股东、实际控制人、对外投资、经营异常、行政处罚等企业全景数据，适用于尽调、风控、营销获客场景。",
-      "tags": ["工商", "风控", "尽调", "获客"],
+      "summary": "One-stop business registration / equity / operating data lookup",
+      "description": "Covers business registration, shareholders, actual controllers, outbound investments, abnormal operations, administrative penalties and other full-profile company data, for due diligence, risk control and customer acquisition scenarios.",
+      "tags": ["Business registration", "Risk control", "Due diligence", "Lead generation"],
       "published": true,
       "featured": true,
       "homepage": "https://open.qcc.com",
       "promptVariables": [
-        { "name": "company", "label": "企业名称", "default": "小米科技有限责任公司", "placeholder": "例如：小米科技有限责任公司", "required": true },
-        { "name": "person", "label": "人员姓名", "default": "雷军", "placeholder": "例如：雷军", "required": true }
+        { "name": "company", "label": "Company name", "default": "小米科技有限责任公司", "placeholder": "e.g. 小米科技有限责任公司", "required": true },
+        { "name": "person", "label": "Person name", "default": "雷军", "placeholder": "e.g. 雷军", "required": true }
       ],
       "auth": {
         "mode": "oauth2-pkce",
@@ -34,48 +34,48 @@
         { "serverKey": "executive", "url": "https://agent.qcc.com/mcp/executive/stream", "serverName": "qcc-executive", "transport": "streamable-http", "headers": {} }
       ],
       "prompts": [
-        { "title": "企业最新工商变更", "text": "查询 {{company}} 的最新工商变更记录", "server": "company" },
-        { "title": "股东结构", "text": "查询 {{company}} 的股东构成与出资信息", "server": "company" },
-        { "title": "实际控制人", "text": "查询 {{company}} 的实际控制人信息", "server": "company" },
-        { "title": "主要人员（高管团队）", "text": "查询 {{company}} 的主要人员信息", "server": "company" },
-        { "title": "对外投资", "text": "查询 {{company}} 的对外投资信息", "server": "company" },
-        { "title": "受益所有人识别", "text": "查询 {{company}} 的受益所有人识别信息", "server": "company" },
-        { "title": "企业风险全景扫描", "text": "对 {{company}} 做一次企业风险全景扫描", "server": "risk" },
-        { "title": "失信信息", "text": "查询 {{company}} 的失信信息", "server": "risk" },
-        { "title": "被执行人信息", "text": "查询 {{company}} 的被执行人信息", "server": "risk" },
-        { "title": "经营异常", "text": "查询 {{company}} 的经营异常信息", "server": "risk" },
-        { "title": "商标信息", "text": "查询 {{company}} 的商标信息", "server": "ipr" },
-        { "title": "专利信息", "text": "查询 {{company}} 的专利信息", "server": "ipr" },
-        { "title": "软件著作权", "text": "查询 {{company}} 的软件著作权信息", "server": "ipr" },
-        { "title": "作品著作权", "text": "查询 {{company}} 的作品著作权信息", "server": "ipr" },
-        { "title": "招投标信息", "text": "查询 {{company}} 的招投标信息", "server": "operation" },
-        { "title": "资质证书", "text": "查询 {{company}} 的资质证书信息", "server": "operation" },
-        { "title": "行政许可", "text": "查询 {{company}} 的行政许可信息", "server": "operation" },
-        { "title": "新闻舆情", "text": "查询 {{company}} 的新闻舆情信息", "server": "operation" },
-        { "title": "历史股东", "text": "查询 {{company}} 的历史股东变动记录", "server": "history" },
-        { "title": "历史法定代表人", "text": "查询 {{company}} 的历史法定代表人记录", "server": "history" },
-        { "title": "历史失信", "text": "查询 {{company}} 的历史失信记录（已移出名单）", "server": "history" },
-        { "title": "历史行政处罚", "text": "查询 {{company}} 的历史行政处罚记录", "server": "history" },
-        { "title": "董监高个人风险扫描", "text": "对 {{company}} 的董监高 {{person}} 做一次个人风险全景扫描", "server": "executive" },
-        { "title": "担任法定代表人", "text": "查询 {{company}} 的董监高 {{person}} 担任法定代表人的情况", "server": "executive" },
-        { "title": "在外任职", "text": "查询 {{company}} 的董监高 {{person}} 的在外任职信息", "server": "executive" },
-        { "title": "全部关联企业", "text": "查询 {{company}} 的董监高 {{person}} 的全部关联企业", "server": "executive" }
+        { "title": "Latest registration changes", "text": "Look up the latest business registration changes for {{company}}", "server": "company" },
+        { "title": "Shareholder structure", "text": "Look up the shareholder composition and capital contributions for {{company}}", "server": "company" },
+        { "title": "Actual controller", "text": "Look up the actual controller information for {{company}}", "server": "company" },
+        { "title": "Key personnel (executive team)", "text": "Look up the key personnel information for {{company}}", "server": "company" },
+        { "title": "Outbound investments", "text": "Look up the outbound investment information for {{company}}", "server": "company" },
+        { "title": "Beneficial owner identification", "text": "Look up the beneficial owner identification information for {{company}}", "server": "company" },
+        { "title": "Full company risk scan", "text": "Run a full risk scan for {{company}}", "server": "risk" },
+        { "title": "Dishonesty records", "text": "Look up the dishonesty records for {{company}}", "server": "risk" },
+        { "title": "Judgment debtor records", "text": "Look up the judgment debtor information for {{company}}", "server": "risk" },
+        { "title": "Abnormal business operations", "text": "Look up the abnormal business operation records for {{company}}", "server": "risk" },
+        { "title": "Trademarks", "text": "Look up the trademark information for {{company}}", "server": "ipr" },
+        { "title": "Patents", "text": "Look up the patent information for {{company}}", "server": "ipr" },
+        { "title": "Software copyrights", "text": "Look up the software copyright information for {{company}}", "server": "ipr" },
+        { "title": "Works copyrights", "text": "Look up the copyrighted works information for {{company}}", "server": "ipr" },
+        { "title": "Tender and bidding", "text": "Look up the tender and bidding information for {{company}}", "server": "operation" },
+        { "title": "Qualification certificates", "text": "Look up the qualification certificate information for {{company}}", "server": "operation" },
+        { "title": "Administrative licenses", "text": "Look up the administrative licensing information for {{company}}", "server": "operation" },
+        { "title": "News and public opinion", "text": "Look up the news and public opinion information for {{company}}", "server": "operation" },
+        { "title": "Historical shareholders", "text": "Look up the historical shareholder change records for {{company}}", "server": "history" },
+        { "title": "Historical legal representatives", "text": "Look up the historical legal representative records for {{company}}", "server": "history" },
+        { "title": "Historical dishonesty records", "text": "Look up the historical dishonesty records for {{company}} (removed from the list)", "server": "history" },
+        { "title": "Historical administrative penalties", "text": "Look up the historical administrative penalty records for {{company}}", "server": "history" },
+        { "title": "Executive personal risk scan", "text": "Run a full personal risk scan for {{person}}, a director, supervisor or senior executive of {{company}}", "server": "executive" },
+        { "title": "Legal representative roles", "text": "Check where {{person}}, a director, supervisor or senior executive of {{company}}, serves as legal representative", "server": "executive" },
+        { "title": "Outside positions", "text": "Look up the outside positions held by {{person}}, a director, supervisor or senior executive of {{company}}", "server": "executive" },
+        { "title": "All affiliated companies", "text": "Look up all affiliated companies of {{person}}, a director, supervisor or senior executive of {{company}}", "server": "executive" }
       ]
     },
     {
       "id": "qcc-legal",
-      "name": "企查查·法律数据",
+      "name": "Qichacha · Legal Data",
       "vendor": "企查查 Qichacha",
       "icon": "/mcp-connector/ui/assets/qcc-logo.svg",
       "category": "法律合规",
-      "summary": "法规条文 / 司法案例检索与核验",
-      "description": "法律法规逐字条文、指导性/公报/典型案例检索、案号引用核验，面向法律意见书与类案检索场景。",
-      "tags": ["法律", "法规", "案例", "核验"],
+      "summary": "Statutory text / judicial case search and verification",
+      "description": "Verbatim statutory text, guiding / gazetteed / typical case search, and case-number citation verification, for legal opinions and similar-case research.",
+      "tags": ["Law", "Statutes", "Cases", "Verification"],
       "published": true,
       "featured": true,
       "homepage": "https://open.qcc.com",
       "promptVariables": [
-        { "name": "topic", "label": "法律主题", "default": "劳动合同解除", "placeholder": "例如：劳动合同解除", "required": true }
+        { "name": "topic", "label": "Legal topic", "default": "劳动合同解除", "placeholder": "e.g. 劳动合同解除", "required": true }
       ],
       "auth": {
         "mode": "oauth2-pkce",
@@ -90,27 +90,27 @@
         { "serverKey": "case", "url": "https://agent.qcc.com/mcp/case/stream", "serverName": "qcc-case", "transport": "streamable-http", "headers": {} }
       ],
       "prompts": [
-        { "title": "法规检索", "text": "检索与「{{topic}}」相关的法律法规", "server": "regulation" },
-        { "title": "法条检索", "text": "检索与「{{topic}}」相关的法条原文", "server": "regulation" },
-        { "title": "司法案例检索", "text": "检索与「{{topic}}」相关的司法案例", "server": "case" },
-        { "title": "权威案例检索", "text": "检索与「{{topic}}」相关的权威司法案例", "server": "case" }
+        { "title": "Statute search", "text": "Find the laws and regulations related to \"{{topic}}\"", "server": "regulation" },
+        { "title": "Statutory provision search", "text": "Look up the verbatim text of the statutory provisions related to \"{{topic}}\"", "server": "regulation" },
+        { "title": "Judicial case search", "text": "Find the judicial cases related to \"{{topic}}\"", "server": "case" },
+        { "title": "Authoritative case search", "text": "Find the authoritative judicial cases related to \"{{topic}}\"", "server": "case" }
       ]
     },
     {
       "id": "qcc-tender",
-      "name": "企查查·招投标",
+      "name": "Qichacha · Tenders",
       "vendor": "企查查 Qichacha",
       "icon": "/mcp-connector/ui/assets/qcc-logo.svg",
       "category": "企业数据",
-      "summary": "招投标公告 / 中标结果 / 采购信息",
-      "description": "覆盖全国招投标公告、中标结果、采购信息，适用于竞对分析、市场研究、销售线索挖掘场景。",
-      "tags": ["招投标", "采购", "中标", "竞对"],
+      "summary": "Tender notices / award results / procurement information",
+      "description": "Nationwide tender notices, award results and procurement information, for competitor analysis, market research and sales lead generation.",
+      "tags": ["Tenders", "Procurement", "Bid awards", "Competitor analysis"],
       "published": true,
       "featured": true,
       "homepage": "https://open.qcc.com",
       "promptVariables": [
-        { "name": "keyword", "label": "项目关键词", "default": "智慧城市", "placeholder": "例如：智慧城市", "required": true },
-        { "name": "company", "label": "企业名称", "default": "华为技术有限公司", "placeholder": "例如：华为技术有限公司", "required": true }
+        { "name": "keyword", "label": "Project keyword", "default": "智慧城市", "placeholder": "e.g. 智慧城市", "required": true },
+        { "name": "company", "label": "Company name", "default": "华为技术有限公司", "placeholder": "e.g. 华为技术有限公司", "required": true }
       ],
       "auth": {
         "mode": "oauth2-pkce",
@@ -124,20 +124,20 @@
         { "serverKey": "tender", "url": "https://agent.qcc.com/mcp/tender/stream", "serverName": "qcc-tender", "transport": "streamable-http", "headers": {} }
       ],
       "prompts": [
-        { "title": "招投标检索", "text": "检索与「{{keyword}}」相关的招投标、采购和中标标讯", "server": "tender" },
-        { "title": "拟建项目检索", "text": "检索与「{{keyword}}」相关的拟建项目", "server": "tender" },
-        { "title": "企业招投标检索", "text": "查询 {{company}} 相关的招标、投标、中标和采购标讯", "server": "tender" }
+        { "title": "Tender search", "text": "Find the tender, procurement and bid award notices related to \"{{keyword}}\"", "server": "tender" },
+        { "title": "Planned project search", "text": "Find the planned projects related to \"{{keyword}}\"", "server": "tender" },
+        { "title": "Company tender search", "text": "Look up the tender, bid, award and procurement notices related to {{company}}", "server": "tender" }
       ]
     },
     {
       "id": "qcc-document",
-      "name": "企查查·智能文档解析",
+      "name": "Qichacha · Smart Document Parsing",
       "vendor": "企查查 Qichacha",
       "icon": "/mcp-connector/ui/assets/qcc-logo.svg",
       "category": "效率工具",
-      "summary": "本机文件 / 在线链接 · OCR 与结构化解析",
-      "description": "一次 OAuth 授权同时连接远程与本地 Agent：远程入口解析公网 PDF/图片 URL，本地入口读取对话中上传、粘贴或指定路径的本机文件，自动上传并输出 Markdown 与结构化内容。本地入口需 Node.js 20+。",
-      "tags": ["智能文档解析", "OCR", "本机文件", "在线文档", "PDF", "图片", "Markdown"],
+      "summary": "Local files / online links · OCR and structured parsing",
+      "description": "A single OAuth authorization connects both the remote and the local agent: the remote entry parses publicly accessible PDF/image URLs, while the local entry reads files uploaded or pasted in the chat or given by path, uploads them automatically and outputs Markdown plus structured content. The local entry requires Node.js 20+.",
+      "tags": ["Smart document parsing", "OCR", "Local files", "Online documents", "PDF", "Images", "Markdown"],
       "published": true,
       "featured": true,
       "homepage": "https://agent.qcc.com/doc",
@@ -162,34 +162,34 @@
         }
       ],
       "prompts": [
-        { "title": "解析在线文档", "text": "解析这份在线文档：请把公网可访问的 PDF 或图片 URL 粘贴到这里，并输出 Markdown 与关键字段。", "server": "document" },
-        { "title": "解析上传文件", "text": "解析我在对话中上传或粘贴的这份 PDF 或图片，提取正文、表格和关键字段。", "server": "document-local" },
-        { "title": "解析本机文件", "text": "解析本机文件：请把文件路径替换为 ~/Desktop/example.pdf，并输出 Markdown 与结构化摘要。", "server": "document-local" }
+        { "title": "Parse an online document", "text": "Parse this online document: paste a publicly accessible PDF or image URL here, and output Markdown with the key fields.", "server": "document" },
+        { "title": "Parse an uploaded file", "text": "Parse the PDF or image I uploaded or pasted in this chat, and extract the body text, tables and key fields.", "server": "document-local" },
+        { "title": "Parse a local file", "text": "Parse a local file: replace the file path with ~/Desktop/example.pdf, and output Markdown with a structured summary.", "server": "document-local" }
       ]
     },
     {
       "id": "pkulaw-legal",
-      "name": "北大法宝·法律检索",
+      "name": "PKULaw · Legal Search",
       "vendor": "北大法宝 PKULaw",
       "icon": "/mcp-connector/ui/assets/pkulaw-logo.png",
       "category": "法律合规",
-      "summary": "法规 / 法条 / 司法案例检索与引用核验",
-      "description": "接入北大法宝法律法规、司法案例、法条识别与引用核验能力。需使用北大法宝 Access Token，相关服务可能需要单独开通或购买。",
-      "tags": ["法律", "法规", "案例", "法条", "第三方收录"],
+      "summary": "Statutes / provisions / judicial case search and citation verification",
+      "description": "Access PKULaw's laws and regulations, judicial cases, statutory provision recognition and citation verification. Requires a PKULaw Access Token; some services may need to be activated or purchased separately.",
+      "tags": ["Law", "Statutes", "Cases", "Statutory provisions", "Third-party listing"],
       "published": true,
       "featured": true,
       "homepage": "https://mcp.pkulaw.com/",
       "promptVariables": [
-        { "name": "topic", "label": "法律主题", "default": "劳动合同解除", "placeholder": "例如：劳动合同解除", "required": true },
-        { "name": "caseTopic", "label": "案例主题", "default": "竞业限制违约", "placeholder": "例如：竞业限制违约", "required": true },
-        { "name": "citation", "label": "法律引用", "default": "《民法典》第五百七十七条", "placeholder": "例如：《民法典》第五百七十七条", "required": true }
+        { "name": "topic", "label": "Legal topic", "default": "劳动合同解除", "placeholder": "e.g. 劳动合同解除", "required": true },
+        { "name": "caseTopic", "label": "Case topic", "default": "竞业限制违约", "placeholder": "e.g. 竞业限制违约", "required": true },
+        { "name": "citation", "label": "Legal citation", "default": "《民法典》第五百七十七条", "placeholder": "e.g. 《民法典》第五百七十七条", "required": true }
       ],
       "auth": {
         "mode": "bearer",
-        "credentialName": "北大法宝 Access Token",
-        "credentialPlaceholder": "请输入您的北大法宝 Access Token",
-        "credentialDescription": "用于访问北大法宝 MCP；仅保存在 DSH 本机。",
-        "credentialHelpLabel": "如何获取北大法宝 Token？"
+        "credentialName": "PKULaw Access Token",
+        "credentialPlaceholder": "Enter your PKULaw Access Token",
+        "credentialDescription": "Used to access the PKULaw MCP service; stored only on this DSH machine.",
+        "credentialHelpLabel": "How do I get a PKULaw Token?"
       },
       "servers": [
         { "serverKey": "law-search", "url": "https://apim-gateway.pkulaw.com/mcp-law-search-service", "serverName": "pkulaw-law-search", "transport": "streamable-http", "headers": {} },
@@ -203,33 +203,33 @@
         { "serverKey": "doc-link", "url": "https://apim-gateway.pkulaw.com/add-doc-link", "serverName": "pkulaw-doc-link", "transport": "streamable-http", "headers": {} }
       ],
       "prompts": [
-        { "title": "法规与法条检索", "text": "用北大法宝 MCP 检索与「{{topic}}」相关的现行法律规定，并给出法条原文和效力信息", "server": "law-search" },
-        { "title": "典型司法案例", "text": "用北大法宝 MCP 检索与「{{caseTopic}}」相关的典型司法案例，并列出案号和裁判要点", "server": "case-semantic-search" },
-        { "title": "法律引用识别", "text": "用北大法宝 MCP 识别并核验 {{citation}} 的标准出处和现行法条原文", "server": "law-recognition" },
-        { "title": "法律引用核验", "text": "用北大法宝 MCP 核验 {{citation}} 是否准确，并说明当前效力状态", "server": "citation-validator" }
+        { "title": "Statute and provision search", "text": "Use the PKULaw MCP to find the currently effective laws and regulations related to \"{{topic}}\", and give the verbatim text and validity information", "server": "law-search" },
+        { "title": "Typical judicial cases", "text": "Use the PKULaw MCP to find typical judicial cases related to \"{{caseTopic}}\", and list the case numbers and holdings", "server": "case-semantic-search" },
+        { "title": "Citation recognition", "text": "Use the PKULaw MCP to identify and verify the standard source of {{citation}} and the currently effective statutory text", "server": "law-recognition" },
+        { "title": "Citation verification", "text": "Use the PKULaw MCP to verify whether {{citation}} is accurate, and explain its current validity status", "server": "citation-validator" }
       ]
     },
     {
       "id": "wind-stock-data",
-      "name": "Wind·股票数据",
+      "name": "Wind · Stock Data",
       "vendor": "Wind 万得",
       "icon": "/mcp-connector/ui/assets/wind-logo.png",
       "category": "金融投资",
-      "summary": "全球股票档案 / 行情 / 技术指标 / 财务与公司事件",
-      "description": "接入万得股票数据服务，覆盖公司档案、股本与股东、行情报价、技术指标、基本面财务、公司事件及风险波动性数据。需使用 Wind Key，服务权限以万得账户实际开通范围为准。",
-      "tags": ["股票", "行情", "财务", "技术指标", "第三方收录"],
+      "summary": "Global stock profiles / market quotes / technical indicators / financials and corporate events",
+      "description": "Access the Wind stock data service, covering company profiles, share capital and shareholders, market quotes, technical indicators, fundamentals, financial statements, corporate events, and risk and volatility data. Requires a Wind Key; the available service scopes depend on what your Wind account actually has enabled.",
+      "tags": ["Stocks", "Market quotes", "Financials", "Technical indicators", "Third-party listing"],
       "published": true,
       "featured": true,
       "homepage": "https://aifinmarket.wind.com.cn/#/market?tab=mcps&detailType=mcp&detailId=wind_stock_data-0",
       "promptVariables": [
-        { "name": "stock", "label": "股票名称或代码", "default": "贵州茅台（600519.SH）", "placeholder": "例如：贵州茅台（600519.SH）", "required": true }
+        { "name": "stock", "label": "Stock name or ticker", "default": "贵州茅台（600519.SH）", "placeholder": "e.g. 贵州茅台（600519.SH）", "required": true }
       ],
       "auth": {
         "mode": "bearer",
-        "credentialName": "Wind API Key（个人密钥）",
-        "credentialPlaceholder": "请输入您的个人 Wind API Key",
-        "credentialDescription": "用于访问 Wind MCP 的个人访问令牌；仅保存在 DSH 本机。",
-        "credentialHelpLabel": "如何获取 Wind API Key？"
+        "credentialName": "Wind API Key (personal key)",
+        "credentialPlaceholder": "Enter your personal Wind API Key",
+        "credentialDescription": "The personal access token for the Wind MCP service; stored only on this DSH machine.",
+        "credentialHelpLabel": "How do I get a Wind API Key?"
       },
       "servers": [
         {
@@ -241,20 +241,20 @@
         }
       ],
       "prompts": [
-        { "title": "公司档案与行业", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 的公司档案、主营业务和所属行业", "server": "stock-data" },
-        { "title": "最新行情", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 的最新价格、成交量、换手率和买卖报价", "server": "stock-data" },
-        { "title": "技术与波动指标", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 最近 20 个交易日的 MACD、RSI、波动率和涨跌幅", "server": "stock-data" },
-        { "title": "核心财务指标", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 最新报告期的营业收入、净利润、ROE 和现金流", "server": "stock-data" }
+        { "title": "Company profile and industry", "text": "Use the Wind stock data MCP to look up the company profile, main business and industry of {{stock}}", "server": "stock-data" },
+        { "title": "Latest quote", "text": "Use the Wind stock data MCP to look up the latest price, volume, turnover rate and bid/ask quotes for {{stock}}", "server": "stock-data" },
+        { "title": "Technical and volatility indicators", "text": "Use the Wind stock data MCP to look up the MACD, RSI, volatility and price change of {{stock}} over the last 20 trading days", "server": "stock-data" },
+        { "title": "Core financial metrics", "text": "Use the Wind stock data MCP to look up the revenue, net profit, ROE and cash flow of {{stock}} for the latest reporting period", "server": "stock-data" }
       ]
     },
     {
       "id": "legacy-internal",
-      "name": "内测·待上架连接器",
-      "vendor": "内部团队",
+      "name": "Internal Beta · Unlisted Connector",
+      "vendor": "Internal team",
       "category": "其他",
-      "summary": "下架示例：published=false 不出现在用户货架",
-      "description": "该条目用于演示「下架」语义——已装用户保留连接，但新用户刷新目录不可见。",
-      "tags": ["内测"],
+      "summary": "Unlisting example: published=false keeps it off the user shelf",
+      "description": "This entry demonstrates the \"unlisted\" semantics — users who already installed it keep the connection, but it stays invisible to new users when the catalog is refreshed.",
+      "tags": ["Internal beta"],
       "published": false,
       "featured": false,
       "auth": { "mode": "none" },

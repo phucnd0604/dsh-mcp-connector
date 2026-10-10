@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const PACKAGE_NAME = 'dsh-mcp-connector';
-const README_PATHS = ['README.md', 'README.en.md'];
+const README_PATHS = ['README.md'];
 
 export function referencedVersions(text, pattern) {
   return [...text.matchAll(pattern)].map((match) => match[1]);
@@ -40,9 +40,9 @@ export async function checkReadmeVersions({
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
   checkReadmeVersions().then((version) => {
-    console.log(`README 版本校验通过：${PACKAGE_NAME}@${version}`);
+    console.log(`README version check passed: ${PACKAGE_NAME}@${version}`);
   }).catch((error) => {
-    console.error(`README 版本校验失败：${error instanceof Error ? error.message : String(error)}`);
+    console.error(`README version check failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;
   });
 }

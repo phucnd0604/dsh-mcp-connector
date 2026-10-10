@@ -1,61 +1,50 @@
-# 公共文档建议文本（未应用）
+# Public Documentation Suggested Text (Not Applied)
 
-日期：2026-09-13。由总体归口指定单一集成人按标题锚点应用，先核对最新内容。本文件不是已修改公共README的声明。
+Date: 2026-09-13. The central integrator applies this by heading anchor after verifying the latest content. This file is not a claim that the public README has been modified.
 
 ## README.md
 
-在“### 工具查找与故障处理”替换现有两段为：
+In "### Tool discovery and troubleshooting", replace the existing two paragraphs with:
 
-> 在“工具”页统一查找当前工作区可见、已启用连接的工具。输入工具名或描述，再按连接、服务和最近发现状态筛选；点击“参数详情”查看类型、必填项与嵌套结构。未选择工作区时，仅展示全局连接。
+> Search cached tools across enabled connections visible to the current workspace in the Tools tab. Enter a tool name or description, then filter by connection, service, and recent discovery status; click "Parameter details" to see types, required fields, and nested structures. Without a selected workspace, only global connections appear.
 >
-> 结果标注来源和最后成功缓存时间。发现失败时仍可查看已有缓存，但不代表服务当前可调用。展开“连接状态与故障处理”，按建议使用“检查连接”或“重新发现工具”。健康连接五分钟后到期，页面保持连接时后台检查到期任务；失败时退避，鉴权失败暂停自动重试。
+> Results identify their source and last successful cache time. When discovery fails you can still view the existing cache, but that does not mean the service is currently callable. Expand "Connection status and troubleshooting" and, following the suggestions, use "Check connection" or "Rediscover tools". Healthy discovery becomes due after five minutes, and while the page remains connected the background checks due tasks; failures back off, and authentication failures pause automatic retries.
 >
-> 详见[工具工作台教程](docs/USER-GUIDE.md#51-工具工作台统一查找工具)。工具页用于发现与诊断，不执行目标工具；参数摘要与原始安全缓存均有裁剪边界。
+> See the [tool workspace guide](docs/USER-GUIDE.md) for details. The tools page is for discovery and diagnostics and does not execute the target tool; both parameter summaries and the raw security cache have redaction boundaries.
 
-在“## 使用”的连接管理步骤之后补充：
-> 连接后打开“工具”页，按工具名或描述查找能力，使用连接/服务筛选定位来源；授权、费用及正式调用仍由相应服务与Host管理。
+After the connection management steps in "## Usage", add:
+> After connecting, open the "Tools" page and look up capabilities by tool name or description, using the connection/service filters to locate the source; authorization, cost, and formal invocation remain managed by the respective service and Host.
 
-首屏hero、营销比较表与图片顺序留给统一文案集成，不在本补丁重复覆盖。新图验收前不添加图片引用。
-
-## README.en.md
-
-在“### Tool discovery and troubleshooting”替换说明为：
-
-> Search cached tools across enabled connections visible to the current workspace in the Tools tab. Filter by connection, service and latest discovery status, then open parameter details for types, required fields and nested structures. Without a selected workspace, only global connections appear.
->
-> Results identify their source and last successful cache time. A cached tool is not a guarantee that the service is currently callable. Expand connection diagnostics to check the connection or rediscover tools. Healthy discovery becomes due after five minutes; while the page remains connected, background scheduling checks due tasks. Failures back off, and authentication failures pause automatic retries.
->
-> Tool browsing does not execute target tools. Parameter summaries may omit complex rules; the original-schema view contains the sanitized, size-limited cached schema, not an untouched server response. See the [Chinese tool-workspace guide](docs/USER-GUIDE.md#51-工具工作台统一查找工具).
+The hero, marketing comparison table, and image order are left to the unified copy integration and are not duplicated in this patch. No image references are added before the new images pass acceptance.
 
 ## docs/USER-GUIDE.md
 
-在第5节末尾、现有“## 6. 添加自定义连接”之前插入：
+Insert at the end of section 5, before the existing "## 6. Add a custom connection":
 
-### 5.1 工具工作台：统一查找工具
+### 5.1 Tool workspace: unified tool lookup
 
-1. 先连接所需MCP服务，打开顶部“工具”页；工具发现会在后台进行，无需先打开每个连接的详情。
-2. 输入工具名或描述中的关键词。精确工具名优先；同名工具仍可能来自不同连接，请核对来源。
-3. 使用“连接”“服务”“发现状态”筛选缩小范围，点击“清除筛选”恢复。结果按页展示。
-4. 工具页搜索的是已启用且当前范围可见连接的成功缓存，不是市场中所有未安装连接器的工具。未选择Workspace时仅显示全局连接。
-5. 没有结果时先清除筛选，并确认连接已启用、范围正确且至少成功发现过一次；首次发现可能仍在等待。
+1. First connect the required MCP service and open the "Tools" page at the top; tool discovery runs in the background, and there is no need to open each connection's details page first.
+2. Enter a keyword from the tool name or description. Exact tool names take priority; tools with the same name may still come from different connections, so verify the source.
+3. Use the "Connection", "Service", and "Discovery status" filters to narrow the scope, and click "Clear filters" to restore. Results are shown page by page.
+4. The tools page searches the successful cache of enabled connections visible in the current scope, not the tools of every uninstalled connector in the marketplace. Without a selected workspace, only global connections are shown.
+5. If there are no results, first clear the filters and confirm that the connection is enabled, the scope is correct, and at least one discovery has succeeded; the first discovery may still be pending.
 
-### 5.2 查看参数与来源
+### 5.2 Viewing parameters and source
 
-每条结果展示连接器、连接、服务、最近发现状态和最后成功缓存时间。点击“参数详情”查看类型、必填、说明、枚举和嵌套结构。
-复杂引用、组合规则或过大结构会提示摘要限制；可展开“原始 Schema（安全缓存）”继续查看。这里的原始Schema仍是安全裁剪后的缓存，不含被移除的默认值/示例，也不保证保留超限字段。此页不执行工具。
+Each result displays the connector, connection, service, most recent discovery status, and last successful cache time. Click "Parameter details" to see the type, required flag, description, enums, and nested structure.
+Complex references, combined rules, or oversized structures will indicate summary limits; you can expand "Raw Schema (security cache)" to keep viewing. The raw Schema here is still the security-redacted cache; it excludes removed defaults/examples and does not guarantee that over-limit fields are preserved. This page does not execute tools.
 
-### 5.3 发现状态和最后成功缓存
+### 5.3 Discovery status and the last successful cache
 
-“尚未发现”表示还没有当前发现状态；“Host状态未知”表示宿主状态无法确认；“最近发现成功/失败”仅代表最近一次发现，不保证随后调用的结果。
-失败时已有的最后成功工具缓存仍可查看；超过24小时会提示陈旧。没有成功记录则无法提供缓存，成功空列表也不代表故障。连接改配、停用或断开可能使原结果不再可见。
+"Not yet discovered" means there is no current discovery status yet; "Host status unknown" means the host state cannot be confirmed; "Recently discovered successfully/failed" only represents the most recent discovery and does not guarantee the result of a subsequent invocation.
+On failure, the existing last successful tool cache can still be viewed; it will be flagged as stale after 24 hours. Without a successful record there is no cache to provide, and a successful empty list does not necessarily indicate a fault. Reconfiguring, disabling, or disconnecting a connection may make the previous results no longer visible.
 
-### 5.4 检查连接与重新发现
+### 5.4 Check connection and rediscover
 
-展开“连接状态与故障处理”，先阅读阶段与建议。“检查连接”执行该连接的健康检查；“重新发现工具”重新获取该连接的工具元数据。两者不是目标工具试运行，也不保证自动修复。
-同连接进行中的操作会合并，频繁操作有冷却；工具页操作不能绕过有效限流等待。鉴权失败请到已安装页更新凭据或重新授权。
-健康后台发现五分钟后到期；页面保持SSE连接时按调度检查到期项，普通故障指数退避，限流结合Retry-After等待，鉴权失败暂停自动重试。不要把“刷新工具视图”误认为强制访问所有服务，它只刷新缓存视图。
+Expand "Connection status and troubleshooting" and first read the stage and suggestions. "Check connection" runs a health check for that connection; "Rediscover tools" re-fetches that connection's tool metadata. Neither is a trial run of the target tool, and neither guarantees automatic repair.
+In-progress operations on the same connection are coalesced, and frequent operations have a cooldown; actions on the tools page cannot bypass an effective rate-limit wait. For authentication failures, go to the installed page to update credentials or re-authorize.
+Healthy background discovery becomes due after five minutes; while the page holds the SSE connection, due items are checked on schedule, ordinary faults back off exponentially, rate limiting waits according to Retry-After, and authentication failures pause automatic retries. Do not mistake "refresh tools view" for forcing access to all services; it only refreshes the cached view.
 
-## 集成检查
+## Integration Checks
 
-确认Markdown锚点实际渲染可跳转；中英文范围/缓存措辞一致。避免覆盖自然搜索任务的新hero；待图片验收后再改图链与素材清单。建议先补用户手册，再同步README，最后更新市场材料。
-
+Confirm that the Markdown anchors actually render as navigable, and that the scope/cache wording is consistent between languages. Avoid overwriting the new hero from the natural search task; wait until image acceptance before changing image links and asset lists. It is recommended to update the user guide first, then sync the README, and finally update the marketplace materials.

@@ -1,5 +1,6 @@
 /**
- * 发布前校验 npm 包内容，防止测试、设计稿、工作流或本地文件被误发布。
+ * Pre-release validation of the npm package contents, so tests, design mockups,
+ * workflows or local files can never be published by accident.
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -42,14 +43,14 @@ try {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 } catch (error) {
-  console.error('verify-pack 失败：`npm pack --dry-run --json` 执行出错');
+  console.error('verify-pack failed: `npm pack --dry-run --json` exited with an error');
   console.error(String(error.stderr ?? error.message));
   process.exit(1);
 }
 
 const [pack] = JSON.parse(raw);
 if (!pack || !Array.isArray(pack.files)) {
-  console.error('verify-pack 失败：无法解析 npm pack 输出');
+  console.error('verify-pack failed: could not parse the npm pack output');
   process.exit(1);
 }
 
@@ -64,24 +65,24 @@ const requiredTutorials = [
 ];
 const missingTutorials = requiredTutorials.filter((file) => !files.includes(file));
 if (missingTutorials.length > 0) {
-  console.error('verify-pack 失败：README 引用的任务教程未进入 npm 包：');
+  console.error('verify-pack failed: the task tutorials linked from the README are missing from the npm package:');
   for (const file of missingTutorials) console.error(`  - ${file}`);
   process.exit(1);
 }
 const stray = files.filter((file) => !WHITELIST.some((rule) => rule.test(file)));
 if (stray.length > 0) {
-  console.error('verify-pack 失败：以下文件不应进入 npm 发布包：');
+  console.error('verify-pack failed: the following files must not be included in the published npm package:');
   for (const file of stray) console.error(`  - ${file}`);
   process.exit(1);
 }
 
 const sensitivePatterns = [
-  ['私钥', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/],
+  ['private key', /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/],
   ['npm token', /npm_[A-Za-z0-9]{20,}/],
   ['GitHub token', /gh[pousr]_[A-Za-z0-9]{20,}/],
-  ['OpenAI 风格密钥', /sk-[A-Za-z0-9_-]{20,}/],
+  ['OpenAI-style key', /sk-[A-Za-z0-9_-]{20,}/],
   ['AWS access key', /AKIA[0-9A-Z]{16}/],
-  ['本机绝对路径', /(?:\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/],
+  ['local absolute path', /(?:\/Users\/[^/\s]+\/|\/home\/[^/\s]+\/)/],
 ];
 const sensitive = [];
 for (const file of files) {
@@ -91,15 +92,15 @@ for (const file of files) {
   }
 }
 if (sensitive.length > 0) {
-  console.error('verify-pack 失败：发布文件疑似包含凭证或本机信息：');
+  console.error('verify-pack failed: published files appear to contain credentials or local machine information:');
   for (const item of sensitive) console.error(`  - ${item}`);
   process.exit(1);
 }
 
 const installScript = readFileSync('install.sh', 'utf8');
 if (!/^PKG="dsh-mcp-connector"$/m.test(installScript)) {
-  console.error('verify-pack 失败：install.sh 未安装 dsh-mcp-connector');
+  console.error('verify-pack failed: install.sh does not install dsh-mcp-connector');
   process.exit(1);
 }
 
-console.log(`verify-pack 通过：${files.length} 个发布文件均在白名单内，且未发现凭证或本机路径`);
+console.log(`verify-pack passed: all ${files.length} published files are whitelisted, and no credentials or local machine paths were found`);

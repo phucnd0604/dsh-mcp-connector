@@ -10,4 +10,4 @@ const raw = [];
 for (const file of files) raw.push(JSON.parse(await readFile(resolve(directory, file), 'utf8')));
 const connectors = validateRegistryDescriptors(raw).sort((a, b) => a.id.localeCompare(b.id));
 await writeFile(output, `${JSON.stringify({ schemaVersion: 1, connectors }, null, 2)}\n`);
-console.log(`registry: ${connectors.length} 个连接器 → ${output}`);
+console.log(`registry: ${connectors.length} connectors → ${output}`);

@@ -1,26 +1,26 @@
 {
   "schemaVersion": 1,
   "id": "wind-stock-data",
-  "name": "Wind·股票数据",
+  "name": "Wind · Stock Data",
   "vendor": "Wind 万得",
   "icon": "/mcp-connector/ui/assets/wind-logo.png",
   "category": "金融投资",
-  "summary": "全球股票档案 / 行情 / 技术指标 / 财务与公司事件",
-  "description": "接入万得股票数据服务，覆盖公司档案、股本与股东、行情报价、技术指标、基本面财务、公司事件及风险波动性数据。需使用 Wind Key，服务权限以万得账户实际开通范围为准。",
-  "tags": ["股票", "行情", "财务", "技术指标", "第三方收录"],
+  "summary": "Global stock profiles / market quotes / technical indicators / financials and corporate events",
+  "description": "Access the Wind stock data service, covering company profiles, share capital and shareholders, market quotes, technical indicators, fundamentals, financial statements, corporate events, and risk and volatility data. Requires a Wind Key; the available service scopes depend on what your Wind account actually has enabled.",
+  "tags": ["Stocks", "Market quotes", "Financials", "Technical indicators", "Third-party listing"],
   "published": true,
   "featured": true,
   "homepage": "https://aifinmarket.wind.com.cn/#/market?tab=mcps&detailType=mcp&detailId=wind_stock_data-0",
   "probeStatus": "unverified",
   "promptVariables": [
-    { "name": "stock", "label": "股票名称或代码", "default": "贵州茅台（600519.SH）", "placeholder": "例如：贵州茅台（600519.SH）", "required": true }
+    { "name": "stock", "label": "Stock name or ticker", "default": "贵州茅台（600519.SH）", "placeholder": "e.g. 贵州茅台（600519.SH）", "required": true }
   ],
   "auth": {
     "mode": "bearer",
-    "credentialName": "Wind API Key（个人密钥）",
-    "credentialPlaceholder": "请输入您的个人 Wind API Key",
-    "credentialDescription": "用于访问 Wind MCP 的个人访问令牌；仅保存在 DSH 本机。",
-    "credentialHelpLabel": "如何获取 Wind API Key？"
+    "credentialName": "Wind API Key (personal key)",
+    "credentialPlaceholder": "Enter your personal Wind API Key",
+    "credentialDescription": "The personal access token for the Wind MCP service; stored only on this DSH machine.",
+    "credentialHelpLabel": "How do I get a Wind API Key?"
   },
   "servers": [
     {
@@ -32,9 +32,9 @@
     }
   ],
   "prompts": [
-    { "title": "公司档案与行业", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 的公司档案、主营业务和所属行业", "server": "stock-data" },
-    { "title": "最新行情", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 的最新价格、成交量、换手率和买卖报价", "server": "stock-data" },
-    { "title": "技术与波动指标", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 最近 20 个交易日的 MACD、RSI、波动率和涨跌幅", "server": "stock-data" },
-    { "title": "核心财务指标", "text": "用 Wind 股票数据 MCP 查询 {{stock}} 最新报告期的营业收入、净利润、ROE 和现金流", "server": "stock-data" }
+    { "title": "Company profile and industry", "text": "Use the Wind stock data MCP to look up the company profile, main business and industry of {{stock}}", "server": "stock-data" },
+    { "title": "Latest quote", "text": "Use the Wind stock data MCP to look up the latest price, volume, turnover rate and bid/ask quotes for {{stock}}", "server": "stock-data" },
+    { "title": "Technical and volatility indicators", "text": "Use the Wind stock data MCP to look up the MACD, RSI, volatility and price change of {{stock}} over the last 20 trading days", "server": "stock-data" },
+    { "title": "Core financial metrics", "text": "Use the Wind stock data MCP to look up the revenue, net profit, ROE and cash flow of {{stock}} for the latest reporting period", "server": "stock-data" }
   ]
 }

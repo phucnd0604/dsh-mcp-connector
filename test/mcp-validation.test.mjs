@@ -12,7 +12,7 @@ test('CLI 授权诊断优先于 Host 通用初始化错误，未知原因不猜�
   assert.equal(unknown.kind, 'authorization-unknown');
   const generic = classifyConnectionError(new Error('initial tool synchronization failed'), { transport: 'stdio' });
   assert.equal(generic.kind, 'startup');
-  assert.match(generic.message, /未提供可识别的具体原因/);
+  assert.match(generic.message, /no recognizable specific reason/);
   assert.doesNotMatch(generic.message, /MCP URL/);
 });
 
@@ -108,29 +108,29 @@ test('连接错误将 TLS reset 转为可操作的用户提示', () => {
   const error = new TypeError('fetch failed', { cause });
   const result = classifyConnectionError(error);
   assert.equal(result.kind, 'tls');
-  assert.match(result.message, /专线|VPN|IP 白名单/);
+  assert.match(result.message, /dedicated line|VPN|IP allowlist/);
 });
 
 test('连接错误将 DNS 解析失败转为可操作提示', () => {
   const cause = Object.assign(new Error('getaddrinfo ENOTFOUND nonexistent.invalid'), { code: 'ENOTFOUND' });
   const result = classifyConnectionError(new TypeError('fetch failed', { cause }));
   assert.equal(result.kind, 'dns');
-  assert.match(result.message, /域名解析失败/);
+  assert.match(result.message, /Domain name resolution failed/);
 });
 
 test('stdio 启动错误区分命令缺失、退出码与启动超时', () => {
   const missing = classifyConnectionError(Object.assign(new Error('spawn uvx ENOENT'), { code: 'ENOENT' }), { transport: 'stdio' });
   assert.equal(missing.kind, 'process-not-found');
-  assert.match(missing.message, /启动命令不存在/);
+  assert.match(missing.message, /launch command does not exist/);
 
   const exited = classifyConnectionError(new Error('child process exited with code 7'), { transport: 'stdio' });
   assert.equal(exited.kind, 'process-exit');
   assert.equal(exited.exitCode, 7);
-  assert.match(exited.message, /退出码 7/);
+  assert.match(exited.message, /exit code 7/);
 
   const timeout = classifyConnectionError(Object.assign(new Error('startup timed out'), { code: 'ETIMEDOUT' }), { transport: 'stdio' });
   assert.equal(timeout.kind, 'timeout');
-  assert.match(timeout.message, /启动或工具同步超时/);
+  assert.match(timeout.message, /launch or tool synchronization timed out/);
 });
 
 test('stdio 健康检查交给 dsh-mcp-client 管理且不发 HTTP 请求', async () => {

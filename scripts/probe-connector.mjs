@@ -3,14 +3,14 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { probeConnector, validateRegistryDescriptors } from '../lib/probe.js';
 
 function usage() {
-  console.log(`用法: dsh-mcp-connector-probe <catalog-or-connector.json> [选项]
+  console.log(`Usage: dsh-mcp-connector-probe <catalog-or-connector.json> [options]
 
-选项:
-  --validate-only       只做 Schema、唯一性、URL 与密钥审计
-  --timeout <ms>        单次网络请求超时（默认 15000）
-  --output <file>       将 JSON 报告写入文件
-  --allow-partial       partial 不作为失败退出
-  --help                显示帮助`);
+Options:
+  --validate-only       Only run Schema, uniqueness, URL and secret audits
+  --timeout <ms>        Per-request network timeout (default 15000)
+  --output <file>       Write the JSON report to a file
+  --allow-partial       Do not exit non-zero when the result is partial
+  --help                Show this help`);
 }
 
 const args = process.argv.slice(2);
@@ -30,12 +30,12 @@ for (let i = 0; i < args.length; i += 1) {
   else if (arg === '--allow-partial') allowPartial = true;
   else if (arg === '--timeout') timeoutMs = Number(args[++i]);
   else if (arg === '--output') output = args[++i];
-  else if (arg.startsWith('--')) throw new Error(`未知选项: ${arg}`);
+  else if (arg.startsWith('--')) throw new Error(`Unknown option: ${arg}`);
   else if (!input) input = arg;
-  else throw new Error(`多余参数: ${arg}`);
+  else throw new Error(`Unexpected argument: ${arg}`);
 }
-if (!input) throw new Error('缺少 connector/catalog JSON 文件');
-if (!Number.isFinite(timeoutMs) || timeoutMs < 100) throw new Error('--timeout 必须是不小于 100 的数字');
+if (!input) throw new Error('Missing connector/catalog JSON file');
+if (!Number.isFinite(timeoutMs) || timeoutMs < 100) throw new Error('--timeout must be a number no less than 100');
 
 const raw = JSON.parse(await readFile(input, 'utf8'));
 const list = Array.isArray(raw) ? raw : Array.isArray(raw?.connectors) ? raw.connectors : [raw];

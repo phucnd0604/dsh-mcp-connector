@@ -4,8 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const PATHS = {
-  readmeZh: 'README.md',
-  readmeEn: 'README.en.md',
+  readme: 'README.md',
   userGuide: 'docs/USER-GUIDE.md',
   growth: 'docs/GROWTH-BASELINE.md',
   entry: 'docs/tutorials/README.md',
@@ -25,8 +24,7 @@ export async function checkFirstUseDocs() {
   const entries = await Promise.all(Object.entries(PATHS).map(async ([key, path]) => [key, await readFile(path, 'utf8')]));
   const docs = Object.fromEntries(entries);
 
-  requireText(PATHS.readmeZh, docs.readmeZh, '(docs/tutorials/README.md)');
-  requireText(PATHS.readmeEn, docs.readmeEn, '(docs/tutorials/README.md)');
+  requireText(PATHS.readme, docs.readme, '(docs/tutorials/README.md)');
   requireText(PATHS.userGuide, docs.userGuide, '(tutorials/README.md)');
 
   for (const link of ['(JSON-MIGRATION.md)', '(OAUTH-DIAGNOSTICS.md)', '(TOOL-SEARCH-RECOVERY.md)']) {
@@ -34,22 +32,21 @@ export async function checkFirstUseDocs() {
   }
   for (const link of ['(FIRST-SUCCESS-SCENARIOS.md)', '(TRUSTED-STATUS-COPY.md)']) {
     requireText(PATHS.entry, docs.entry, link);
-    requireText(PATHS.readmeZh, docs.readmeZh, `docs/tutorials/${link.slice(1)}`);
-    requireText(PATHS.readmeEn, docs.readmeEn, `docs/tutorials/${link.slice(1)}`);
+    requireText(PATHS.readme, docs.readme, `docs/tutorials/${link.slice(1)}`);
   }
   requireText(PATHS.userGuide, docs.userGuide, '(tutorials/FIRST-SUCCESS-SCENARIOS.md)');
   requireText(PATHS.userGuide, docs.userGuide, '(tutorials/TRUSTED-STATUS-COPY.md)');
   for (const expected of [
     'dsh plugin --profile web add dsh-mcp-connector',
-    'DSH Desktop 和 `dsh web` 都从本机 `web` profile 加载插件',
-    '不要因为使用 Desktop 就把命令改成 `--profile desktop`',
-    '设置 → 插件 → 插件配置 → MCP连接器',
+    'DSH Desktop and `dsh web` both load the plugin from the local `web` profile',
+    'do not switch the command to `--profile desktop` just because you are using Desktop',
+    'Settings → Plugins → Plugin configuration → MCP Connector',
     'mcp__<serverName>__<toolName>',
-    '只读调用',
+    'read-only call',
     'DSH Host',
-    '权限',
-    '费用',
-    '无数据/待验收',
+    'permission',
+    'cost',
+    'no data / pending acceptance',
     'https://github.com/duhu2000/dsh-mcp-connector/stargazers',
     'https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/docs/ONBOARDING.md',
     '../../CONTRIBUTING.md',
@@ -62,43 +59,43 @@ export async function checkFirstUseDocs() {
   }
 
   for (const expected of [
-    '企业信息只读查询',
-    '本地智能文档解析',
-    '授权办公文档或日程查询',
-    '本机进程 + 远程处理',
-    '无证据/待用户验收',
+    'Read-only company information lookup',
+    'Local intelligent document parsing',
+    'Authorized office document or schedule lookup',
+    'Local process + remote processing',
+    'no evidence / pending user acceptance',
     '(TRUSTED-STATUS-COPY.md)',
   ]) {
     requireText(PATHS.scenarios, docs.scenarios, expected);
   }
 
   for (const expected of [
-    '账号/组织：当前连接无法确认',
-    '授权状态未知',
-    'Host 注册状态未知',
-    '调用：无证据/待验收',
-    '管理员前提：待服务商确认',
-    '本机进程 + 远程处理',
-    '本次费用：无法由插件确认',
-    '检查时间：YYYY-MM-DD HH:mm:ss ±HH:mm',
-    '缓存参数结构已变化，可能影响既有调用；使用前请核对参数，并按 Host 要求重新确认。',
-    'Schema 不完整或缺少历史记录，无法判断兼容性。',
-    '仅为发现缓存；调用：无证据/待验收。',
-    'Schema 变化：检测到工具移除、必填参数新增、类型/枚举收窄或其他不兼容差异',
-    '当前 Schema 无法确认',
-    '工具副作用：服务未提供或 Host 未传递可靠标记',
-    '不为文案新增隐性用户跟踪',
+    'Account/organization: the current connection cannot confirm this',
+    'Authorization status unknown',
+    'Host registration status unknown',
+    'Invocation: no evidence / pending acceptance',
+    'Administrator prerequisites: pending service provider confirmation',
+    'Local process + remote processing',
+    "This run's cost: the plugin cannot confirm it",
+    'Checked at: YYYY-MM-DD HH:mm:ss ±HH:mm',
+    'The cached parameter structure has changed and may affect existing invocations; verify the parameters before use, and re-confirm as the Host requires.',
+    'Schema is incomplete or has no history, so compatibility cannot be determined.',
+    'Discovery cache only; invocation: no evidence / pending acceptance.',
+    'Schema change: tool removal, newly required parameters, narrowed types/enums or other incompatible differences detected;',
+    'The current schema cannot be confirmed;',
+    'Tool side effects: the service did not provide them, or the Host did not pass a reliable marker; read-only behaviour cannot be concluded from this.',
+    'do not add covert user tracking for copy',
   ]) {
     requireText(PATHS.statusCopy, docs.statusCopy, expected);
   }
 
   for (const expected of [
-    '仅本地/仓库草稿',
-    '不得自动公开发布',
-    'MCP连接器、MCP Server、连接管理、跨连接工具搜索、连接排障',
+    'Local/repository draft only',
+    'do not publish publicly automatically',
+    'MCP Connector, MCP Server, connection management, cross-connection tool search, connection troubleshooting',
     '2026-10-02',
     '2026-10-09',
-    '不从下载量推算连接或首次调用',
+    'Do not infer connections or first calls from download counts',
   ]) {
     requireText(PATHS.publicationDrafts, docs.publicationDrafts, expected);
   }
@@ -122,9 +119,9 @@ export async function checkFirstUseDocs() {
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
   checkFirstUseDocs().then((path) => {
-    console.log(`首次使用文档校验通过：${path}`);
+    console.log(`First-use docs check passed: ${path}`);
   }).catch((error) => {
-    console.error(`首次使用文档校验失败：${error instanceof Error ? error.message : String(error)}`);
+    console.error(`First-use docs check failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;
   });
 }

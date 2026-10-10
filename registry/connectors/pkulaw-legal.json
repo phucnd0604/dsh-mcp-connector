@@ -1,28 +1,28 @@
 {
   "schemaVersion": 1,
   "id": "pkulaw-legal",
-  "name": "北大法宝·法律检索",
+  "name": "PKULaw · Legal Search",
   "vendor": "北大法宝 PKULaw",
   "icon": "/mcp-connector/ui/assets/pkulaw-logo.png",
   "category": "法律合规",
-  "summary": "法规 / 法条 / 司法案例检索与引用核验",
-  "description": "接入北大法宝法律法规、司法案例、法条识别与引用核验能力。需使用北大法宝 Access Token，相关服务可能需要单独开通或购买。",
-  "tags": ["法律", "法规", "案例", "法条", "第三方收录"],
+  "summary": "Statutes / provisions / judicial case search and citation verification",
+  "description": "Access PKULaw's laws and regulations, judicial cases, statutory provision recognition and citation verification. Requires a PKULaw Access Token; some services may need to be activated or purchased separately.",
+  "tags": ["Law", "Statutes", "Cases", "Statutory provisions", "Third-party listing"],
   "published": true,
   "featured": true,
   "homepage": "https://mcp.pkulaw.com/",
   "probeStatus": "unverified",
   "promptVariables": [
-    { "name": "topic", "label": "法律主题", "default": "劳动合同解除", "placeholder": "例如：劳动合同解除", "required": true },
-    { "name": "caseTopic", "label": "案例主题", "default": "竞业限制违约", "placeholder": "例如：竞业限制违约", "required": true },
-    { "name": "citation", "label": "法律引用", "default": "《民法典》第五百七十七条", "placeholder": "例如：《民法典》第五百七十七条", "required": true }
+    { "name": "topic", "label": "Legal topic", "default": "劳动合同解除", "placeholder": "e.g. 劳动合同解除", "required": true },
+    { "name": "caseTopic", "label": "Case topic", "default": "竞业限制违约", "placeholder": "e.g. 竞业限制违约", "required": true },
+    { "name": "citation", "label": "Legal citation", "default": "《民法典》第五百七十七条", "placeholder": "e.g. 《民法典》第五百七十七条", "required": true }
   ],
   "auth": {
     "mode": "bearer",
-    "credentialName": "北大法宝 Access Token",
-    "credentialPlaceholder": "请输入您的北大法宝 Access Token",
-    "credentialDescription": "用于访问北大法宝 MCP；仅保存在 DSH 本机。",
-    "credentialHelpLabel": "如何获取北大法宝 Token？"
+    "credentialName": "PKULaw Access Token",
+    "credentialPlaceholder": "Enter your PKULaw Access Token",
+    "credentialDescription": "Used to access the PKULaw MCP service; stored only on this DSH machine.",
+    "credentialHelpLabel": "How do I get a PKULaw Token?"
   },
   "servers": [
     { "serverKey": "law-search", "url": "https://apim-gateway.pkulaw.com/mcp-law-search-service", "serverName": "pkulaw-law-search", "transport": "streamable-http", "headers": {} },
@@ -36,9 +36,9 @@
     { "serverKey": "doc-link", "url": "https://apim-gateway.pkulaw.com/add-doc-link", "serverName": "pkulaw-doc-link", "transport": "streamable-http", "headers": {} }
   ],
   "prompts": [
-    { "title": "法规与法条检索", "text": "用北大法宝 MCP 检索与「{{topic}}」相关的现行法律规定，并给出法条原文和效力信息", "server": "law-search" },
-    { "title": "典型司法案例", "text": "用北大法宝 MCP 检索与「{{caseTopic}}」相关的典型司法案例，并列出案号和裁判要点", "server": "case-semantic-search" },
-    { "title": "法律引用识别", "text": "用北大法宝 MCP 识别并核验 {{citation}} 的标准出处和现行法条原文", "server": "law-recognition" },
-    { "title": "法律引用核验", "text": "用北大法宝 MCP 核验 {{citation}} 是否准确，并说明当前效力状态", "server": "citation-validator" }
+    { "title": "Statute and provision search", "text": "Use the PKULaw MCP to find the currently effective laws and regulations related to \"{{topic}}\", and give the verbatim text and validity information", "server": "law-search" },
+    { "title": "Typical judicial cases", "text": "Use the PKULaw MCP to find typical judicial cases related to \"{{caseTopic}}\", and list the case numbers and holdings", "server": "case-semantic-search" },
+    { "title": "Citation recognition", "text": "Use the PKULaw MCP to identify and verify the standard source of {{citation}} and the currently effective statutory text", "server": "law-recognition" },
+    { "title": "Citation verification", "text": "Use the PKULaw MCP to verify whether {{citation}} is accurate, and explain its current validity status", "server": "citation-validator" }
   ]
 }

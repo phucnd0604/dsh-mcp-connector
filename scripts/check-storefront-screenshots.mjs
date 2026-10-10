@@ -129,9 +129,9 @@ export async function checkStorefrontScreenshots({
 const invokedPath = process.argv[1] ? resolve(process.argv[1]) : '';
 if (invokedPath === fileURLToPath(import.meta.url)) {
   checkStorefrontScreenshots()
-    .then((screenshots) => console.log(`Storefront 截图校验通过：${screenshots.length} 张图片`))
+    .then((screenshots) => console.log(`Storefront screenshot check passed: ${screenshots.length} images`))
     .catch((error) => {
-      console.error(`Storefront 截图校验失败：${error instanceof Error ? error.message : String(error)}`);
+      console.error(`Storefront screenshot check failed: ${error instanceof Error ? error.message : String(error)}`);
       process.exitCode = 1;
     });
 }

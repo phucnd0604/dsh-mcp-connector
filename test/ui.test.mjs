@@ -7,26 +7,26 @@ const uiSource = normalizeLineEndings(await readFile(new URL('../ui/index.html',
 const clientSource = normalizeLineEndings(await readFile(new URL('../lib/client.js', import.meta.url), 'utf8'));
 const harnessSource = normalizeLineEndings(await readFile(new URL('../scripts/ui-harness.mjs', import.meta.url), 'utf8'));
 
-test('授权和本地启动错误不追加 API Key、JSON 或 URL 建议', () => {
+test('guidance does not append API Key, JSON or URL advice to authorization and local launch errors', () => {
   const start = uiSource.indexOf('  function guidanceFor(');
   const end = uiSource.indexOf('  function showModalError(', start);
   const guide = new Function(`${uiSource.slice(start, end)}; return guidanceFor;`)();
-  for (const text of ['钉钉待授权，请等待管理员处理', 'CLI OAuth 返回无效 JSON', '本地 MCP 初始化失败', '连接失败：首次工具同步失败']) {
+  for (const text of ['DingTalk authorization is pending, wait for the administrator', 'CLI OAuth returned invalid JSON', 'Local MCP initialization failed', 'Connection failed: the first tool sync failed']) {
     assert.equal(guide(text), text);
   }
-  assert.match(guide('fetch failed'), /检查网络/);
-  assert.match(guide('JSON 格式错误'), /检查引号/);
+  assert.match(guide('fetch failed'), /Check the network/);
+  assert.match(guide('JSON format error'), /Check the quotes/);
 });
 
-test('连接说明明确区分 CLI 授权、运行位置与权限，不把 none 宣传为免授权', () => {
+test('connection labels distinguish CLI authorization, run location and permissions, and never advertise none as authorization-free', () => {
   const start = uiSource.indexOf('  function connectionLabels(');
   const end = uiSource.indexOf('  function cardHtml(', start);
   const labels = new Function(`${uiSource.slice(start, end)}; return connectionLabels;`)();
-  assert.deepEqual(labels({ id: 'dingtalk', vendor: '钉钉', authMode: 'none', servers: [{ transport: 'stdio' }] }),
-    ['提供方：钉钉', '官方 CLI OAuth', '运行于 DSH 主机', '当前桥接仅提供只读工具']);
-  assert.ok(labels({ authMode: 'none' }).includes('按服务要求授权'));
-  assert.ok(labels({ authMode: 'bearer' }).includes('Bearer 凭据'));
-  assert.ok(labels({ authMode: 'oauth2-pkce' }).includes('OAuth 授权'));
+  assert.deepEqual(labels({ id: 'dingtalk', vendor: 'DingTalk', authMode: 'none', servers: [{ transport: 'stdio' }] }),
+    ['Provider: DingTalk', 'Official CLI OAuth', 'Runs on the DSH Host', 'The current bridge only provides read-only tools']);
+  assert.ok(labels({ authMode: 'none' }).includes('Authorize as the service requires'));
+  assert.ok(labels({ authMode: 'bearer' }).includes('Bearer credential'));
+  assert.ok(labels({ authMode: 'oauth2-pkce' }).includes('OAuth authorization'));
   assert.match(uiSource, /if \(!r.ok\) showModalError\(r.message\)/);
 });
 
@@ -35,28 +35,28 @@ test('市场卡片恢复紧凑信息量，运行提示为短标签，完整说�
   const end = uiSource.indexOf('  function actionHtml(', start);
   const source = uiSource.slice(start, end);
   const escape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-  const render = new Function('esc', 'isImageIcon', 'actionHtml', source + '; return cardHtml;')(escape, () => false, () => '<button>详情</button>');
-  const remote = { id: 'qcc', name: '企查查', summary: '企业工商信息', vendor: '长提供方说明', servers: [{ transport: 'streamable-http' }] };
+  const render = new Function('esc', 'isImageIcon', 'actionHtml', source + '; return cardHtml;')(escape, () => false, () => '<button>Details</button>');
+  const remote = { id: 'qcc', name: 'Qichacha', summary: 'Business registration data', vendor: 'Long provider description', servers: [{ transport: 'streamable-http' }] };
   const html = render(remote);
   assert.match(html, /class="name"/);
   assert.match(html, /class="summary"/);
   assert.match(html, /class="actions"/);
-  assert.doesNotMatch(html, /class="hint"|class="runtime-tag"|长提供方说明|权限以授权页/);
-  assert.match(render({ ...remote, servers: [{ transport: 'stdio' }] }), />本地运行<\/span>/);
-  assert.match(render({ ...remote, id: 'dingtalk', servers: [{ transport: 'stdio' }] }), />本地 CLI<\/span>/);
+  assert.doesNotMatch(html, /class="hint"|class="runtime-tag"|Long provider description|permissions follow/i);
+  assert.match(render({ ...remote, servers: [{ transport: 'stdio' }] }), />Local runtime<\/span>/);
+  assert.match(render({ ...remote, id: 'dingtalk', servers: [{ transport: 'stdio' }] }), />Local CLI<\/span>/);
   assert.match(render({ ...remote, summary: '<script>bad</script>' }), /&lt;script&gt;/);
   assert.match(uiSource, /\.card \.summary \{[^}]*-webkit-line-clamp: 2/);
   assert.match(uiSource, /connectionLabels\(connector\)\.map\(esc\)\.join/);
   assert.match(uiSource, /connectionLabels\(d\)\.join/);
 });
 
-test('已安装连接可选始终注入或按会话启用，并明确不会断开连接', () => {
+test('installed connections can always inject or enable per session, and it is clear the connection is not disconnected', () => {
   assert.match(uiSource, /class="injection-select"/);
-  assert.match(uiSource, />始终注入<\/option>/);
-  assert.match(uiSource, />按会话启用（实验）<\/option>/);
-  assert.match(uiSource, /按会话模式不会断开连接/);
+  assert.match(uiSource, />Always inject<\/option>/);
+  assert.match(uiSource, /Enable per session[^<]*<\/option>/);
+  assert.match(uiSource, /Enabling per session does not disconnect/);
   assert.match(uiSource, /call\('setInjectionMode', \{ key, mode \}\)/);
-  assert.match(uiSource, /最长 30 分钟/);
+  assert.match(uiSource, /up to 30 minutes/);
 });
 
 test('参数摘要保留必填、嵌套与约束，转义所有远端文本并对复杂结构降级', () => {
@@ -69,21 +69,21 @@ test('参数摘要保留必填、嵌套与约束，转义所有远端文本并�
     filters: { type: 'object', properties: { names: { type: 'array', items: { type: 'string' } } } },
     target: { oneOf: [{ type: 'string' }, { type: 'number' }] },
   } });
-  assert.match(html, /必填/); assert.match(html, /minLength/); assert.match(html, /数组元素/);
-  assert.match(html, /摘要不代表完整规则/); assert.doesNotMatch(html, /<img/); assert.match(html, /&lt;img/);
+  assert.match(html, /Required/); assert.match(html, /minLength/); assert.match(html, /Array items/);
+  assert.match(html, /summary does not represent/); assert.doesNotMatch(html, /<img/); assert.match(html, /&lt;img/);
   let nested = { type: 'string' };
   for (let i = 0; i < 20; i++) nested = { type: 'object', properties: { nested } };
-  assert.match(render(nested), /结构较大/);
+  assert.match(render(nested), /Structure is large/);
 });
 
-test('工具工作台提供筛选分页和独立的检查/发现，过期响应和工作区切换有保护', () => {
+test('the tool workbench offers filters, paging and separate check/discover actions, with protection against stale responses and workspace switches', () => {
   assert.match(uiSource, /data-view="tools"/);
-  assert.match(uiSource, /按连接筛选/); assert.match(uiSource, /按服务筛选/);
+  assert.match(uiSource, /Filter by connection/); assert.match(uiSource, /Filter by server/);
   assert.match(uiSource, /data-explorer-page="next"/);
   assert.match(uiSource, /data-explorer-action="discover"/); assert.match(uiSource, /data-explorer-action="check"/);
   assert.match(uiSource, /sequence !== explorerSequence/);
   assert.match(uiSource, /requestId !== explorerDetailSequence/);
-  assert.match(uiSource, /原始 Schema（安全缓存）/);
+  assert.match(uiSource, /raw schema/i);
 });
 
 test('工具页面排序与缓存搜索一致，精确工具名优先并支持中英混排', async () => {
@@ -123,17 +123,17 @@ test('宿主原生面板填满 main 区域，兼容弹窗和截图 harness 保�
   assert.doesNotMatch(harnessSource, /new Set\(\['qcc-company'\]\)/);
 });
 
-test('界面固定为中文且不提供语言切换入口', () => {
-  assert.match(uiSource, /<html lang="zh-CN">/);
+test('the interface is English-only and provides no language switch entry', () => {
+  assert.match(uiSource, /<html lang="en">/);
   assert.doesNotMatch(uiSource, /id="locale-toggle"/);
   assert.doesNotMatch(uiSource, /mcp-connector:locale/);
-  assert.doesNotMatch(uiSource, /Switch language|>EN<\/button>|Sending…/);
+  assert.doesNotMatch(uiSource, /Switch language|>EN<\/button>/);
   assert.doesNotMatch(uiSource, /data-i18n/);
-  assert.match(uiSource, /const LABELS = \{[\s\S]*?details: '详情'/);
+  assert.match(uiSource, /const LABELS = \{[\s\S]*?details: 'Details'/);
 });
 
 test('目录刷新文案与插件升级明确区分', () => {
-  assert.match(uiSource, /id="refresh" title="刷新连接器目录">刷新连接器目录<\/button>/);
+  assert.match(uiSource, /id="refresh" title="Refresh connector catalog">Refresh catalog<\/button>/);
   assert.match(uiSource, /call\('refreshCatalog', \{\}\)/);
 });
 
@@ -152,69 +152,68 @@ test('参数弹框与发送提示位于详情弹框之上', () => {
 test('JSON 导入提供缩进示例、格式化和简洁的本机安全说明', () => {
   assert.match(uiSource, /const MCP_JSON_EXAMPLE = JSON\.stringify\([\s\S]*?null, 2\)/);
   assert.match(uiSource, /formatImportJson\(silent = false\)/);
-  assert.match(uiSource, /配置和凭据仅保存在 DSH 本机/);
-  assert.doesNotMatch(uiSource, /JSON 导入后进入「已安装」/);
-  assert.match(uiSource, />市场卡片<\/button>/);
+  assert.match(uiSource, /configuration and credentials are stored only on this DSH machine/);
+  assert.match(uiSource, />Market card<\/button>/);
 });
 
 test('配置备份提供脱敏导出、快照预览与原子恢复入口', () => {
-  assert.match(uiSource, /id="config-backup"[^>]*>配置备份<\/button>/);
+  assert.match(uiSource, /id="config-backup"[^>]*>Config backup<\/button>/);
   assert.match(uiSource, /call\('exportConfig'/);
   assert.match(uiSource, /call\('listSnapshots'/);
   assert.match(uiSource, /call\('createSnapshot'/);
   assert.match(uiSource, /call\('previewSnapshot'/);
   assert.match(uiSource, /call\('restoreSnapshot'/);
-  assert.match(uiSource, /Token、API Key、Header\/env 值、stdio 参数、本地路径与 OAuth Grant 均不会导出/);
-  assert.match(uiSource, /恢复过程中任一 Server 失败会整体回滚/);
+  assert.match(uiSource, /are never exported/);
+  assert.match(uiSource, /If any Server fails during the restore, everything is rolled back/);
 });
 
 test('自定义和 JSON 连接可无中断修改显示名', () => {
   assert.match(uiSource, /const canRename = r\.canRename === true/);
-  assert.match(uiSource, />重命名<\/button>/);
+  assert.match(uiSource, />Rename<\/button>/);
   assert.match(uiSource, /function openRenameConnection\(key\)/);
-  assert.match(uiSource, /serverName（工具前缀，不可修改）/);
+  assert.match(uiSource, /serverName \(tool prefix[^)]*\)/);
   assert.match(uiSource, /call\('renameConnection', \{ key, name \}\)/);
-  assert.match(uiSource, /当前连接不会中断/);
+  assert.match(uiSource, /not interrupted/);
 });
 
 test('自定义和 JSON 连接可安全编辑完整配置并原子重连', () => {
   assert.match(uiSource, /const canEditConfiguration = r\.canEditConfiguration === true/);
-  assert.match(uiSource, />编辑配置<\/button>/);
+  assert.match(uiSource, />Edit configuration<\/button>/);
   assert.match(uiSource, /function openConnectionEditor\(key\)/);
   assert.match(uiSource, /call\('editableConnectionConfig', \{ key \}\)/);
   assert.match(uiSource, /id="edit-connection-json"/);
   assert.match(uiSource, /&lt;KEEP_EXISTING&gt;/);
-  assert.match(uiSource, /serverName<\/code> 是连接身份，不可修改/);
+  assert.match(uiSource, /is the connection identity/);
   assert.match(uiSource, /call\('reconfigureConnection', \{ key, json \}\)/);
-  assert.match(uiSource, /任何校验、启动或保存失败都会保留原连接/);
+  assert.match(uiSource, /Any validation, launch, or save failure keeps the original connection/);
   assert.match(uiSource, /reconfigureConnection: 145_000/);
 });
 
 test('添加连接默认打开 JSON 且首屏操作按钮保持可见', () => {
   assert.match(uiSource, /function openAddConnection\(mode = 'json'/);
   assert.match(uiSource, /#add-connection'\)\.addEventListener\('click', \(\) => openAddConnection\('json'\)\)/);
-  assert.ok(uiSource.indexOf('>导入 JSON</button>') < uiSource.indexOf('>手动配置</button>'));
+  assert.ok(uiSource.indexOf('>Import JSON</button>') < uiSource.indexOf('>Manual setup</button>'));
   assert.match(uiSource, /id="import-json" rows="8"/);
   assert.match(uiSource, /\.modal \.m-actions \{[\s\S]*?position: sticky; bottom: 0;/);
 });
 
 test('手动配置支持 stdio 并区分 URL 与本地进程字段', () => {
-  assert.match(uiSource, /<option value="stdio">stdio（本地进程）<\/option>/);
+  assert.match(uiSource, /<option value="stdio">stdio \(local process\)<\/option>/);
   assert.match(uiSource, /id="cfg-command"/);
   assert.match(uiSource, /id="cfg-args"/);
   assert.match(uiSource, /id="cfg-env"/);
   assert.match(uiSource, /function|syncTransportFields/);
   assert.match(uiSource, /transport === 'stdio' \? 'none' : authMode/);
-  assert.match(uiSource, /Host 已完成 stdio 初始化，但该 Server 当前没有可展示的工具/);
+  assert.match(uiSource, /stdio initialization, but this server currently has no tools to show/);
 });
 
 test('局域网明文 HTTP 需用户显式确认且告知限定范围', () => {
   assert.match(uiSource, /id="cfg-allow-insecure-lan" type="checkbox"/);
-  assert.match(uiSource, /接受 HTTP 传输可被同网段监听或篡改的风险/);
-  assert.match(uiSource, /10\/8、172\.16\/12、192\.168\/16 和 IPv6 ULA/);
+  assert.match(uiSource, /accept that HTTP traffic can be observed or tampered with on the same network segment/);
+  assert.match(uiSource, /10\/8, 172\.16\/12, 192\.168\/16 and IPv6 ULA/);
   assert.match(uiSource, /allowInsecurePrivateNetwork: transport !== 'stdio'/);
   assert.match(uiSource, /private-network HTTP requires explicit confirmation/);
-  assert.match(uiSource, /局域网 HTTP 风险已确认/);
+  assert.match(uiSource, /HTTP risk/);
 });
 
 test('连接、健康检查与工具加载均有有限超时和可重试提示', () => {
@@ -225,26 +224,26 @@ test('连接、健康检查与工具加载均有有限超时和可重试提示',
   assert.match(uiSource, /const controller = new AbortController\(\)/);
   assert.match(uiSource, /signal: controller\.signal/);
   assert.match(uiSource, /authMode === 'oauth2-pkce' \? 310_000/);
-  assert.match(uiSource, /请求超时（\$\{Math\.ceil\(timeoutMs \/ 1000\)\} 秒）/);
+  assert.match(uiSource, /Request timed out \(\$\{Math\.ceil\(timeoutMs \/ 1000\)\} seconds\)/);
   assert.match(uiSource, /detailNeedsReconfigure = true/);
-  assert.match(uiSource, /重新检查/);
+  assert.match(uiSource, /Check again/);
 });
 
-test('页面通过同源 SSE 实时刷新，并在实时失败时显示最后成功工具缓存与参数详情', () => {
+test('the page refreshes over same-origin SSE, and shows the last successful tool cache with parameter details when live data fails', () => {
   assert.match(uiSource, /new EventSource\('\/mcp-connector\/events'\)/);
   assert.match(uiSource, /source\.addEventListener\('status'/);
   assert.match(uiSource, /scheduleStatusRefresh/);
   assert.match(uiSource, /statusEventSource\?\.close\(\)/);
   assert.match(uiSource, /server\.cached/);
-  assert.match(uiSource, /最后成功缓存/);
+  assert.match(uiSource, /last successful cache/);
   assert.match(uiSource, /call\('toolDetail'/);
   assert.match(uiSource, /data-tool-detail=/);
-  assert.match(uiSource, /schema 已安全裁剪/);
+  assert.match(uiSource, /schema has been safely truncated/);
 });
 
 test('凭据型市场卡片提供多 Server 一次配置表单', () => {
   assert.match(uiSource, /function openCatalogCredentialForm\(preset\)/);
-  assert.match(uiSource, /一次配置 \$\{servers\.length\} 个 MCP Server/);
+  assert.match(uiSource, /Configure \$\{servers\.length\} MCP servers at once/);
   assert.match(uiSource, /preset\.credentialName/);
   assert.match(uiSource, /preset\.credentialPlaceholder/);
   assert.match(uiSource, /preset\.credentialDescription/);
@@ -253,12 +252,12 @@ test('凭据型市场卡片提供多 Server 一次配置表单', () => {
   assert.match(uiSource, /data-credential-key=/);
   assert.match(uiSource, /field\.secret === false \? 'text' : 'password'/);
   assert.match(uiSource, /connectorId,\s*authMode,\s*credentialValues,\s*bearerToken/);
-  assert.match(uiSource, /本地 Agent · 本机文件/);
-  assert.match(uiSource, /远程 Agent · 在线链接文档/);
-  assert.match(uiSource, /在线链接 \+ 本机文件同时启用/);
+  assert.match(uiSource, /Local Agent · local files/);
+  assert.match(uiSource, /Remote Agent · online/);
+  assert.match(uiSource, /Online links and local files are enabled together/);
   assert.match(uiSource, /connectionComplete === false/);
-  assert.match(uiSource, /completeSetup: '补充本地解析'/);
-  assert.match(uiSource, /upgradeOauth: '升级一键授权'/);
+  assert.match(uiSource, /completeSetup: 'Complete local parsing'/);
+  assert.match(uiSource, /upgradeOauth: 'Upgrade to one-click auth'/);
   assert.match(uiSource, /incomplete && d\.authMode === 'oauth2-pkce'[\s\S]*?window\.__mcp\.connect/);
   assert.match(uiSource, /detailFailureState === 'incomplete' && detailConnector\?\.authMode === 'oauth2-pkce'/);
 });
@@ -268,17 +267,17 @@ test('详情页的 Bearer/API Key 连接按钮直接打开凭据表单', () => {
   assert.match(trySource, /\['bearer', 'api-key'\]\.includes\(detailConnector\.authMode\)/);
   assert.match(trySource, /openAddConnection\('manual', detailConnector\)/);
   assert.ok(trySource.indexOf("openAddConnection('manual', detailConnector)") < trySource.indexOf("call('connect'"));
-  assert.match(uiSource, /configureConnect: '🔑 录入凭据并连接'/);
+  assert.match(uiSource, /configureConnect: '🔑 Add credentials and connect'/);
   assert.match(uiSource, /showToast\(r\.message, true\); await refreshConnectionUi\(connectorId\)/);
-  assert.match(uiSource, /正在验证凭据与连接…/);
+  assert.match(uiSource, /Verifying credentials and the connection…/);
   assert.match(uiSource, /detailNeedsReconfigure[\s\S]*?reconfigureCredential/);
   assert.match(uiSource, /detailConnector\?\.connected\?\.length > 0 && !detailNeedsReconfigure/);
-  assert.match(uiSource, /当前连接异常/);
-  assert.match(uiSource, /授权已失效/);
-  assert.match(uiSource, /重新检查/);
+  assert.match(uiSource, /The current connection is abnormal/);
+  assert.match(uiSource, /Authorization has expired/);
+  assert.match(uiSource, /Check again/);
 });
 
-test('连接成功后原地重载已打开的详情与工具清单', () => {
+test('a successful connection reloads the open detail and tool list in place', () => {
   const connectSource = uiSource.match(/async connect\(connectorId\) \{[\s\S]*?\n    \},/)?.[0] ?? '';
   const configureSource = uiSource.match(/async submitConfig\(\) \{[\s\S]*?\n    \},\n    async submitImport/)?.[0] ?? '';
   const trySource = uiSource.match(/\$\('#detail-try-btn'\)\.addEventListener\('click', async \(\) => \{[\s\S]*?\n  \}\);/)?.[0] ?? '';
@@ -294,8 +293,8 @@ test('连接成功后原地重载已打开的详情与工具清单', () => {
 
 test('未连接且无工具快照的市场卡片不误报连接异常', () => {
   assert.match(uiSource, /if \(!d\.connected\?\.length && !d\.toolsSnapshot\?\.length\)/);
-  assert.match(uiSource, /连接后查看工具/);
-  assert.match(uiSource, /连接后可读取服务端工具清单/);
+  assert.match(uiSource, /connectToUse/);
+  assert.match(uiSource, /After connecting, the server tool list can be read/);
   assert.ok(
     uiSource.indexOf('if (!d.connected?.length && !d.toolsSnapshot?.length)') < uiSource.indexOf("call('toolsList', { connectorId, connectionKey: d.connectionKey, ...workspaceParams() })"),
   );
@@ -312,7 +311,7 @@ test('详情页提供连接、Server、Tool 三层策略预览、应用和回滚
   assert.match(uiSource, /expectedRevision: preview\.detail\.baseRevision/);
   assert.match(uiSource, /call\('applyPolicy'/);
   assert.match(uiSource, /call\('rollbackPolicy'/);
-  assert.match(uiSource, /当前 Host 未观察到该工具，不能报告为已禁用或健康/);
+  assert.match(uiSource, /Host has not observed this tool, so it cannot be reported as disabled or healthy/);
 });
 
 test('新连接显示 project/global 目标，范围变更先预览影响再应用且可回滚', () => {
@@ -322,8 +321,8 @@ test('新连接显示 project/global 目标，范围变更先预览影响再应�
   assert.match(uiSource, /let availableWorkspaces = \[\]/);
   assert.match(uiSource, /function scopeFieldHtml/);
   assert.match(uiSource, /project:\$\{workspace\.workspaceId\}/);
-  assert.match(uiSource, /可选择任一 Workspace/);
-  assert.match(uiSource, /所有项目（全局）/);
+  assert.match(uiSource, /any workspace; project scope is only visible to that workspace/);
+  assert.match(uiSource, /All projects/);
   assert.match(uiSource, /function openConnectScope\(connectorId\)/);
   assert.match(uiSource, /call\('connect', \{ connectorId, \.\.\.scopeParams \}/);
   assert.match(uiSource, /call\('previewConnectionScope'/);
@@ -332,7 +331,7 @@ test('新连接显示 project/global 目标，范围变更先预览影响再应�
   assert.match(uiSource, /call\('applyConnectionScope'/);
   assert.match(uiSource, /call\('previewConnectionScopeRollback'/);
   assert.match(uiSource, /call\('rollbackConnectionScope'/);
-  assert.match(uiSource, /范围绑定不保存或复制凭据/);
+  assert.match(uiSource, /scope binding never stores or copies credential/);
 });
 
 test('市场卡片区分状态未知、已连接、重新授权和连接异常', () => {
@@ -348,25 +347,36 @@ test('市场卡片区分状态未知、已连接、重新授权和连接异常',
 test('已安装列表和详情展示可解释诊断与最近成功时间', () => {
   assert.match(uiSource, /r\.diagnostic\.stageLabel \|\| r\.diagnostic\.stage/);
   assert.match(uiSource, /r\.diagnostic\.code/);
-  assert.match(uiSource, /建议：/);
+  assert.match(uiSource, /Suggestion:/);
   assert.match(uiSource, /r\.lastSuccessfulAt/);
-  assert.match(uiSource, /detailFailureState === 'unknown' \? '工具状态未知'/);
-  assert.match(uiSource, /状态尚未确认/);
+  assert.match(uiSource, /detailFailureState === 'unknown' \? 'Tool status unknown'/);
+  assert.match(uiSource, /Status not yet confirmed/);
 });
 
 test('市场只保留推荐与业务分类筛选', () => {
-  assert.match(uiSource, /aria-label="市场分类"/);
+  assert.match(uiSource, /aria-label="Market categories"/);
   assert.match(uiSource, /items\.filter\(matchesMarketFilters\)/);
   assert.doesNotMatch(uiSource, /marketVendor|marketAuth|AUTH_FILTERS/);
   assert.doesNotMatch(uiSource, /market-vendor-filter|data-auth-filter|market-filter-reset/);
   assert.doesNotMatch(uiSource, /服务商<\/span>|接入方式<\/span>|全部服务商|全部接入|Key \/ Token|免密/);
 });
 
-test('市场支持分类筛选与推荐位（9 分类 + 推荐）', () => {
+test('the market supports category filtering and a featured section (9 categories + featured)', () => {
   assert.match(uiSource, /const CATEGORIES = \[/);
-  assert.match(uiSource, /value: 'recommended', label: '推荐'/);
-  for (const category of ['企业数据', '金融投资', '法律合规', '开发工具', '办公协作', '调研分析', '设计创意', '效率工具', '其他']) {
-    assert.match(uiSource, new RegExp(`value: '${category}', label: '${category}'`));
+  assert.match(uiSource, /value: 'recommended', label: 'Recommended'/);
+  // Category values stay in the catalog's original Chinese keys, but every user-facing label is English.
+  for (const [category, label] of [
+    ['企业数据', 'Enterprise Data'],
+    ['金融投资', 'Finance & Investment'],
+    ['法律合规', 'Legal & Compliance'],
+    ['开发工具', 'Developer Tools'],
+    ['办公协作', 'Office & Collaboration'],
+    ['调研分析', 'Research & Analysis'],
+    ['设计创意', 'Design & Creative'],
+    ['效率工具', 'Productivity'],
+    ['其他', 'Other'],
+  ]) {
+    assert.match(uiSource, new RegExp(`value: '${category}', label: '${label}'`));
   }
   assert.match(uiSource, /function normalizeCategory\(c\)/);
   assert.match(uiSource, /CATEGORY_MAP\[c\] \|\| '其他'/);
@@ -380,10 +390,10 @@ test('市场支持分类筛选与推荐位（9 分类 + 推荐）', () => {
 test('全部市场按分类分章节，每章默认展示 4 个并可展开', () => {
   assert.match(uiSource, /const MARKET_SECTION_PREVIEW_LIMIT = 4;/);
   assert.match(uiSource, /function groupedMarketHtml\(items\)/);
-  assert.match(uiSource, /value: 'recommended', label: '推荐', items:/);
+  assert.match(uiSource, /value: 'recommended', label: 'Recommended', items:/);
   assert.match(uiSource, /items\.slice\(0, MARKET_SECTION_PREVIEW_LIMIT\)/);
   assert.match(uiSource, /data-section-toggle=/);
-  assert.match(uiSource, /查看全部 \$\{items\.length\} 个/);
+  assert.match(uiSource, /View all \$\{items\.length\}/);
   assert.match(uiSource, /filtered\.map\(cardHtml\)/, '点击分类后应展示该分类全部卡片');
   assert.doesNotMatch(uiSource, /catalogRenderLimit|id="catalog-more"/);
 });
@@ -423,10 +433,10 @@ test('连接、配置、导入或 URL 安装成功后显示克制的社区入口
   const installFromUrlSource = uiSource.match(/async submitUrl\(\) \{[\s\S]*?\n    \},\n    async migrateLegacy/)?.[0] ?? '';
   assert.match(uiSource, /function communityCtaHtml\(\)/);
   assert.match(uiSource, /function markCommunityCtaEligible\(\)/);
-  assert.match(uiSource, /连接顺利？如果 MCP连接器对你有帮助/);
+  assert.match(uiSource, /Connecting well\? If MCP Connector helps you/);
   assert.match(uiSource, />Star<\/a>/);
-  assert.match(uiSource, />提交连接器<\/a>/);
-  assert.match(uiSource, />参与贡献<\/a>/);
+  assert.match(uiSource, />Submit a connector<\/a>/);
+  assert.match(uiSource, />Contribute<\/a>/);
   assert.match(uiSource, /\$\{communityCtaHtml\(\)\}/);
   assert.match(connectSource, /if \(r\.ok\) \{\s*markCommunityCtaEligible\(\);/);
   assert.equal((configureSource.match(/call\('configure'/g) || []).length, 2, '市场配置和自定义配置都必须受测');
@@ -443,11 +453,11 @@ test('关闭社区入口后在本次页面生命周期内保持隐藏', () => {
   assert.match(uiSource, /dismissCommunityCta\(\) \{ dismissCommunityCta\(\); \}/);
 });
 
-test('工具清单使用中文计数并标记服务商弃用工具', () => {
-  assert.match(uiSource, /\$\('#tools-summary'\)\.textContent = `\$\{detailToolServers\.length\} 个服务 · \$\{totalTools\} 个工具`/);
+test('the tool list uses English counts and flags provider-deprecated tools', () => {
+  assert.match(uiSource, /\$\('#tools-summary'\)\.textContent = `\$\{detailToolServers\.length\} servers · \$\{totalTools\} tools`/);
   assert.match(uiSource, /function isDeprecatedTool\(tool\)/);
   assert.match(uiSource, /deprecated/);
   assert.match(uiSource, /已弃用\|已废弃\|不再推荐/);
-  assert.match(uiSource, /<span class="tool-deprecated">已弃用<\/span>/);
+  assert.match(uiSource, /<span class="tool-deprecated">Deprecated<\/span>/);
   assert.match(uiSource, /Number\(isDeprecatedTool\(left\)\) - Number\(isDeprecatedTool\(right\)\)/);
 });

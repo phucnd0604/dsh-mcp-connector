@@ -1,87 +1,87 @@
-# 线上收录与排名证据
+# Live Cataloging and Ranking Evidence
 
-## 1. 产品事实基线
+## 1. Product Fact Baseline
 
-本轮只采用 `v0.2.45 / 82d240601df73b8e704124100ec5771a0cd5514a`。该提交的 `CHANGELOG.md` 和界面源码确认：
+This round adopts only `v0.2.45 / 82d240601df73b8e704124100ec5771a0cd5514a`. That commit's `CHANGELOG.md` and interface source confirm:
 
-- 独立“工具”页支持跨连接统一搜索、精确工具名优先、分页，以及连接/服务/发现状态筛选。
-- 结果展示连接、服务、最近发现状态和最后成功缓存时间。
-- 参数详情展示类型、必填、枚举、约束与可展开嵌套结构。
-- 每条连接可执行“检查连接”和“重新发现工具”，并显示已有诊断建议。
-- 搜索和筛选仅读取安全裁剪后的缓存，不执行目标工具，也不证明远端服务当前可调用。
-- 后台发现采用有界并发与失败退避；429 遵守 `Retry-After`，鉴权失败暂停自动重试。
+- The standalone "Tools" page supports unified cross-connection search, exact tool name priority, pagination, and filtering by connection/service/discovery status.
+- Results display the connection, service, most recent discovery status, and last successful cache time.
+- Parameter details display the type, required flag, enums, constraints, and an expandable nested structure.
+- Each connection can run "Check connection" and "Rediscover tools", and displays existing diagnostic suggestions.
+- Search and filtering only read the safely redacted cache; they do not execute the target tool and do not prove that the remote service is currently callable.
+- Background discovery uses bounded concurrency and failure backoff; 429 responses respect `Retry-After`, and authentication failures pause automatic retries.
 
-数量口径由 0.2.45 数据证据任务冻结：公共 Registry 106 条、随包唯一 4 条、合并去重后 110 张、覆盖 9 类、精选 6 张。市场文案使用更耐久的“超百个”，不把目录条数或 npm 下载量解释为用户数；连接器也不应被笼统描述为“全部免费”。
+The count definitions were frozen by the 0.2.45 data evidence task: 106 public Registry entries, 4 bundled-unique entries, 110 after merge and dedupe, covering 9 categories with 6 featured. Marketplace copy uses the more durable "over one hundred", does not interpret catalog entry counts or npm download counts as user counts, and connectors should not be broadly described as "entirely free".
 
-> 注：上一段中的产品能力应以源码/CHANGELOG 为准；“缓存可查”不等于断网或远端故障时工具仍可调用。
+> Note: the product capabilities in the preceding paragraph should be governed by the source code/CHANGELOG; a "viewable cache" does not mean the tool is still callable while offline or during a remote outage.
 
-## 2. awesome-dsh-plugin 收录历史
+## 2. awesome-dsh-plugin Cataloging History
 
-| 事项 | 状态 | 合并时间 | 证据 |
+| Item | Status | Merge time | Evidence |
 |---|---|---:|---|
-| 初次收录 #2633 | 已合并 | 2026-08-23 | [PR #2633](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/2633) |
-| 介绍优化 #3656 | 已合并 | 2026-08-29 | [PR #3656](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/3656) |
-| 数量表述 #4119 | 已合并；维护者曾按当时 97 条改为“近百/~100” | 2026-09-02 03:49Z | [PR #4119](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/4119)，合并提交 `6e1478ff02a3838daf95c80dde9ec55bab11702b` |
-| 超百表述 #4146 | 已合并；检查全部成功 | 2026-09-03 07:09Z | [PR #4146](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/4146)，合并提交 `e5c464a61d62de68cf10b88c1d558601feb9f0d0` |
+| Initial cataloging #2633 | Merged | 2026-08-23 | [PR #2633](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/2633) |
+| Introduction optimization #3656 | Merged | 2026-08-29 | [PR #3656](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/3656) |
+| Count wording #4119 | Merged; the maintainer changed it to "nearly one hundred/~100" based on the 97 entries at the time | 2026-09-02 03:49Z | [PR #4119](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/4119), merge commit `6e1478ff02a3838daf95c80dde9ec55bab11702b` |
+| Over-one-hundred wording #4146 | Merged; all checks succeeded | 2026-09-03 07:09Z | [PR #4146](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/4146), merge commit `e5c464a61d62de68cf10b88c1d558601feb9f0d0` |
 
-目标文件 `data/plugins/duhu2000__dsh-mcp-connector.yml` 的最新提交仍是 #4146 对应的 `91e2f408c7cb0abe0744db4ccd60fe90699ffe3e`；本次核对未发现更晚的条目更新。
+The latest commit to the target file `data/plugins/duhu2000__dsh-mcp-connector.yml` is still `91e2f408c7cb0abe0744db4ccd60fe90699ffe3e` corresponding to #4146; this verification found no later entry update.
 
-## 3. 当前线上条目
+## 3. Current Live Entry
 
-数据源：[`plugins.json`](https://awesome-dsh-plugin.com/plugins.json)，本次读取到 `updated: 2026-09-12`、`count: 3561`。
+Data source: [`plugins.json`](https://awesome-dsh-plugin.com/plugins.json); this read returned `updated: 2026-09-12`, `count: 3561`.
 
-| 字段 | 当前值 |
+| Field | Current value |
 |---|---|
-| 页面 | <https://awesome-dsh-plugin.com/zh/p/duhu2000/dsh-mcp-connector/> |
-| 分类 | `tools` / 工具与能力 |
+| Page | <https://awesome-dsh-plugin.com/zh/p/duhu2000/dsh-mcp-connector/> |
+| Category | `tools` / Tools and Capabilities |
 | npm | `dsh-mcp-connector` |
-| 市场显示版本 | `0.2.44` |
+| Version shown in marketplace | `0.2.44` |
 | npm `latest` | `0.2.45` |
-| 近 30 天下载量 | 10,255（排序信号，不是用户数） |
-| GitHub Stars | 20（同下载量时的次级排序信号） |
-| 默认位置 | 62 / 3,561 |
+| Downloads in the last 30 days | 10,255 (a ranking signal, not a user count) |
+| GitHub Stars | 20 (the secondary ranking signal at equal download counts) |
+| Default position | 62 / 3,561 |
 
-版本差的原因是市场公开 JSON 的构建时间早于 0.2.45 Release（Release 发布于 2026-09-12 11:16:20Z）。市场版本由 npm 探测生成，条目 YAML 不接受手填 `npm` 或 `version` 字段，因此应等待同步，不为此提交描述 PR。
+The version gap is caused by the marketplace's public JSON being built earlier than the 0.2.45 Release (the Release was published at 2026-09-12 11:16:20Z). The marketplace version is generated by probing npm, and the entry YAML does not accept a manually filled `npm` or `version` field, so you should wait for the sync and not submit a description PR for this.
 
-## 4. 搜索与默认排序机制
+## 4. Search and Default Sorting Mechanism
 
-官方构建脚本和页面模板给出的机制：
+The mechanism given by the official build script and page template:
 
-- 默认 `sort=dl`：有 npm 下载数据的条目按近 30 天下载量降序；下载量相同时按 Stars 降序。
-- 没有 npm 数据的条目排在后面，并按 Stars 降序。
-- 搜索对当前语言页面每张卡片的全部可见文本执行小写化后的字面子串匹配。
-- 搜索只过滤卡片，不会按关键词相关度重新排序；命中项继续沿用当前排序。
-- 描述变化可以增加某个关键词是否命中，但不会直接改变默认下载量排序。
+- Default `sort=dl`: entries with npm download data are sorted by downloads in the last 30 days in descending order; on equal download counts, by Stars in descending order.
+- Entries without npm data are placed afterwards, sorted by Stars in descending order.
+- Search performs a lowercased literal substring match against all visible text on each card of the current language page.
+- Search only filters cards and does not re-rank by keyword relevance; matches continue to use the current sort order.
+- A description change can increase whether a keyword matches, but does not directly change the default download sorting.
 
-规则来源：
+Sources for these rules:
 
 - [build-site.mjs](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/scripts/build-site.mjs)
 - [site/template.html](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/site/template.html)
 - [contributing.md](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md)
 
-## 5. 2026-09-12 中文 UI 实测
+## 5. 2026-09-12 Chinese UI Hands-on Verification
 
-在 `https://awesome-dsh-plugin.com/zh/?q=mcp` 的实际页面中确认：排序控件为“下载量”，页面显示 171/3,561，目标卡片位于第 2。随后按同一 DOM 顺序对五组字面查询复核：
+Confirmed on the actual page at `https://awesome-dsh-plugin.com/zh/?q=mcp`: the sort control is "Downloads", the page shows 171/3,561, and the target card is in position 2. Five groups of literal queries were then re-verified in the same DOM order:
 
-| 查询 | 全部命中数 | 目标位置 | 结论 |
+| Query | Total matches | Target position | Conclusion |
 |---|---:|---:|---|
-| `mcp` | 171 | 2 | 已命中 |
-| `MCP连接器` | 0 | — | 当前缺口；现有文案写作 `MCP 连接器` |
-| `连接器` | 5 | 1 | 已命中 |
-| `mcp server` | 17 | 1 | 已命中 |
-| `连接管理` | 1 | 1 | 已命中 |
-| 清空查询（默认） | 3,561 | 62 | 只记录，不设提升目标 |
+| `mcp` | 171 | 2 | Matched |
+| `MCP连接器` | 0 | — | Current gap; the existing copy writes `MCP 连接器` |
+| `连接器` | 5 | 1 | Matched |
+| `mcp server` | 17 | 1 | Matched |
+| `连接管理` | 1 | 1 | Matched |
+| Cleared query (default) | 3,561 | 62 | Recorded only; no improvement target set |
 
-英文页补充基线：`mcp` 为第 2/174，`mcp server` 为第 1/67。中文查询不应在英文页作为验收失败项。
+Supplemental baseline for the English page: `mcp` is 2nd of 174, `mcp server` is 1st of 67. Chinese queries should not be treated as acceptance failures on the English page.
 
-## 6. 当前文案与 0.2.45 的差异
+## 6. Differences Between the Current Copy and 0.2.45
 
-| 项目 | 当前市场文案 | 0.2.45 实际能力 | 建议 |
+| Item | Current marketplace copy | Actual 0.2.45 capability | Recommendation |
 |---|---|---|---|
-| 产品名关键词 | `MCP 连接器`（有空格） | 产品统一名为 `MCP连接器` | 中文描述首词使用无空格产品名；正文无需重复堆词 |
-| 工具入口 | 仅“工具与 Prompt 发现” | 独立工具页、跨连接搜索、精确名称优先、分页 | 改为“跨连接工具查找” |
-| 筛选 | 未提及 | 连接/服务/发现状态筛选 | 在完整市场描述中列出 |
-| 参数 | 未提及 | 易读参数、约束、嵌套结构与安全 Schema | 写“易读参数”，避免声称执行工具 |
-| 可观测性 | 未提及 | 来源、最后成功缓存时间、最近发现状态 | 写“最后成功缓存时间”；明确缓存不代表可调用 |
-| 排障 | 仅“连接管理” | 单连接诊断、检查连接、重新发现工具 | 写“连接管理与连接排障”及“逐连接重新发现工具” |
-| 后台策略 | 未提及 | 有界并发、退避、429/鉴权处理 | 不塞入短描述，可在详情/更新说明展开 |
+| Product name keyword | `MCP 连接器` (with a space) | The product's unified name is `MCP Connector` | Use the space-free product name as the first word of the Chinese description; no need to stack keywords in the body |
+| Tool entry point | Only "tool and Prompt discovery" | Standalone tools page, cross-connection search, exact name priority, pagination | Change to "cross-connection tool lookup" |
+| Filtering | Not mentioned | Connection/service/discovery status filtering | List it in the full marketplace description |
+| Parameters | Not mentioned | Readable parameters, constraints, nested structures, and safe Schema | Write "readable parameters" and avoid claiming the tool is executed |
+| Observability | Not mentioned | Source, last successful cache time, most recent discovery status | Write "last successful cache time"; make clear the cache does not mean callable |
+| Troubleshooting | Only "connection management" | Per-connection diagnostics, check connection, rediscover tools | Write "connection management and connection troubleshooting" plus "rediscover tools per connection" |
+| Background policy | Not mentioned | Bounded concurrency, backoff, 429/authentication handling | Do not put this in the short description; it can be expanded in the details/update notes |

@@ -1,38 +1,38 @@
-# OAuth 连接没有成功时，先定位哪一层失败
+# When an OAuth connection does not succeed, locate which layer failed
 
-返回[首次成功统一入口](README.md)。
+Back to the [first-success unified entry point](README.md).
 
-适用场景：市场卡片要求 OAuth 2.0 PKCE，但按钮显示“自动重试中”“需重新授权”或连接异常。OAuth 接入能力依赖服务商公开元数据、客户端注册、账号权限与网络条件；插件支持 OAuth 流程，不等于每个市场连接器都已对任意账号开放。
+When this applies: a Market card requires OAuth 2.0 PKCE, but the button shows "Auto-retrying", "Reauthorization required" or a connection error. OAuth capability depends on the provider's public metadata, client registration, account permissions and network conditions; the plugin supporting the OAuth flow does not mean every Market connector is open to every account.
 
-## 先看状态，而不是反复点击授权
+## Look at the status first, instead of clicking authorize repeatedly
 
-1. 在“市场”或“已安装”找到对应连接，记录服务商名称、插件版本和按钮状态，不记录 Token/授权码。
-2. 展开详情中的诊断，记录 `stage`、稳定 `code`、`checkedAt` 与建议动作。`状态未知` 只表示缺少当前进程的观察证据，既不是成功也不是失败。
-3. 若为“自动重试中”，先检查网络与服务商状态，等待有界退避；临时刷新失败不必立刻重新授权。
-4. 若明确为“需重新授权”，再从卡片发起新授权。不要向未获授权的企业账号反复尝试登录，也不要把真实凭据交给第三方排障者。
+1. Find the matching connection under "Market" or "Installed", and record the provider name, plugin version and button status — never record the token/authorization code.
+2. Expand the diagnostics in the details view, and record `stage`, the stable `code`, `checkedAt` and the suggested action. `Status unknown` only means there is no observation evidence from the current process; it is neither success nor failure.
+3. If it shows "Auto-retrying", first check the network and the provider's status and wait for the bounded backoff; a temporary refresh failure does not require immediate reauthorization.
+4. If it explicitly shows "Reauthorization required", then start a new authorization from the card. Do not repeatedly attempt to log in to an enterprise account you are not authorized for, and never hand real credentials to third-party troubleshooters.
 
-## 按失败阶段处理
+## Handling by failure stage
 
-| 观察到的阶段或代码 | 首先核对 | 不应推断 |
+| Observed stage or code | Check first | Do not infer |
 |---|---|---|
-| OAuth 元数据/动态客户端注册；HTTP 403 | 服务商是否允许公开注册、是否需要预登记客户端或企业资格 | 浏览器没弹出就认定插件损坏；重复点击可绕过服务商政策 |
-| `auth` / `refresh` | 账号权限、授权范围、Grant 是否失效、服务商撤销状态 | 所有 refresh 错误都意味着永久失效 |
-| `dns` / `tls` / `timeout` / `http` | DNS、代理、证书、VPN/专线、白名单、服务端状态 | 授权已成功就说明 MCP 端点也可用 |
-| `protocol` | URL 是否为兼容的 MCP Streamable HTTP 端点 | 普通网页登录地址或 REST API 地址可直接替代 MCP URL |
-| `host-tools-pending` / `host-status-unavailable` | DSH Host 是否完成工具注册、版本是否能观测状态 | “已保存”就等于工具可调用 |
+| OAuth metadata / dynamic client registration; HTTP 403 | Whether the provider allows public registration, requires pre-registered clients or enterprise eligibility | That a missing browser popup means the plugin is broken; that clicking again can bypass provider policy |
+| `auth` / `refresh` | Account permissions, authorization scope, whether the grant has expired, the provider's revocation state | That every refresh error means permanent failure |
+| `dns` / `tls` / `timeout` / `http` | DNS, proxy, certificates, VPN/dedicated line, allowlist, server status | That a successful authorization means the MCP endpoint is also usable |
+| `protocol` | Whether the URL is a compatible MCP Streamable HTTP endpoint | That an ordinary web login URL or REST API URL can directly replace an MCP URL |
+| `host-tools-pending` / `host-status-unavailable` | Whether the DSH Host completed tool registration and whether the version can report status | That "saved" equals "the tool is callable" |
 
-只有页面明确显示“客户端注册被拒绝、尚未进入浏览器授权”时，才将问题定位到服务商注册政策；这不是用户 OAuth 登录失败。服务商可能要求登记客户端，不能靠重复尝试用户登录绕过。
+Only when the page explicitly shows that client registration was rejected and the browser authorization step has not been reached should you attribute the problem to the provider's registration policy; this is not a user OAuth login failure. A provider may require registered clients, which cannot be bypassed by repeatedly attempting a user login.
 
-## 验证恢复，而不是只看授权回调
+## Verify the recovery, not just the authorization callback
 
-1. 完成浏览器授权后回到 DSH，检查连接诊断与最近观察时间。多 Server 卡片如有一个异常，整体可能显示“部分异常”。
-2. 在当前工作区打开“工具”，确认对应连接/服务的工具被发现；若未选择 Workspace，只会显示全局连接。最后成功缓存可帮助定位，但不代表当前可调用。
-3. 在正常 DSH 会话里，以服务商许可的**只读**任务验证一次正式调用。工具执行、权限和审批由 DSH Host 管理；页面里的“检查连接/重新发现工具”不会执行目标工具。
+1. After completing browser authorization, return to DSH and check the connection diagnostics and the most recent observation time. If a multi-server card has one abnormal server, the whole card may show "partially degraded".
+2. Open "Tools" in the current workspace and confirm that the tools for the matching connection/service were discovered; if no workspace is selected, only global connections are shown. The last successful cache can help locate the problem but does not mean it is callable right now.
+3. In a normal DSH session, verify one formal call with a provider-permitted **read-only** task. Tool execution, permissions and approval are managed by the DSH Host; the page's "Check connection" / "Rediscover tools" actions never execute the target tool.
 
-授权成功、工具注册成功和业务调用成功是三个不同结果。只有全部完成，才可说“首次使用通过”。不要用含真实业务数据、付费或有副作用的调用做公开演示。
+Successful authorization, successful tool registration and a successful business call are three different results. Only when all three are done can you say "first use passed". Do not use calls that involve real business data, payment or side effects for public demos.
 
-## 安全反馈模板
+## Safe feedback template
 
-在 [GitHub Issue](https://github.com/duhu2000/dsh-mcp-connector/issues) 提供：DSH 版本、插件版本、连接器名称、操作系统、脱敏的阶段/code、时间、复现步骤，以及“浏览器是否进入授权”“工具是否注册”“只读调用是否成功”三个独立结论。不要上传 Token、API Key、Cookie、授权码、完整 Header、用户信息或本机路径。
+When opening a [GitHub Issue](https://github.com/duhu2000/dsh-mcp-connector/issues), provide: the DSH version, plugin version, connector name, operating system, the redacted stage/code, the time, reproduction steps, and three separate conclusions — "did the browser reach authorization", "were the tools registered", "did the read-only call succeed". Do not upload tokens, API keys, cookies, authorization codes, complete headers, user information or local paths.
 
-完整状态语义见[用户手册：连接诊断](../USER-GUIDE.md#75-如何理解连接诊断)。
+For the complete status semantics, see the [user guide: connection diagnostics](../USER-GUIDE.md).

@@ -1,6 +1,6 @@
-# MCP连接器 插件（DSH Bundle patch）
-# 作为 bundle 被合入 profile 时，自动插入本插件行。
-# 插件负责连接器目录、三通道连接、凭证存储与 mcp-client 条目动态配置。
+# MCP Connector plugin (DSH Bundle patch)
+# Inserted automatically when this bundle is merged into a profile.
+# The plugin owns the connector catalog, three connection channels, credential storage, and mcp-client entry provisioning.
 - insert:
     - id: mcp-connector
       name: 'dsh-mcp-connector'

@@ -1,113 +1,112 @@
-# v0.2.45 宣传案例录制手册
+# v0.2.45 Promotional Case Recording Runbook
 
-本手册用于在干净测试环境中复现“开发工具、办公协作、数据分析”三类案例。所有案例默认只读，不执行付费、发送、创建、修改或删除操作。
+This runbook is used to reproduce the three case categories "developer tools, office collaboration, data analysis" in a clean test environment. All cases are read-only by default and never perform paid, send, create, modify, or delete operations.
 
-## 统一录制规则
+## Unified Recording Rules
 
-1. 使用 `dsh-mcp-connector` v0.2.45，并先点击“刷新连接器目录”。
-2. 截图需同时能看到连接器名称、连接状态、工具总数或工具搜索结果、提问和带来源的回答。
-3. 连接前记录授权方式和运行时前置；连接后记录实时工具发现，不把 Registry 静态描述当成运行时成功证据。
-4. 不展示账号、邮箱、工作区/项目真实名称、Token、授权码、Cookie、本机绝对路径、客户数据或个人信息。
-5. 遇到服务不可达、授权失败、限流或工具变更时，保留错误类别和时间，不宣称产品永久可用。
+1. Use `dsh-mcp-connector` v0.2.45, and click "Refresh connector catalog" first.
+2. Screenshots must simultaneously show the connector name, connection status, total tool count or tool search results, the question, and the answer with sources.
+3. Before connecting, record the authorization method and runtime prerequisites; after connecting, record real-time tool discovery, and do not treat the Registry's static description as evidence of runtime success.
+4. Do not display accounts, email addresses, real workspace/project names, Tokens, authorization codes, Cookies, local absolute paths, customer data, or personal information.
+5. When encountering an unreachable service, authorization failure, rate limiting, or tool changes, keep the error category and timestamp, and do not claim the product is permanently available.
 
-## 案例 A：SHOPLINE 官方开发文档检索
+## Case A: SHOPLINE Official Developer Documentation Search
 
-### 目标
+### Goal
 
-证明用户可从统一工具搜索进入 SHOPLINE 官方开发资料查询，并产出带来源的 API 结论。
+Demonstrate that a user can enter the SHOPLINE official developer resource lookup through unified tool search and produce an API conclusion with sources.
 
-### 前置
+### Prerequisites
 
-- Connector：`shopline-developer-mcp`
-- 传输：stdio
-- 命令：`npx -y @shoplineos/shopline-developer-mcp@1.1.0`
-- 鉴权/费用：Connector 无鉴权；不因此承诺 SHOPLINE 其他业务服务免费。
-- 本地要求：Node.js/npm；可访问 npm 和 SHOPLINE 官方开发文档。
+- Connector: `shopline-developer-mcp`
+- Transport: stdio
+- Command: `npx -y @shoplineos/shopline-developer-mcp@1.1.0`
+- Authentication/cost: the Connector has no authentication; this does not imply a promise that other SHOPLINE business services are free.
+- Local requirements: Node.js/npm; access to npm and the SHOPLINE official developer documentation.
 
-### 录制步骤
+### Recording Steps
 
-1. 在市场搜索“SHOPLINE 开发者 MCP”，连接后确认发现 9 个工具。
-2. 在统一工具搜索中输入 `GraphQL`，确认能找到 `get_graphql_schema`、`validate_graphql_codes`。
-3. 发送：
+1. Search the marketplace for "SHOPLINE Developer MCP"; after connecting, confirm that 9 tools are discovered.
+2. Enter `GraphQL` in unified tool search and confirm that `get_graphql_schema` and `validate_graphql_codes` can be found.
+3. Send:
 
-   > 查找 SHOPLINE Storefront GraphQL 中查询商品标题、价格和库存的 schema，并生成一段可通过校验的只读查询；说明 API 版本与来源，不调用反馈工具。
+   > Look up the schema in SHOPLINE Storefront GraphQL for querying product title, price, and inventory, and generate a read-only query that passes validation; explain the API version and sources, and do not invoke the feedback tool.
 
-4. 验收回答包含：使用的工具、官方来源链接、GraphQL 代码、校验结果和版本/时效说明。
+4. The accepted answer contains: the tools used, official source links, GraphQL code, validation results, and a version/currency note.
 
-### 安全闸门
+### Safety Gates
 
-- 不调用 `shopline_mcp_feedback`；它会把内容发送给 SHOPLINE。
-- 不声称该 Connector 可读取真实店铺商品或订单；当前工具定位是开发文档、API 定义、Schema 与代码校验。
-- 已有只读验收只覆盖 1.1.0；包版本升级后需重新验收。
+- Do not invoke `shopline_mcp_feedback`; it sends content to SHOPLINE.
+- Do not claim that this Connector can read real store products or orders; the current tool positioning is developer documentation, API definitions, Schema, and code validation.
+- The existing read-only acceptance only covers 1.1.0; after a package version upgrade it must be re-accepted.
 
-## 案例 B：Notion 工作区只读进展汇总
+## Case B: Notion Workspace Read-Only Progress Summary
 
-### 目标
+### Goal
 
-证明统一 OAuth 连接后，可搜索和读取用户授权范围内的办公知识库，同时守住“只读”边界。
+Demonstrate that after a unified OAuth connection, the user's authorized office knowledge base can be searched and read while the "read-only" boundary is maintained.
 
-### 前置
+### Prerequisites
 
-- Connector：`notion`
-- 传输：官方托管 Streamable HTTP
-- 端点：`https://mcp.notion.com/mcp`
-- 鉴权：OAuth 2.0 PKCE
-- 费用/套餐：连接器目录不承诺 Notion 全部能力免费；跨 Slack/Google Drive/Jira 的连接源搜索需要 Notion AI，高级跨数据源查询还可能要求 Enterprise/Business 等计划。
-- 测试数据：专用空白工作区内准备 3 张虚构页面，例如“版本目标”“风险清单”“发布待办”。
+- Connector: `notion`
+- Transport: officially hosted Streamable HTTP
+- Endpoint: `https://mcp.notion.com/mcp`
+- Authentication: OAuth 2.0 PKCE
+- Cost/plan: the connector catalog does not promise that all Notion capabilities are free; cross-Slack/Google Drive/Jira source search requires Notion AI, and advanced cross-data-source queries may additionally require an Enterprise/Business plan or similar.
+- Test data: prepare 3 fictional pages in a dedicated blank workspace, for example "Release goals", "Risk list", and "Release to-dos".
 
-### 录制步骤
+### Recording Steps
 
-1. 连接 Notion，OAuth 时只选择专用测试工作区。
-2. 展开工具详情，确认实时发现 `notion-search` 与 `notion-fetch`；工具名前缀可能因客户端规范显示为 `search`、`fetch`。
-3. 发送：
+1. Connect Notion, selecting only the dedicated test workspace during OAuth.
+2. Expand the tool details and confirm real-time discovery of `notion-search` and `notion-fetch`; depending on client conventions, tool names may be displayed with the prefix removed as `search` and `fetch`.
+3. Send:
 
-   > 使用 Notion MCP 搜索工作区中与“v0.2.45 发布”相关的页面，汇总进展、风险和待办并附页面标题；不要创建、更新、移动页面或发表评论。
+   > Use Notion MCP to search the workspace for pages related to the "v0.2.45 release", summarize progress, risks, and to-dos, and attach the page titles; do not create, update, or move pages, and do not post comments.
 
-4. 验收回答只引用测试页面，按进展/风险/待办分组，并未触发任何写入工具。
+4. The accepted answer references only test pages, groups them by progress/risks/to-dos, and does not trigger any write tool.
 
-### 安全闸门
+### Safety Gates
 
-- 当前 Registry 卡片 `probeStatus` 为 `unverified`；完成本手册 TODO 前不得把此案例写成“DSH 已实测通过”。
-- 官方 MCP 的权限等同于当前 Notion 用户在被授权工作区的权限；录制不得连接生产工作区。
-- 不调用 `notion-create-pages`、`notion-update-page`、`notion-move-pages`、`notion-create-comment` 等写入工具。
-- 官方速率限制与套餐规则可能变化；出现限流时减少并行搜索或稍后重试。
+- The current Registry card's `probeStatus` is `unverified`; until the TODO in this runbook is completed, this case must not be written up as "verified in practice on DSH".
+- The permissions of the official MCP are equivalent to those of the current Notion user in the authorized workspace; recording must not connect a production workspace.
+- Do not invoke write tools such as `notion-create-pages`, `notion-update-page`, `notion-move-pages`, or `notion-create-comment`.
+- Official rate limits and plan rules may change; when rate limited, reduce parallel searches or retry later.
 
-## 案例 C：世界银行 Data360 跨国发展指标比较
+## Case C: World Bank Data360 Cross-Country Development Indicator Comparison
 
-### 目标
+### Goal
 
-证明免密公共 MCP 可以先发现指标、核对口径与覆盖，再获取数据和生成可核验图表方案。
+Demonstrate that a password-free public MCP can first discover indicators, verify definitions and coverage, and then fetch data and produce a verifiable charting plan.
 
-### 前置
+### Prerequisites
 
-- Connector：`world-bank-data360`
-- 传输：官方托管 Streamable HTTP
-- 端点：`https://maimcpext.worldbank.org/ext/data360/mcp`
-- 鉴权/费用：当前公共端点配置免密；不代表其他 World Bank 内部/APIM 部署免鉴权，也不代表所有衍生服务永久免费。
-- 本地要求：无需 stdio 运行时；需可访问 World Bank MCP、Data360 API，生成图表 URL 时还依赖 Charts API。
+- Connector: `world-bank-data360`
+- Transport: officially hosted Streamable HTTP
+- Endpoint: `https://maimcpext.worldbank.org/ext/data360/mcp`
+- Authentication/cost: the current public endpoint is configured as password-free; this does not mean other World Bank internal/APIM deployments are authentication-free, nor does it mean all derived services are permanently free.
+- Local requirements: no stdio runtime needed; requires access to World Bank MCP and the Data360 API, and generating chart URLs additionally depends on the Charts API.
 
-### 录制步骤
+### Recording Steps
 
-1. 在市场搜索“世界银行 Data360”，连接后确认发现 15 个工具。
-2. 在统一工具搜索中分别输入 `search`、`disaggregation`、`compare`、`viz`，确认能发现对应工具。
-3. 发送：
+1. Search the marketplace for "World Bank Data360"; after connecting, confirm that 15 tools are discovered.
+2. Enter `search`, `disaggregation`, `compare`, and `viz` respectively in unified tool search, and confirm that the corresponding tools can be discovered.
+3. Send:
 
-   > 比较印度尼西亚、马来西亚、菲律宾、泰国和越南 2014 年至最新可用年份的人均 GDP 与国际贫困线以下贫困人口比例变化；先检索指标并核对国家与年份覆盖，再生成年度对比表并总结趋势，列出指标定义、来源、单位、方法限制和缺失值，不要猜测 database_id 或 indicator_id。
+   > Compare how per-capita GDP and the share of population below the international poverty line changed from 2014 to the latest available year for Indonesia, Malaysia, the Philippines, Thailand, and Vietnam; retrieve the indicators first and verify country and year coverage, then generate a year-by-year comparison table and summarize the trends, listing indicator definitions, sources, units, methodological limits, and missing values; do not guess database_id or indicator_id.
 
-4. 验收调用顺序至少体现：`data360_search_indicators` → `data360_get_disaggregation` → `data360_get_data` 或 `data360_compare_countries`；若生成图表，再调用 `data360_get_viz_spec`。
-5. 验收回答保留指标定义、来源、单位、查询/最新可得时间、缺失值与比较限制。
+4. The accepted invocation sequence shows at least: `data360_search_indicators` → `data360_get_disaggregation` → `data360_get_data` or `data360_compare_countries`; if a chart is generated, `data360_get_viz_spec` is called.
+5. The accepted answer preserves indicator definitions, sources, units, query/latest-available times, missing values, and comparison limits.
 
-### 安全闸门
+### Safety Gates
 
-- 不预填或猜测 `database_id`、`indicator_id`；必须来自搜索结果。
-- 不能把相关性写成因果关系，不能隐藏缺失年份或口径差异。
-- “免密”只描述当前 Registry 指向的公共端点；服务限流、维护或网络故障仍会影响调用。
+- Do not pre-fill or guess `database_id` or `indicator_id`; they must come from search results.
+- Do not write correlation as causation, and do not hide missing years or differences in definitions.
+- "Password-free" describes only the public endpoint currently pointed to by the Registry; service rate limiting, maintenance, or network failures will still affect invocations.
 
-## 冻结判定
+## Freeze Decision
 
-| 案例 | 当前证据状态 | 可否直接用于“已实测”宣传 |
+| Case | Current evidence status | May be used directly for "verified in practice" promotion |
 |---|---|---|
-| SHOPLINE | 2026-09-11 已完成 `initialize`、9 个工具发现及只读检索 | 可以，但需注明测试包版本与日期 |
-| Notion | 官方文档与 Registry 卡片已核对，尚无本轮专用工作区真实验收 | 暂不可以；完成 TODO 后再升级表述 |
-| Data360 | Registry 为 `pass`，官方页面列明 15 个工具和公共端点 | 可描述“官方支持/目录已收录”；录屏后再描述“本轮实测” |
-
+| SHOPLINE | `initialize`, 9-tool discovery, and read-only search completed on 2026-09-11 | Yes, but the test package version and date must be noted |
+| Notion | Official documentation and the Registry card have been verified, but there is no real acceptance in a dedicated workspace for this round | Not yet; upgrade the wording only after the TODO is completed |
+| Data360 | The Registry is `pass`, and the official page lists 15 tools and the public endpoint | It can be described as "officially supported / cataloged"; describe "verified in practice this round" only after recording |

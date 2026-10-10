@@ -23,6 +23,10 @@ function yamlSingleQuoted(value) {
   return `'${String(value).replaceAll("'", "''")}'`;
 }
 
+// Matches any CJK ideograph. The English fork must not ship Chinese copy in
+// user-facing or distribution-facing text.
+const CJK_PATTERN = /[\u4e00-\u9fff]/;
+
 function githubHeaders() {
   const headers = {
     accept: 'application/vnd.github+json',
@@ -40,11 +44,10 @@ async function fetchJson(url, options = {}) {
 }
 
 export async function checkMarketingMetadata({ live = false, liveGithub = live, liveNpm = live } = {}) {
-  const [metadata, packageJson, readmeZh, readmeEn, externalListing, contributing, ui] = await Promise.all([
+  const [metadata, packageJson, readme, externalListing, contributing, ui] = await Promise.all([
     readJson('marketing/metadata.json'),
     readJson('package.json'),
     readText('README.md'),
-    readText('README.en.md'),
     readText('duhu2000__dsh-mcp-connector.yml'),
     readText('CONTRIBUTING.md'),
     readText('ui/index.html'),
@@ -70,45 +73,29 @@ export async function checkMarketingMetadata({ live = false, liveGithub = live, 
     expect(packageKeywords.includes(topic), `GitHub topic ${topic} is not represented in package keywords`);
   }
 
-  contains(readmeZh, metadata.readme.heroZh, 'Chinese README hero differs from marketing metadata');
-  contains(readmeEn, metadata.readme.heroEn, 'English README hero differs from marketing metadata');
-  contains(readmeZh, metadata.readme.ctaZh, 'Chinese README CTA differs from marketing metadata');
-  contains(readmeEn, metadata.readme.ctaEn, 'English README CTA differs from marketing metadata');
+  contains(readme, metadata.readme.heroEn, 'English README hero differs from marketing metadata');
+  contains(readme, metadata.readme.ctaEn, 'English README CTA differs from marketing metadata');
   contains(externalListing, `en: ${yamlSingleQuoted(metadata.externalListing.en)}`, 'external English listing differs from marketing metadata');
-  contains(externalListing, `zh: ${yamlSingleQuoted(metadata.externalListing.zh)}`, 'external Chinese listing differs from marketing metadata');
 
-  const externalEnglish = [
+  // This fork is English-primary: the storefront copy, the README and the UI
+  // must stay free of Chinese so the distributed artifact reads consistently.
+  for (const [label, copy] of [
     ['npm description', metadata.npm.description],
     ['GitHub description', metadata.github.description],
     ['English README hero', metadata.readme.heroEn],
     ['external English listing', metadata.externalListing.en],
-  ];
-  for (const [label, copy] of externalEnglish) {
+  ]) {
     contains(copy, 'DeepSeek Harness', `${label} must retain the external platform identity`);
     contains(copy.toLowerCase(), 'mcp connector', `${label} must identify the MCP Connector`);
     contains(copy.toLowerCase(), 'connect', `${label} must describe MCP server connection`);
     contains(copy.toLowerCase(), 'search tools', `${label} must describe cross-connection tool search`);
     contains(copy.toLowerCase(), 'troubleshoot', `${label} must describe connection troubleshooting`);
-  }
-  for (const [label, copy] of [
-    ['Chinese README hero', metadata.readme.heroZh],
-    ['external Chinese listing', metadata.externalListing.zh],
-  ]) {
-    contains(copy, 'DeepSeek Harness', `${label} must retain the external platform identity`);
-    contains(copy, '超百个 MCP连接器', `${label} must use the durable over-one-hundred connector claim`);
-    contains(copy, 'MCP Server', `${label} must describe MCP server connection`);
-    contains(copy, '工具', `${label} must describe tool discovery`);
-    contains(copy, '排障', `${label} must describe connection troubleshooting`);
+    expect(!CJK_PATTERN.test(copy), `${label} must not contain Chinese text in the English fork`);
   }
 
-  // DSH Market searches each localized description as one field. Pure Chinese
-  // queries are not segmented, so keep the established core phrase contiguous.
-  // The adjacent-intent phrases below protect the real-UI query matrix without
-  // changing ranking weights or adding package-specific search aliases.
-  for (const phrase of ['MCP连接器', '连接管理', 'MCP Server', 'MCP 管理面板', '授权配置', 'OAuth']) {
-    contains(metadata.externalListing.zh, phrase, `external Chinese listing is missing search phrase ${phrase}`);
-  }
-  for (const phrase of ['MCP manager', 'panel']) {
+  // DSH Market searches each localized description as one field, so keep the
+  // established English core phrases contiguous.
+  for (const phrase of ['MCP manager', 'panel', 'MCP Server', 'search tools', 'OAuth']) {
     contains(metadata.externalListing.en, phrase, `external English listing is missing search phrase ${phrase}`);
   }
 
@@ -145,9 +132,9 @@ if (isMain) {
   const liveNpm = live || process.argv.includes('--live-npm');
   checkMarketingMetadata({ liveGithub, liveNpm }).then((metadata) => {
     const liveTargets = [liveGithub ? 'GitHub' : '', liveNpm ? 'npm' : ''].filter(Boolean).join('/');
-    console.log(`营销元数据校验通过：${metadata.packageName}${liveTargets ? `（含 ${liveTargets} 线上状态）` : ''}`);
+    console.log(`Marketing metadata check passed: ${metadata.packageName}${liveTargets ? ` (including live ${liveTargets} state)` : ''}`);
   }).catch((error) => {
-    console.error(`营销元数据校验失败：${error instanceof Error ? error.message : String(error)}`);
+    console.error(`Marketing metadata check failed: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;
   });
 }

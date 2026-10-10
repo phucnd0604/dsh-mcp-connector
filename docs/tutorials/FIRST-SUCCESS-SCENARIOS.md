@@ -1,102 +1,102 @@
-# 三个首次成功场景包
+# Three First-Success Scenario Packs
 
-这三包把[统一首次成功路径](README.md)落到可复核任务。它们是验收步骤，不是“全部账号均已成功”的宣传证明。每次只选择一个服务商许可的只读任务；账号、组织、套餐、管理员批准或脱敏样例不可得时，保留“无证据/待验收”。状态记录遵循[可信状态文案规范](TRUSTED-STATUS-COPY.md)。
+These three packs turn the [unified first-success path](README.md) into reviewable tasks. They are acceptance steps, not proof of promotion that "every account has succeeded". Pick only one provider-permitted read-only task at a time; when the account, organization, plan, administrator approval or redacted sample is unavailable, keep "no evidence / pending user acceptance". Status records follow the [trusted status copy guidelines](TRUSTED-STATUS-COPY.md).
 
-## 场景一：企业信息只读查询
+## Scenario 1: Read-only company information lookup
 
-**目标**：使用“企查查·企业工商”（`qcc-company`）查询一个公开、非敏感测试主体的基本工商信息，并在结果中核对主体名称和更新时间/数据日期（若服务返回）。
+**Goal**: use "Qichacha · Company Registration" (`qcc-company`) to look up the basic registration information of one public, non-sensitive test entity, and verify the entity name and the update/data date in the result (if the service returns them).
 
-| 项目 | 验收要求 |
+| Item | Acceptance requirement |
 |---|---|
-| 前提 | 正式 `dsh-mcp-connector@0.2.59+`；当前 Workspace；企查查 OAuth 可用；测试账号具有目标企业数据权限 |
-| 权限/管理员 | 账号权限、组织授权和可见字段由服务商控制；企业组织可能需要管理员开通，当前文档不能替代审批 |
-| 费用 | 可能受套餐、次数或字段权限影响；MCP连接器无法确认本次费用，调用前在服务商侧核对 |
-| 运行/数据去向 | 远程 MCP Server；企业名称、查询参数和调用结果经 DSH Host 发送到/返回自 `agent.qcc.com` |
-| 安全输入 | 使用公开测试主体名称；不要把客户名单、内部标签或未公开调查对象用于公开验收 |
-| 预期输出 | 可辨认的主体基本信息；字段、页数和数据日期以真实工具返回为准，不预设一定包含某字段 |
+| Prerequisites | A release `dsh-mcp-connector@0.2.59+`; the current Workspace; working Qichacha OAuth; a test account with permission for the target company data |
+| Permissions / administrator | Account permissions, organization authorization and visible fields are controlled by the service provider; an enterprise organization may need administrator provisioning, and this document cannot replace approval |
+| Cost | May be affected by plan, call count or field permissions; the MCP Connector cannot confirm this run's cost, so verify on the provider's side before invoking |
+| Runtime / data destination | Remote MCP Server; the company name, query parameters and invocation results are sent to / returned from `agent.qcc.com` through the DSH Host |
+| Safe input | Use a public test entity name; do not use customer lists, internal labels or undisclosed investigation targets for public acceptance |
+| Expected output | Recognizable basic entity information; fields, page counts and data date follow what the real tool returns — do not assume a certain field is present |
 
-验收步骤：
+Acceptance steps:
 
-1. 在市场连接“企查查·企业工商”，在“已安装”记录范围、启停、授权状态和检查时间。
-2. 在“工具”搜索“工商/企业基本信息”，核对来源为 `qcc-company`；记录实际工具名和必填参数，不从 Prompt 标题猜工具名。
-3. 在正常 DSH 会话发送：
+1. Connect "Qichacha · Company Registration" in the Market, and record the scope, enable/disable state, authorization status and check time in "Installed".
+2. Search for "company registration / basic company information" in "Tools" and verify the source is `qcc-company`; record the actual tool name and required parameters, and do not guess the tool name from a prompt title.
+3. Send this in a normal DSH session:
 
    ```text
-   请只使用刚确认的企查查企业工商只读工具，查询“<公开测试企业名称>”的基本工商信息。
-   调用前列出工具来源、实际工具名、关键参数，以及账号权限和费用是否仍需在服务商侧确认。
-   不扩展到关联人、风险扫描或批量名单；若需要额外权限、付费或写操作，请停止。
+   Please use only the Qichacha company registration read-only tool you just confirmed, and look up the basic registration information of "<public test company name>".
+   Before invoking, list the tool source, the actual tool name, the key parameters, and whether account permissions and cost still need confirmation on the provider's side.
+   Do not expand to related persons, risk scans or bulk lists; if extra permissions, payment or write operations are needed, stop.
    ```
 
-4. 通过 Host 审批后，核对结果主体与输入一致；只保存脱敏字段清单、调用时间和成功/失败结论，不上传完整业务结果。
+4. After Host approval, verify the result entity matches the input; keep only a redacted field list, the invocation time and the success/failure conclusion, and do not upload full business results.
 
-失败恢复：主体歧义时增加服务商允许的标识字段；403/无字段先核对账号套餐与组织权限；工具未出现按[工具发现恢复教程](TOOL-SEARCH-RECOVERY.md)处理；OAuth 失败按[授权诊断](OAUTH-DIAGNOSTICS.md)处理。不得反复请求未获授权的数据。
+Failure recovery: when the entity is ambiguous, add an identifier field the provider allows; for 403/missing fields, first check the account plan and organization permissions; if the tool does not appear, follow the [tool discovery recovery tutorial](TOOL-SEARCH-RECOVERY.md); for OAuth failures, follow the [authorization diagnostics](OAUTH-DIAGNOSTICS.md). Never repeatedly request data you are not authorized to access.
 
-**验证状态（2026-09-29）**：正式包、目录描述、远程 Server 配置和教程路径已核对；没有在本轮使用获授权账号执行真实业务调用，因此调用层为**无证据/待用户验收**。
+**Verification status (2026-09-29)**: the release pack, catalog description, remote server configuration and tutorial paths have been verified; no real business invocation was executed with an authorized account in this round, so the invocation layer is **no evidence / pending user acceptance**.
 
-## 场景二：本地智能文档解析
+## Scenario 2: Local intelligent document parsing
 
-**目标**：使用“企查查·智能文档解析”（`qcc-document`）的本机入口 `qcc-document-mcp`，解析一份专门制作、无个人信息和客户数据的测试 PDF/图片，返回 Markdown 或结构化摘要。
+**Goal**: use the local entry point `qcc-document-mcp` of "Qichacha · Intelligent Document Parsing" (`qcc-document`) to parse a purpose-made test PDF/image containing no personal or customer data, and return Markdown or a structured summary.
 
-| 项目 | 验收要求 |
+| Item | Acceptance requirement |
 |---|---|
-| 前提 | Node.js 20+；可信 npm 网络；企查查 OAuth；本机可运行 `npx -y qcc-document-mcp`；准备脱敏测试文件 |
-| 权限/管理员 | OAuth 账号需有文档解析权限；企业环境可能限制本地进程、npm 下载或文件上传，需要管理员批准 |
-| 费用 | 解析次数、页数、OCR 或结构化能力可能受套餐/配额影响；调用前在服务商侧核对 |
-| 运行/数据去向 | **本机进程 + 远程处理**：本机 Agent 读取指定文件后自动上传到企查查服务处理；“本地入口”不表示文件只在设备内处理 |
-| 安全输入 | 只用合成/公开测试文档；不得上传合同原件、身份证、客户材料、密钥或受限文件 |
-| 预期输出 | Markdown、正文/表格或关键字段；以实际工具 schema 和返回为准，不保证所有版式都能完整恢复 |
+| Prerequisites | Node.js 20+; a trusted npm network; Qichacha OAuth; the ability to run `npx -y qcc-document-mcp` locally; a redacted test file ready |
+| Permissions / administrator | The OAuth account needs document parsing permission; an enterprise environment may restrict local processes, npm downloads or file uploads and require administrator approval |
+| Cost | Parsing counts, page counts, OCR or structured output may be limited by plan/quota; verify on the provider's side before invoking |
+| Runtime / data destination | **Local process + remote processing**: the local Agent reads the specified file and automatically uploads it to the Qichacha service for processing; a "local entry point" does not mean the file is processed only on the device |
+| Safe input | Use only synthetic/public test documents; never upload original contracts, ID cards, customer materials, keys or restricted files |
+| Expected output | Markdown, body text/tables or key fields; follow the actual tool schema and return value, and do not assume every layout is fully recoverable |
 
-验收步骤：
+Acceptance steps:
 
-1. 连接“企查查·智能文档解析”，确认远程 `qcc-document` 与本机 `qcc-document-mcp` 均完成发现/Host 注册；只出现一个入口时不记为双入口通过。
-2. 在“工具”找到本机文件解析工具，查看实际参数；确认文件路径指向专用测试文件。
-3. 在正常 DSH 会话发送：
+1. Connect "Qichacha · Intelligent Document Parsing", and confirm that both the remote `qcc-document` and the local `qcc-document-mcp` have completed discovery/Host registration; if only one entry point appears, do not record the dual-entry check as passed.
+2. Find the local file parsing tool in "Tools" and review its actual parameters; confirm the file path points to the dedicated test file.
+3. Send this in a normal DSH session:
 
    ```text
-   请仅使用已确认的 qcc-document-mcp 本机文件只读解析工具处理“<脱敏测试文件路径>”。
-   调用前说明文件将由本机 Agent 读取并上传到企查查远程服务、将发送的路径/文件类型，以及费用或配额是否未知。
-   只返回 Markdown 与关键字段；如果文件包含个人信息、客户数据、密钥，或需要额外付费/权限，请停止。
+   Please use only the confirmed qcc-document-mcp local file read-only parsing tool to process "<redacted test file path>".
+   Before invoking, explain that the file will be read by the local Agent and uploaded to the Qichacha remote service, list the path/file type that will be sent, and state whether cost or quota is unknown.
+   Return only Markdown and key fields; if the file contains personal information, customer data or keys, or if extra payment/permission is needed, stop.
    ```
 
-4. 通过 Host 审批后，核对输出可辨认且不含未提供的数据；验收记录只保留测试文件哈希/类型、工具名、时间和结论，不保存真实本机路径或完整正文。
+4. After Host approval, verify the output is recognizable and contains no data you did not supply; the acceptance record keeps only the test file hash/type, tool name, time and conclusion, and does not keep real local paths or full body text.
 
-失败恢复：本机进程未启动时检查 Node/npm、代理、命令和 Host 日志；仅远程入口成功时不要宣称本地解析成功；上传/授权失败按稳定 stage/code 排查；格式不支持时换服务商明确支持的合成样例，不上传真实材料试错。
+Failure recovery: if the local process does not start, check Node/npm, the proxy, the command and the Host logs; if only the remote entry point succeeds, do not claim local parsing succeeded; for upload/authorization failures, investigate using the stable stage/code; if the format is unsupported, switch to a synthetic sample the provider explicitly supports instead of uploading real material to test.
 
-**验证状态（2026-09-29）**：正式目录已核对双入口、OAuth 资源和本机 `npx` 配置；本轮没有用户授权账号与获准测试文件，因此真实上传和调用层为**无证据/待用户验收**。
+**Verification status (2026-09-29)**: the release catalog has been verified for dual entry points, OAuth resources and the local `npx` configuration; this round had no user-authorized account and no approved test file, so the real upload and invocation layers are **no evidence / pending user acceptance**.
 
-## 场景三：授权办公文档或日程查询
+## Scenario 3: Authorized office document or schedule lookup
 
-**目标**：从当前用户已获授权的办公服务连接中二选一，读取一份专用测试文档的标题/更新时间，或读取测试日历未来三条事件的时间/标题。只验证读取，不创建、修改、评论、邀请或删除。
+**Goal**: choose one of the office service connections the current user is already authorized for, and read the title/update time of one dedicated test document, or the times/titles of the next three events in a test calendar. Verify reading only — do not create, modify, comment, invite or delete anything.
 
-| 项目 | 验收要求 |
+| Item | Acceptance requirement |
 |---|---|
-| 前提 | 已安装并启用明确支持办公文档或日历读取的 MCP/受控 CLI Provider；使用隔离测试工作区/日历和测试数据 |
-| 权限/管理员 | OAuth scope/CLI 登录必须覆盖目标资源；组织可能禁用第三方应用、要求管理员批准或仅允许特定工作区 |
-| 费用 | 服务商套餐、API 配额、高级搜索或跨数据源能力可能收费；连接器不把“已授权”解释为“免费” |
-| 运行/数据去向 | 远程 MCP 时参数/结果发送到办公服务；受控本机 CLI 时命令在本机执行，但仍访问办公服务 API；结果随后进入 DSH/模型上下文 |
-| 安全输入 | 只使用专用测试文档/日历；不要读取真实会议主题、参会人、客户文件或组织敏感内容用于公开验收 |
-| 预期输出 | 文档标题与更新时间，或最多三条测试事件的标题与时间；不返回正文、参会人或附件，除非测试范围明确允许 |
+| Prerequisites | An installed and enabled MCP/controlled CLI Provider that explicitly supports office document or calendar reads; an isolated test workspace/calendar with test data |
+| Permissions / administrator | The OAuth scope/CLI login must cover the target resource; the organization may disable third-party apps, require administrator approval, or allow only specific workspaces |
+| Cost | The provider's plan, API quota, advanced search or cross-source capabilities may be chargeable; the connector never interprets "authorized" as "free" |
+| Runtime / data destination | With a remote MCP server, parameters/results are sent to the office service; with a controlled local CLI, the command runs locally but still calls the office service API; results then enter the DSH/model context |
+| Safe input | Use only dedicated test documents/calendars; do not read real meeting topics, attendees, customer files or sensitive organization content for public acceptance |
+| Expected output | The document title and update time, or at most three test event titles and times; body text, attendees and attachments are not returned unless the test scope explicitly allows it |
 
-验收步骤：
+Acceptance steps:
 
-1. 在“已安装”确认连接名称、项目/全局范围、授权状态和可能的管理员前提；账号/组织不可见时记录“当前连接无法确认”。
-2. 在“工具”搜索“文档读取/搜索”或“日历查询”，核对服务来源、只读语义、实际参数和工具名；若只看到写入工具则停止。
-3. 在正常 DSH 会话按所选分支发送：
+1. In "Installed", confirm the connection name, the project/global scope, the authorization status and any administrator prerequisites; when the account/organization is not visible, record "the current connection cannot confirm this".
+2. Search for "document read/search" or "calendar query" in "Tools" and verify the service source, the read-only semantics, the actual parameters and the tool name; if you only see write tools, stop.
+3. Send this in a normal DSH session, depending on the branch you chose:
 
    ```text
-   请只使用刚确认的办公服务只读工具，在已授权的测试范围内完成以下二选一任务：
-   A. 查找标题为“<测试文档标题>”的文档，只返回标题和更新时间；或
-   B. 查询测试日历未来三条事件，只返回标题和起止时间。
-   调用前列出服务来源、工具名、授权范围、管理员前提、数据去向和可能费用。
-   不读取正文/附件/参会人，不创建、修改、评论、邀请或删除；范围不明确时停止。
+   Please use only the office service read-only tool you just confirmed, and complete one of the following two tasks within the authorized test scope:
+   A. Find the document titled "<test document title>" and return only the title and update time; or
+   B. Query the test calendar for the next three events and return only titles and start/end times.
+   Before invoking, list the service source, the tool name, the authorization scope, the administrator prerequisites, the data destination and any possible cost.
+   Do not read body text/attachments/attendees, and do not create, modify, comment, invite or delete; stop if the scope is unclear.
    ```
 
-4. 通过 Host 审批后，只把测试数据与预置答案对照；记录脱敏结果摘要、工具名、时间和所用测试租户，不记录真实账号或组织名称。
+4. After Host approval, compare only the test data against the expected answers; record a redacted result summary, the tool name, the time and the test tenant used, and do not record real account or organization names.
 
-失败恢复：授权但工具缺失时先确认 scope/管理员政策和 Host 注册；403 不通过重复登录绕过；限流按 Retry-After/诊断等待；没有隔离测试租户时保持待验收，不以个人生产账号替代。
+Failure recovery: when authorized but the tool is missing, first confirm the scope/administrator policy and Host registration; do not bypass a 403 by logging in repeatedly; for rate limiting, wait according to Retry-After/the diagnostic; without an isolated test tenant, keep the result pending acceptance and do not substitute an individual production account.
 
-**验证状态（2026-09-29）**：统一连接、发现、Host 审批路径已经核对；未提供获授权的办公测试工作区/日历和管理员批准证据，因此连接器选择与真实调用均为**无证据/待用户验收**。
+**Verification status (2026-09-29)**: the unified connection, discovery and Host approval paths have been verified; no authorized office test workspace/calendar and no administrator approval evidence were provided, so both the connector selection and the real invocation are **no evidence / pending user acceptance**.
 
-## 统一验收记录
+## Unified acceptance record
 
-每个场景只记录以下脱敏字段：插件版本、DSH Host/Market 版本、连接器与 Server、项目/全局范围、账号/组织是否可确认、授权/发现/调用三层结论、权限/管理员前提、运行位置、数据去向、费用依据、实际工具名、带时区检查时间、失败 stage/code 和恢复动作。不要记录 Token、Cookie、授权码、完整业务输入输出、本机绝对路径或真实组织身份。
+For each scenario, record only these redacted fields: plugin version, DSH Host/Market version, connector and server, project/global scope, whether the account/organization can be confirmed, the conclusions for the authorization/discovery/invocation layers, permissions/administrator prerequisites, runtime location, data destination, cost basis, the actual tool name, the check time with timezone, the failure stage/code and the recovery action. Do not record tokens, cookies, authorization codes, full business inputs/outputs, local absolute paths or real organization identities.

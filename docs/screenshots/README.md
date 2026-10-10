@@ -1,28 +1,28 @@
-# UI 素材说明
+# Screenshot asset notes
 
-本目录保存 `dsh-mcp-connector` 的公开界面截图。所有素材均来自无凭据 UI harness：外层浏览器视口为 1280×720，harness 复刻 `lib/client.js` 中定义的 800px 产品面板，因此桌面端稳定为一行 2 张卡片。画面只展示公开目录元数据、示例 Prompt 和明确标识为 Mock 的工具数据，不包含 OAuth Token、API Key、本机路径、用户会话或查询结果。
+This directory holds the public UI screenshots of `dsh-mcp-connector`. Every asset comes from the credential-free UI harness: the outer browser viewport is 1280×720, and the harness reproduces the 800px product panel defined in `lib/client.js`, so the desktop layout is stably two cards per row. The images only show public catalog metadata, sample prompts and tool data explicitly marked as mock; they contain no OAuth token, API key, local path, user session or query result.
 
-素材分为两组，避免把历史截图误写成当前版本：
+The assets are split into two groups so historical screenshots are not mistaken for the current version:
 
-- `01`–`04` 是 2026-09-06 从 `v0.2.37` 采集的历史市场、详情、发现和导入快照；当时公开 Registry 为 105 条，与 4 张随包唯一卡片去重后显示 109 张。
-- `05`–`07` 和 `../demo.gif` 是 2026-09-14 从 `v0.2.46` 当前 UI harness 采集的工具工作台、参数和诊断素材。harness 中的目录数量、连接数量和工具数量属于测试夹具，不代表生产市场统计。
+- `01`–`04` are historical Market, detail, discovery and import snapshots captured on 2026-09-06 from `v0.2.37`; at that time the public Registry had 105 entries, and after deduplicating against the 4 bundled unique cards it showed 109.
+- `05`–`07` and `../demo.gif` are tool workbench, parameter and diagnostics assets captured on 2026-09-14 from the current `v0.2.46` UI harness. The catalog, connection and tool counts in the harness are test fixtures and do not represent production Market statistics.
 
-旧素材曾直接以 1280px 打开内部 iframe，绕过真实产品的 800px 宿主面板，因此触发 `auto-fill/minmax(300px)` 的 3 列布局；这是采集 harness/视口过期，不是产品 CSS 漂移。当前全部登记素材都从浏览器中的真实页面状态直接截取，没有后期重排卡片或修改连接状态。
+Old assets opened the inner iframe directly at 1280px, bypassing the real 800px host panel, which triggered the 3-column `auto-fill/minmax(300px)` layout; that was an outdated capture harness/viewport, not product CSS drift. Every currently registered asset is captured directly from the real page state in the browser, with no post-hoc card reordering or connection state changes.
 
-仓库根目录的 [`screenshots.json`](../../screenshots.json) 按市场总览、连接器详情、工具发现、JSON 导入、统一工具搜索、参数详情和连接诊断的顺序声明 7 张图片，供 awesome-dsh-plugin 和 DSH Market 的 App Store 风格详情页采集。根清单保持外部消费者兼容的路径数组；[`assets.json`](assets.json) 记录采集版本、视口、产品面板、无凭据状态，以及每张截图和 `demo.gif` 的 SHA-256、尺寸与 GIF 时长。
+The repository-root [`screenshots.json`](../../screenshots.json) declares 7 images in the order: Market overview, connector detail, tool discovery, JSON import, unified tool search, parameter details and connection diagnostics. It is used by awesome-dsh-plugin and the DSH Market App Store-style detail page capture. The root manifest keeps a path array compatible with external consumers; [`assets.json`](assets.json) records the capture version, viewport, product panel, credential-free state, and the SHA-256, dimensions and GIF duration of each screenshot and of `demo.gif`.
 
-| 文件 | 展示内容 |
+| File | Content shown |
 |---|---|
-| `01-market-overview.jpg` | `v0.2.37` 历史市场快照：109 张合并市场卡片、桌面两列、推荐章节、9 分类和固定分类栏 |
-| `02-connector-detail.jpg` | `v0.2.37` 智能文档解析详情：一次 OAuth 授权同时连接远程 URL 解析与本地 `qcc-document-mcp` 文件解析 |
-| `03-tool-discovery.jpg` | `v0.2.37` Context7 无凭据 Mock 健康状态、Mock 工具数量/描述、搜索和独立滚动区 |
-| `04-json-import.jpg` | `v0.2.37` Streamable HTTP / stdio JSON 导入与本机凭据提示 |
-| `05-unified-tool-search.png` | `v0.2.46` 统一工具搜索：跨连接结果、来源、发现失败和最后成功缓存 |
-| `06-tool-parameters.png` | `v0.2.46` 参数详情：必填、类型、枚举、嵌套结构和原始安全 Schema |
-| `07-connection-diagnostics.png` | `v0.2.46` 连接诊断：成功缓存、可控失败原因、建议、“检查连接”和“重新发现工具” |
+| `01-market-overview.jpg` | `v0.2.37` historical Market snapshot: 109 merged Market cards, two desktop columns, a featured section, 9 categories and the fixed category bar |
+| `02-connector-detail.jpg` | `v0.2.37` intelligent document parsing detail: a single OAuth authorization connects both the remote URL parsing and the local `qcc-document-mcp` file parsing |
+| `03-tool-discovery.jpg` | `v0.2.37` Context7 credential-free mock health status, mock tool counts/descriptions, search and a separate scroll area |
+| `04-json-import.jpg` | `v0.2.37` Streamable HTTP / stdio JSON import and the local credential notice |
+| `05-unified-tool-search.png` | `v0.2.46` unified tool search: cross-connection results, sources, discovery failure and the last successful cache |
+| `06-tool-parameters.png` | `v0.2.46` parameter details: required, type, enums, nested structures and the raw safe schema |
+| `07-connection-diagnostics.png` | `v0.2.46` connection diagnostics: successful cache, controllable failure causes, suggestions, "Check connection" and "Rediscover tools" |
 
-`../demo.gif` 由 6 个真实浏览器状态顺序编码：市场、连接器详情、工具详情、统一搜索、参数 Schema、连接诊断。时长 43 秒，分辨率 960×540；编码只做等比例缩放和 GIF 调色，不改变布局或状态。
+`../demo.gif` is encoded from 6 real browser states in order: Market, connector detail, tool details, unified search, parameter schema, connection diagnostics. Its duration is 43 seconds at 960×540; the encoding only applies proportional scaling and GIF palette quantization and does not change layout or state.
 
-`npm run storefront:check` 校验路径、顺序、格式、文件存在性、哈希、尺寸和采集约束；`npm run check` 已包含该门禁。更新 UI 后继续使用 1280×720 浏览器视口、800px 产品面板和无凭据初始状态采集，并检查桌面两列、企查查卡片不出现“需重新授权”，且画面不包含凭据、本机路径、真实会话、查询结果或其他不应公开的内容。
+`npm run storefront:check` validates paths, order, format, file existence, hashes, dimensions and capture constraints; `npm run check` already includes this gate. After updating the UI, keep capturing at a 1280×720 browser viewport with an 800px product panel and a credential-free initial state, and check the two-column desktop layout, that Qichacha cards do not show "Reauthorization required", and that the image contains no credentials, local paths, real sessions, query results or anything else that should not be public.
 
-截图顶部“无凭据 Mock”标识和工具名中的 `mock_` 前缀用于明确区分验收数据与真实授权。真实用户的已安装数量、授权状态和服务健康度会因本机环境而不同。
+The "credential-free mock" badge at the top of the screenshots and the `mock_` prefix in tool names exist to clearly distinguish acceptance data from real authorization. A real user's installed count, authorization status and service health will differ depending on their local environment.

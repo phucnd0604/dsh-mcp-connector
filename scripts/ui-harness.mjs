@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** 本地 UI 契约测试壳：不读凭据、不连接真实 MCP，只提供可交互的 mock API。 */
+/** Local UI contract test harness: reads no credentials, never reaches a real MCP server, and only serves an interactive mock API. */
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';

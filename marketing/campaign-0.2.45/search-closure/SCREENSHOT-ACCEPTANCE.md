@@ -1,38 +1,37 @@
-# 宣传素材验收规范
+# Promotional Asset Acceptance Specification
 
-日期：2026-09-13。状态：规范完成；三张新图与新视频 TODO，未生成。
+Date: 2026-09-13. Status: specification complete; the three new images and the new video are TODO, not yet generated.
 
-## 现有素材核对
+## Verification of Existing Assets
 
-screenshots.json 当前四项：01-market-overview.jpg、02-connector-detail.jpg、03-tool-discovery.jpg、04-json-import.jpg（均位于docs/screenshots）。
-docs/screenshots/README.md 与 assets.json 记载：2026-09-06、源码0.2.37、1280×720浏览器、800px产品面板；旧图的109条是当时快照，不要后期改成110冒充新采集。旧demo.gif为960×540、16秒、四状态编码。
-新素材不得直接1280px打开内部iframe冒充800px宿主。现有门禁 scripts/check-storefront-screenshots.mjs 支持最多8图，但格式/顺序/元数据要求应由集成人再次核对。
+The four current entries in screenshots.json: 01-market-overview.jpg, 02-connector-detail.jpg, 03-tool-discovery.jpg, 04-json-import.jpg (all located in docs/screenshots).
+docs/screenshots/README.md and assets.json record: 2026-09-06, source 0.2.37, 1280×720 browser, 800px product panel; the 109 entries in the old images are a snapshot from that time and must not be retroactively changed to 110 to masquerade as a new capture. The old demo.gif is 960×540, 16 seconds, four-state encoded.
+New assets must not simply open the internal iframe at 1280px and pass it off as an 800px host. The existing gate scripts/check-storefront-screenshots.mjs supports up to 8 images, but the format/order/metadata requirements should be re-verified by the integrator.
 
-## 三图设计
+## Three-Image Design
 
-| 候选名 | 页面与状态 | 必须可见 | 图注草稿 |
+| Candidate name | Page and state | Must be visible | Caption draft |
 |---|---|---|---|
-| 05-unified-tool-search.png | 工具页，两条以上模拟连接，搜索词匹配多个来源 | 关键词、连接/服务筛选、来源、最近状态、缓存时间 | 跨连接查找工具，按服务缩小范围（演示数据） |
-| 06-tool-parameters.png | 参数详情，展开一个嵌套结构 | 名称、类型、必填、枚举、原始Schema入口 | 看懂参数要求，按需查看安全缓存Schema（演示数据） |
-| 07-connection-diagnostics.png | 受控模拟超时且已有成功缓存 | 模拟故障标识、诊断、缓存时间、检查连接/重新发现按钮 | 查看最后成功工具缓存，按诊断排查连接（模拟故障） |
+| 05-unified-tool-search.png | Tools page, more than two mock connections, a search term matching multiple sources | The keyword, connection/service filters, source, most recent status, cache time | Find tools across connections, narrow the scope by service (demo data) |
+| 06-tool-parameters.png | Parameter details, one nested structure expanded | Name, type, required flag, enums, Raw Schema entry point | Understand parameter requirements and view the safe cached Schema as needed (demo data) |
+| 07-connection-diagnostics.png | A controlled mock timeout that already has a successful cache | Mock failure indicator, diagnostics, cache time, Check connection/Rediscover tools buttons | View the last successful tool cache and troubleshoot the connection following the diagnostics (mock failure) |
 
-参数图不强求展示全部长Schema；不得靠缩小到不可读塞入全量。工具页是列表而非市场卡片网格，不要求工具结果两列。
-主视觉可选成功状态；故障图必须显著标明模拟，不能后期把失败改成成功。不得用真实失效Token制造宣传场景。
+The parameter image is not required to show the entire long Schema; it must not be shrunk to illegibility in order to fit everything in. The tools page is a list, not a marketplace card grid, so tool results are not required to be two columns.
+The main visual may use a success state; a failure image must clearly mark it as a mock, and a failure must not be changed into a success in post-processing. Do not use a real invalid Token to create a promotional scenario.
 
-## 采集与脱敏验收清单
+## Capture and Redaction Acceptance Checklist
 
-- [ ] 1280×720浏览器、真实800px面板；文字清晰、按钮完整、无截断遮挡。
-- [ ] 可见“演示数据/无凭据Mock”，保留 mock_ 标识，不伪装真实用户工具规模。
-- [ ] 不含OAuth Token、API Key、Header/env值、本机路径、邮箱、真实会话或查询结果。
-- [ ] 版本、范围、缓存时间、状态不相互矛盾；图注与画面能力一致。
-- [ ] 原图由实际浏览器状态采集，不用生成式图像或重排界面伪造产品能力。
-- [ ] 记录采集日期、固定提交、场景、尺寸、SHA-256；新图通过目视检查后才纳入清单。
-- [ ] 集成人同步 assets.json、screenshots.json、素材README、中英文README链接与storefront门禁。
-- [ ] npm run storefront:check、npm run check通过；检查发布包大小和清晰度。
+- [ ] 1280×720 browser, real 800px panel; text is legible, buttons are complete, and nothing is truncated or obscured.
+- [ ] "Demo data / credential-less mock" is visible, the `mock_` identifier is retained, and the real user tool scale is not disguised.
+- [ ] No OAuth Token, API Key, Header/env value, local path, email address, real session, or query result is included.
+- [ ] Version, scope, cache time, and status do not contradict each other; the caption matches the capabilities shown.
+- [ ] The original image is captured from real browser state, not produced with generative imagery or by rearranging the interface to fake product capabilities.
+- [ ] Record the capture date, pinned commit, scenario, dimensions, and SHA-256; a new image joins the list only after passing visual inspection.
+- [ ] The integrator syncs assets.json, screenshots.json, the asset README, the Chinese/English README links, and the storefront gate.
+- [ ] `npm run storefront:check` and `npm run check` pass; check the release package size and legibility.
 
-## 演示节奏
+## Demo Pacing
 
-0–6秒适用平台/入口；6–18秒跨连接搜索与服务筛选；18–28秒参数；28–40秒模拟故障缓存与诊断动作；40–45秒安装/贡献入口。
-不宣称45秒完成真实授权，不演示付费/有副作用工具调用。可进行等比例编码，不改变状态或隐去Mock声明。
-阻塞不是产品功能不足：当前仅缺素材采集与真实验收安排，不需再开发产品。
-
+0–6s platform/entry point; 6–18s cross-connection search and service filtering; 18–28s parameters; 28–40s mock failure cache and diagnostic actions; 40–45s install/contribution entry point.
+Do not claim that real authorization is completed in 45 seconds, and do not demo paid or side-effecting tool invocations. Proportional re-encoding is allowed, but do not change state or hide the mock declaration.
+The blocker is not insufficient product functionality: what is currently missing is only asset capture and real acceptance scheduling, and no further product development is needed.

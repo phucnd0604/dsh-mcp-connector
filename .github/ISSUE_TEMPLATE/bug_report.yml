@@ -1,4 +1,4 @@
-name: Bug report / 缺陷报告
+name: Bug report
 description: Report a reproducible Connector problem without credentials or private data.
 title: "[Bug]: "
 labels: [bug]

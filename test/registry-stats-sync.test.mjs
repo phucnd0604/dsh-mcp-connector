@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import {
   normalizeStats,
-  renderChineseStats,
+  renderEnglishStats,
   syncRegistryStats,
 } from '../scripts/sync-registry-stats.mjs';
 
@@ -24,28 +24,26 @@ test('validates count relationships and safe category names', () => {
   assert.deepEqual(normalizeStats(stats), stats);
   assert.throws(() => normalizeStats({ ...stats, marketCount: 81 }), /marketCount must equal/);
   assert.throws(() => normalizeStats({ ...stats, categoryNames: [...stats.categoryNames.slice(0, 8), '[bad]'] }), /unsafe value/);
-  assert.match(renderChineseStats(stats), /78 条.*82 张.*9 类.*6 张/s);
+  assert.match(renderEnglishStats(stats), /publishes 78 connector descriptors.*exposes 82 cards.*9 business categories.*6 featured cards/s);
 });
 
-test('syncs the Chinese and English generated blocks plus local snapshot', async (t) => {
+test('syncs the generated English block plus local snapshot', async (t) => {
   const directory = await mkdtemp(join(tmpdir(), 'dsh-registry-stats-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const sourcePath = join(directory, 'source.json');
-  const chinesePath = join(directory, 'README.md');
-  const englishPath = join(directory, 'README.en.md');
+  const readmePath = join(directory, 'README.md');
   const snapshotPath = join(directory, 'snapshot.json');
   const marked = 'before\n<!-- catalog-stats:start -->\nstale\n<!-- catalog-stats:end -->\nafter\n';
   await Promise.all([
     writeFile(sourcePath, JSON.stringify(stats)),
-    writeFile(chinesePath, marked),
-    writeFile(englishPath, marked),
+    writeFile(readmePath, marked),
   ]);
 
-  await syncRegistryStats({ sourcePath, chineseReadmePath: chinesePath, englishReadmePath: englishPath, snapshotPath });
-  const [chinese, english, snapshot] = await Promise.all([
-    readFile(chinesePath, 'utf8'), readFile(englishPath, 'utf8'), readFile(snapshotPath, 'utf8'),
+  await syncRegistryStats({ sourcePath, readmePath, snapshotPath });
+  const [readme, snapshot] = await Promise.all([
+    readFile(readmePath, 'utf8'), readFile(snapshotPath, 'utf8'),
   ]);
-  assert.match(chinese, /Registry 已发布 78 条.*82 张/s);
-  assert.match(english, /publishes 78 connector descriptors.*exposes 82 cards/s);
+  assert.match(readme, /publishes 78 connector descriptors.*exposes 82 cards/s);
+  assert.doesNotMatch(readme, /stale/);
   assert.deepEqual(JSON.parse(snapshot), stats);
 });

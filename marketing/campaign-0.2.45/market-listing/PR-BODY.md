@@ -1,10 +1,10 @@
-# 外部 PR 草稿
+# External PR Draft
 
-建议标题：
+Suggested title:
 
 > docs: update MCP Connector description for v0.2.45
 
-建议正文：
+Suggested body:
 
 ---
 
@@ -26,7 +26,7 @@ The Chinese description also uses the product spelling `MCP连接器`, while ret
 - Release notes: <https://github.com/duhu2000/dsh-mcp-connector/blob/82d240601df73b8e704124100ec5771a0cd5514a/CHANGELOG.md#L7-L23>
 - Tool explorer UI: <https://github.com/duhu2000/dsh-mcp-connector/blob/82d240601df73b8e704124100ec5771a0cd5514a/ui/index.html#L1216-L1265>
 
-The existing “over one hundred” claim is unchanged in substance and was previously reviewed in #4146. This PR adds no new numerical claim.
+The existing "over one hundred" claim is unchanged in substance and was previously reviewed in #4146. This PR adds no new numerical claim.
 
 ## Scope
 
@@ -40,10 +40,9 @@ Screenshots are maintained by the plugin repository's root `screenshots.json` an
 
 ---
 
-## 提交前注意
+## Pre-Submission Notes
 
-- 这是申请说明草稿，不代表 PR 已提交或 CI 已运行。
-- 由归口会话在用户批准后，从 awesome-dsh-plugin 最新 `main` 创建分支并应用 `awesome-dsh-plugin-description.patch`。
-- 若维护者要求压缩文案，优先删除认证协议尾部，不删除 `MCP连接器`、`MCP Server`、`连接管理`、跨连接工具查找和连接排障等验收词。
-- 不要把更新理由写成“提升默认排名”；应写“补齐自然搜索与同步已发布能力”。
-
+- This is a request description draft; it does not mean the PR has been submitted or that CI has run.
+- After the user approves, the central session creates a branch from awesome-dsh-plugin's latest `main` and applies `awesome-dsh-plugin-description.patch`.
+- If the maintainer asks to compress the copy, prioritize deleting the authentication protocol tail rather than deleting acceptance terms such as `MCP连接器`, `MCP Server`, `连接管理`, cross-connection tool lookup, and connection troubleshooting.
+- Do not write the reason for the update as "improving default ranking"; write it as "completing natural search terms and syncing released capabilities".

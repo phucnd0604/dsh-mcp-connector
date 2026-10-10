@@ -1,53 +1,53 @@
-# 从安装到首次成功调用
+# From install to the first successful call
 
-这是一条统一的最短路径。它把已有教程串成“安装 → 连接 → 找到工具 → 首次只读调用”，不替代各服务商文档。首次调用只选你已获准使用、费用与权限边界明确的只读任务；截图、GIF、连接成功或工具缓存都不等于真实业务调用通过。
+This is the single shortest path. It strings the existing tutorials together into "install → connect → find a tool → make the first read-only call", and does not replace each provider's own documentation. For the first call, choose only a read-only task you are already permitted to use and whose cost and permission boundaries are clear; screenshots, GIFs, a successful connection or a tool cache do not equal a successful real business call.
 
-需要可直接执行的验收任务时，选择[企业信息只读查询、本地智能文档解析、授权办公文档或日程查询](FIRST-SUCCESS-SCENARIOS.md)中的一个场景；记录状态时使用[可信状态文案规范](TRUSTED-STATUS-COPY.md)，缺少账号、组织、费用或调用证据就明确写“未知/待验收”。
+When you need an acceptance task you can execute directly, choose one of the scenarios in [read-only company information lookup, local intelligent document parsing, authorized office document or schedule lookup](FIRST-SUCCESS-SCENARIOS.md); when recording status, use the [trusted status copy guidelines](TRUSTED-STATUS-COPY.md), and explicitly write "unknown / pending acceptance" when the account, organization, cost or invocation evidence is missing.
 
-## 1. 安装并重启正确的 profile
+## 1. Install and restart the correct profile
 
-当前默认安装布局中，DSH Desktop 和 `dsh web` 都从本机 `web` profile 加载插件，因此两种宿主都使用同一条安装命令；不要因为使用 Desktop 就把命令改成 `--profile desktop`。
+In the current default install layout, DSH Desktop and `dsh web` both load the plugin from the local `web` profile, so both hosts use the same install command; do not switch the command to `--profile desktop` just because you are using Desktop.
 
 ```bash
 dsh plugin --profile web add dsh-mcp-connector
 ```
 
-安装或升级后，只重启你正在使用的宿主：DSH Desktop 需完全退出应用后重新打开；`dsh web` 需停止原进程后重新启动。打开左侧“MCP连接器”；若侧边栏入口已隐藏，从“设置 → 插件 → 插件配置 → MCP连接器”点击“打开 MCP连接器”。自定义过 profile 布局的部署应以其宿主配置为准。
+After installing or upgrading, restart only the host you are actually using: DSH Desktop requires fully quitting the app and reopening it; `dsh web` requires stopping the original process and starting it again. Open "MCP Connector" in the left sidebar; if the sidebar entry is hidden, click "Open MCP Connector" from "Settings → Plugins → Plugin configuration → MCP Connector". Deployments with a customized profile layout should follow their own host configuration.
 
-## 2. 只选一条连接路径
+## 2. Pick exactly one connection path
 
-- 已有其他客户端配置：按[迁移 `mcpServers` JSON](JSON-MIGRATION.md)导入，并在提交前确认当前项目或全局范围。
-- 使用市场中的 OAuth / API Key 连接器：按服务商要求授权或在本机录入凭据；卡住时转到[OAuth 连接诊断](OAUTH-DIAGNOSTICS.md)。OAuth 能否使用取决于服务商客户端注册政策、账号权限和授权范围。
-- 自建 HTTP / stdio Server：按[用户手册的自定义连接说明](../USER-GUIDE.md#6-添加自定义连接)填写可信端点或本机命令。普通 REST API 或 CLI 不能因此自动变成 MCP Server。
+- You already have another client's configuration: import it with [migrate `mcpServers` JSON](JSON-MIGRATION.md), and confirm the current project or global scope before submitting.
+- You use an OAuth / API Key connector from the Market: authorize as the provider requires or enter credentials locally; if you get stuck, switch to [OAuth connection diagnostics](OAUTH-DIAGNOSTICS.md). Whether OAuth works depends on the provider's client registration policy, account permissions and authorization scope.
+- You run your own HTTP / stdio server: follow the [user guide's custom connection instructions](../USER-GUIDE.md) and enter a trusted endpoint or a local command. An ordinary REST API or CLI does not automatically become an MCP server because of this.
 
-连接后先在“已安装”确认名称、项目/全局范围和启停状态。这里只证明配置已保存，不证明工具已经注册或服务当前可调用。
+After connecting, first confirm the name, the project/global scope and the enabled state in "Installed". This only proves the configuration was saved; it does not prove that the tool is registered or that the service is currently callable.
 
-## 3. 找到要调用的工具
+## 3. Find the tool you want to call
 
-在当前 Workspace 打开“工具”，搜索预期工具，核对连接、Server、工具来源和参数。若结果为空、陈旧或最近发现失败，按[跨连接找工具与恢复](TOOL-SEARCH-RECOVERY.md)处理。
+Open "Tools" in the current Workspace, search for the expected tool, and check the connection, server, tool source and parameters. If results are empty, stale, or the most recent discovery failed, follow [cross-connection tool search and recovery](TOOL-SEARCH-RECOVERY.md).
 
-工具页只展示当前范围内已启用连接的安全缓存，不执行目标工具。继续之前，确认预期工具已被发现；必要时核对 DSH Host 中的 `mcp__<serverName>__*` 注册状态。
+The Tools page only shows the safe cache of enabled connections in the current scope, and never executes the target tool. Before continuing, confirm the expected tool has been discovered; if necessary, check the `mcp__<serverName>__*` registration status in the DSH Host.
 
-## 4. 在正常 DSH 会话完成首次只读调用
+## 4. Complete the first read-only call in a normal DSH session
 
-插件页面没有绕过审批的“试运行”按钮。回到正常 DSH 会话，替换尖括号后发送：
+The plugin page has no approval-bypassing "dry run" button. Return to a normal DSH session and send the following after replacing the angle brackets:
 
 ```text
-请仅使用 MCP 工具 mcp__<serverName>__<toolName> 完成“<一个服务商允许的只读任务>”。
-调用前请列出工具来源、将发送的关键参数，以及是否可能产生费用或副作用。
-如果需要写入、付费、发布、删除，或超出当前账户权限，请停止并先请求我确认。
+Please use only the MCP tool mcp__<serverName>__<toolName> to complete "<one read-only task the provider allows>".
+Before invoking, list the tool source, the key parameters you will send, and whether it may incur cost or side effects.
+If a write, payment, publication or deletion is needed, or if it exceeds the permissions of the current account, stop and ask me to confirm first.
 ```
 
-实际工具执行及权限/审批由 DSH Host 管理。服务商可能另有账号资格、配额和费用；不要为首次验收使用真实敏感数据，或选择写入、删除、发布等有副作用的操作。
+Actual tool execution and permission/approval are managed by the DSH Host. The provider may impose additional account eligibility, quota and cost; do not use real sensitive data for first-time acceptance, and do not choose side-effecting operations such as writing, deleting or publishing.
 
-## 5. 记录三个独立结果
+## 5. Record three independent results
 
-| 层次 | 通过条件 |
+| Layer | Pass condition |
 |---|---|
-| 配置 | “已安装”中存在目标连接，范围和启停状态正确 |
-| 发现/注册 | “工具”中出现预期工具和来源；必要时确认 Host 注册状态 |
-| 调用 | 正常会话经 Host 审批链完成服务商许可的只读调用，并得到可辨认结果 |
+| Configuration | The target connection exists in "Installed", with the correct scope and enabled state |
+| Discovery / registration | The expected tool and its source appear in "Tools"; confirm Host registration status if necessary |
+| Invocation | A normal session completes a provider-permitted read-only call through the Host approval chain and yields a recognizable result |
 
-只有第三项通过，才能把这个具体场景记为“首次成功调用”。若第三项没有条件验证，请明确写“无数据/待验收”，不要从下载量、页面浏览、连接成功或演示素材推算。
+Only when the third layer passes can this specific scenario be recorded as a "first successful call". If the third layer cannot be verified with real conditions, explicitly write "no data / pending acceptance" and do not infer it from download counts, page views, successful connections or demo material.
 
-如果这条路径确实帮你完成首次调用，欢迎克制地 [Star 项目](https://github.com/duhu2000/dsh-mcp-connector/stargazers)、[提交新连接器](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/docs/ONBOARDING.md)或[参与贡献](../../CONTRIBUTING.md)。
+If this path actually helped you complete your first call, you are welcome to [Star the project](https://github.com/duhu2000/dsh-mcp-connector/stargazers), [submit a new connector](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/docs/ONBOARDING.md) or [contribute](../../CONTRIBUTING.md).

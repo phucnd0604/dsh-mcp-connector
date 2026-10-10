@@ -100,15 +100,15 @@ async function fetchResponse(url, { token, json = false } = {}) {
 function summaryMarkdown(result, options) {
   const mark = (value) => value ? '✅' : '⏳';
   const lines = [
-    '## DSH 外部市场自动验收',
+    '## DSH external Marketplace automated acceptance',
     '',
-    `- 状态：\`${result.status}\``,
-    `- PR：https://github.com/${options.pullRequestRepository}/pull/${options.pullRequestNumber}`,
-    `- ${mark(result.checks.pullRequestMerged)} PR 已合并`,
-    `- ${mark(result.checks.registrationPresent)} 上游注册 YAML 已进入 main`,
-    `- ${mark(result.checks.directoryPresent)} DSH 实际 plugins.json 已可搜索`,
+    `- Status: \`${result.status}\``,
+    `- PR: https://github.com/${options.pullRequestRepository}/pull/${options.pullRequestNumber}`,
+    `- ${mark(result.checks.pullRequestMerged)} PR merged`,
+    `- ${mark(result.checks.registrationPresent)} upstream registration YAML has landed on main`,
+    `- ${mark(result.checks.directoryPresent)} the DSH plugins.json is now searchable`,
   ];
-  if (result.plugin) lines.push(`- 目录条目：\`${result.plugin.name}\` · ${result.plugin.url}`);
+  if (result.plugin) lines.push(`- Directory entry: \`${result.plugin.name}\` · ${result.plugin.url}`);
   return `${lines.join('\n')}\n`;
 }
 
@@ -155,7 +155,7 @@ if (isMain) {
   runMarketRegistrationCheck()
     .then((code) => { process.exitCode = code; })
     .catch((error) => {
-      console.error(`市场验收检查失败：${error.message}`);
+      console.error(`Marketplace acceptance check failed: ${error.message}`);
       process.exitCode = 1;
     });
 }

@@ -1,44 +1,44 @@
-# MCP Connector 对外宣传发布登记
+# MCP Connector External Promotion Publication Register
 
-更新时间：2026-09-14（Asia/Shanghai）
+Last updated: 2026-09-14 (Asia/Shanghai)
 
-## 目的
+## Purpose
 
-用户已确认 MCP连接器通过多个媒体渠道发布过宣传内容，但仓库此前没有保存这些文章的规范 URL、发布时间和来源版本。因此目前可以确认产品仓库、npm、GitHub Release 与主要插件目录已经更新，不能据此推断每篇外部媒体正文也已同步。
+The user has confirmed that MCP Connector has published promotional content through multiple media channels, but the repository previously stored no canonical URLs, publication times, or source versions for those articles. Therefore we can currently confirm that the product repository, npm, GitHub Release, and major plugin catalogs have been updated; we cannot infer from this that every external media article body has also been synchronized.
 
-本表是后续版本更新的唯一媒体登记入口。没有真实 URL 时保持“待登记”，不得编造链接或把搜索结果页当作文章证据。
+This table is the single media registration entry point for future version updates. Without a real URL, keep the status as "pending registration"; never fabricate links or treat search result pages as article evidence.
 
-## 规范来源
+## Canonical Sources
 
-- 当前版本与安装命令：[npm](https://www.npmjs.com/package/dsh-mcp-connector)、[最新 Release](https://github.com/duhu2000/dsh-mcp-connector/releases/latest)
-- 当前产品能力与截图：[README](../../README.md)、[UI 素材说明](../../docs/screenshots/README.md)
-- 动态连接器数量：[Registry statistics](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/catalog-stats.json)
-- 外部插件目录状态：[分发总账](../../docs/DISTRIBUTION.md)
-- 当前活动事实、指标与复盘日期：[LEDGER.md](LEDGER.md)
+- Current version and install command: [npm](https://www.npmjs.com/package/dsh-mcp-connector), [latest Release](https://github.com/duhu2000/dsh-mcp-connector/releases/latest)
+- Current product capabilities and screenshots: [README](../../README.md), [UI asset documentation](../../docs/screenshots/README.md)
+- Dynamic connector count: [Registry statistics](https://github.com/duhu2000/dsh-mcp-connector-registry/blob/main/catalog-stats.json)
+- External plugin catalog status: [Distribution master ledger](../../docs/DISTRIBUTION.md)
+- Current campaign facts, metrics, and retrospective dates: [LEDGER.md](LEDGER.md)
 
-## 已知媒体登记
+## Known Media Registrations
 
-| 渠道 | 文章规范 URL | 发布时间 | 文中产品版本 | 素材版本 | 当前状态 | 下一步 |
+| Channel | Canonical article URL | Publication time | Product version in article | Asset version | Current status | Next step |
 |---|---|---|---|---|---|---|
-| CSDN | 待登记 | 待登记 | 待核对 | 待核对 | 用户确认已发布，仓库无 URL | 补充文章直链后核对标题、安装命令、数量和截图 |
-| 搜狐 | 待登记 | 待登记 | 待核对 | 待核对 | 用户确认已发布，仓库无 URL | 补充文章直链后核对正文与跳转链接 |
-| 腾讯新闻 | 待登记 | 待登记 | 待核对 | 待核对 | 用户确认已发布，仓库无 URL | 补充文章直链后核对版本与产品定位 |
-| 知乎 | 待登记 | 待登记 | 待核对 | 待核对 | 是否发布尚无仓库证据 | 如已发布，登记文章直链；未发布则保留为候选 |
-| 掘金 | 待登记 | 待登记 | 待核对 | 待核对 | 是否发布尚无仓库证据 | 如已发布，登记文章直链；未发布则保留为候选 |
+| CSDN | Pending registration | Pending registration | To be verified | To be verified | User confirms it is published, repository has no URL | After adding the direct article link, verify the title, install command, counts, and screenshots |
+| Sohu | Pending registration | Pending registration | To be verified | To be verified | User confirms it is published, repository has no URL | After adding the direct article link, verify the body text and outbound links |
+| Tencent News | Pending registration | Pending registration | To be verified | To be verified | User confirms it is published, repository has no URL | After adding the direct article link, verify the version and product positioning |
+| Zhihu | Pending registration | Pending registration | To be verified | To be verified | No repository evidence on whether it is published | If published, register the direct article link; if not, keep it as a candidate |
+| Juejin | Pending registration | Pending registration | To be verified | To be verified | No repository evidence on whether it is published | If published, register the direct article link; if not, keep it as a candidate |
 
-## 每次发布或补丁后的同步清单
+## Sync Checklist After Every Release or Patch
 
-- [ ] 页面中的当前版本、npm 安装命令和 Release 链接与线上一致。
-- [ ] 精确连接器数量从 `catalog-stats.json` 读取；耐久正文优先写“超百个”，避免版本无关的静态数字快速过期。
-- [ ] 新功能只引用已经发布版本，草稿、PR 或计划不得写成已上线。
-- [ ] 使用最新已验收素材；历史截图继续使用时必须明确标注来源版本。
-- [ ] 不把 npm 下载量、GitHub clone 或市场卡片数量解释为用户数。
-- [ ] 不宣称默认搜索排名、全部连接器免费、目录收录等于安全审计，或缓存可见等于服务当前可调用。
-- [ ] 保留 GitHub、npm、用户手册、第三方连接器贡献入口和问题反馈链接。
-- [ ] 登记修改日期、修改人、文章 URL 和修改后的来源版本。
+- [ ] The current version, npm install command, and Release link in the page match production.
+- [ ] The exact connector count is read from `catalog-stats.json`; durable body copy should prefer writing "over a hundred" to avoid a version-independent static number going stale quickly.
+- [ ] New features only reference already-released versions; drafts, PRs, or plans must not be written up as already shipped.
+- [ ] Use the latest accepted assets; when continuing to use historical screenshots, the source version must be clearly labeled.
+- [ ] Do not interpret npm download counts, GitHub clones, or market card counts as user counts.
+- [ ] Do not claim default search rankings, that all connectors are free, that catalog inclusion equals a security audit, or that a visible cache means the service is currently callable.
+- [ ] Retain the GitHub, npm, user manual, third-party connector contribution entry point, and issue reporting links.
+- [ ] Record the modification date, the person making the change, the article URL, and the source version after modification.
 
-## 当前结论
+## Current Conclusion
 
-- 产品仓库、npm/GitHub 元数据、awesome-dsh-plugin 描述和当前三张工具工作台截图/43 秒演示已有可复核证据。
-- 媒体正文是否同步仍未知；这是缺少规范 URL 的运营证据缺口，不是产品开发失败。
-- 收到文章直链后，应逐篇核对并更新上表；不要仅凭搜索摘要判断正文是否已更新。
+- The product repository, npm/GitHub metadata, the awesome-dsh-plugin description, and the current three tool workbench screenshots plus 43-second demo all have reviewable evidence.
+- Whether the media article bodies are synchronized is still unknown; this is an operational evidence gap caused by missing canonical URLs, not a product development failure.
+- Once direct article links are received, each article should be verified one by one and the table above updated; do not judge whether the body has been updated based only on search snippets.

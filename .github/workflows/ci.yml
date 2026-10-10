@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
-      # DSH 依赖由 Host 提供；legacy-peer-deps 避免 npm 尝试拼装一套不完整的 Host。
+      # DSH dependencies are provided by the Host; --legacy-peer-deps stops npm from trying to assemble an incomplete Host of its own.
       - run: npm install --legacy-peer-deps --ignore-scripts --no-audit --no-fund
       - run: npm run check
 
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      # 目标问题来自 Windows Desktop；使用与 Linux 相同的完整门禁防止平台回归。
+      # The target problem comes from Windows Desktop; running the same full gate as Linux prevents platform regressions.
       - run: npm install --legacy-peer-deps --ignore-scripts --no-audit --no-fund
       - name: Windows CLI native process regression
         run: node --test --test-reporter=tap test/cli-providers.test.mjs

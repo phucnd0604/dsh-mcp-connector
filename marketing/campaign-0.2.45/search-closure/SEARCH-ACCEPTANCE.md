@@ -1,41 +1,40 @@
-# 搜索与故障处理验收规范
+# Search and Troubleshooting Acceptance Specification
 
-日期：2026-09-13。状态：待执行规范；已存在的自动测试不等于以下真实页面案例全部通过。
+Date: 2026-09-13. Status: a pending-execution specification; the automated tests that already exist do not mean that all the real page cases below have passed.
 
-## 记录与环境
+## Record and Environment
 
-每次记录：日期/时区、DSH/插件版本、profile、工作区范围（对外用别名）、目录快照、查询原文、筛选值、缓存时间、操作、实际结果、通过/失败/未测、截图编号。不要收集Token、Header、真实查询结果或本机敏感路径。
-阶段A：无凭据 harness + 本机模拟 HTTP 服务；阶段B：用户授权的真实 DSH 独立验收环境。不得对真实服务主动制造429、撤销凭据或高频重试。
-统一工具搜索与插件市场搜索分开记录；前者搜已启用可见连接缓存，后者搜插件条目。
+Record each time: date/timezone, DSH/plugin version, profile, workspace scope (use an alias externally), catalog snapshot, the literal query, filter values, cache time, the action, the actual result, pass/fail/not tested, and screenshot number. Do not collect Tokens, Headers, real query results, or sensitive local paths.
+Phase A: credential-less harness + local mock HTTP service; Phase B: a user-authorized real DSH separate acceptance environment. Do not actively induce 429s on real services, revoke credentials, or retry at high frequency.
+Unified tool search and plugin marketplace search are recorded separately; the former searches the cache of enabled visible connections, while the latter searches plugin entries.
 
-| 编号 | 操作 | 预期 |
+| ID | Action | Expected |
 |---|---|---|
-| T01 | 两条连接均有工具；搜精确名称，并有前缀/描述匹配干扰项 | 精确名称在较弱匹配之前；同名不同来源保留 |
-| T02 | 搜标题、描述中存在的词及不存在词 | 匹配可解释；无结果有提示；搜索不触发目标MCP请求 |
-| T03 | 选连接，再选服务，再清除筛选 | 仅对应来源；清除恢复；分页数量一致 |
-| T04 | 分别选尚未发现、Host未知、最近成功、最近失败 | 按最近发现状态过滤；不将未知当成功 |
-| T05 | 记录成功缓存，模拟超时，再搜索和开参数 | 缓存仍可读、失败状态保留、时间不伪刷新 |
-| T06 | 从未成功发现；成功返回空列表；模拟超过24小时缓存 | 三种状态分别表达，不把空列表当断网缓存 |
-| T07 | 精确定位同名工具的参数 | 来源正确；必填/类型/枚举/嵌套可读；组合结构有提示；安全原始Schema可展开 |
-| T08 | 模拟恢复，点重新发现；再检查连接 | 仅该连接被访问，完成后状态同步；不调用tools/call |
-| T09 | 快速重复点击、模拟429 Retry-After=600 | 在途合并/五秒冷却；限流等待内操作拒绝且不增加请求 |
-| T10 | 模拟普通失败、鉴权失败及恢复 | 指数退避；鉴权暂停；成功重置。只在模拟环境测 |
-| T11 | 项目A独有、全局连接；切到B、无Workspace、停用或断开 | A独有数据不泄漏；无Workspace仅全局；旧响应不复活已失效缓存 |
-| T12 | 结果超过20条，翻页后改查询/筛选 | 页码复位、无重复漏项；记录确定性排序 |
-| T13 | 保持页面SSE；健康连接持续观察 | 到期调度不形成事件-请求循环；最多两后台任务；关闭订阅后的行为与实现一致 |
+| T01 | Both connections have tools; search an exact name, with prefix/description matches as distractors | The exact name ranks ahead of weaker matches; same-name entries from different sources are retained |
+| T02 | Search for a word present in the title, present in the description, and absent | Matches are explainable; a no-result state is indicated; search does not trigger a request to the target MCP |
+| T03 | Select a connection, then a service, then clear the filters | Only the corresponding source; clearing restores; the pagination count is consistent |
+| T04 | Select respectively not-yet-discovered, host-unknown, recently successful, recently failed | Filter by most recent discovery status; do not treat unknown as success |
+| T05 | Record a successful cache, simulate a timeout, then search and open parameters | The cache is still readable, the failure state is retained, and the timestamp is not falsely refreshed |
+| T06 | Never successfully discovered; successful empty list; simulate a cache older than 24 hours | The three states are expressed separately; an empty list is not treated as an offline cache |
+| T07 | Precisely locate the parameters of a same-name tool | The source is correct; required/type/enum/nested are readable; combined structures are indicated; the safe raw Schema can be expanded |
+| T08 | Simulate recovery, click rediscover; then check connection | Only that connection is accessed, the state syncs after completion; `tools/call` is not invoked |
+| T09 | Rapid repeated clicks, simulate 429 Retry-After=600 | In-flight coalescing/five-second cooldown; actions within the rate-limit wait are rejected without increasing requests |
+| T10 | Simulate ordinary failures, authentication failures, and recovery | Exponential backoff; authentication pauses; success resets. Test only in the mock environment |
+| T11 | Project-A-only data and global connections; switch to B, no workspace, disabled or disconnected | A-only data does not leak; no workspace means global only; old responses do not revive an invalidated cache |
+| T12 | Results exceed 20 items; after paging, change the query/filters | The page number resets with no duplicates or omissions; record the deterministic ordering |
+| T13 | Keep the page SSE open; continuously observe healthy connections | Expiry scheduling does not create an event-request loop; at most two background tasks; behavior after unsubscribing matches the implementation |
 
-## 自动化依据与命令
+## Automation Basis and Commands
 
-仓库中执行 node --test test/discovery-policy.test.mjs test/ui.test.mjs，以及 node --test --test-name-pattern='工具浏览 API|后台发现' test/plugin-flow.test.mjs；完整门禁 npm run check。模拟HTTP测试需允许本机监听。
-请求数由测试服务端计数，不以页面流畅感替代。调度模型18/126是模型任务数，不能宣传实际性能提升百分比。
+Run in the repository `node --test test/discovery-policy.test.mjs test/ui.test.mjs`, plus `node --test --test-name-pattern='tool browsing API|background discovery' test/plugin-flow.test.mjs`; the full gate is `npm run check`. The mock HTTP tests require local listening to be allowed.
+The request count is tallied by the test server; do not substitute the page's smoothness feel for it. The scheduling model figures of 18/126 are model task counts and must not be promoted as an actual performance improvement percentage.
 
-## 真实 DSH 复验
+## Real DSH Re-verification
 
-先确认部署版本和范围，使用已有授权的至少两个连接；执行T01–T04、T07、T08、T12的无副作用部分。故障、429、凭据失效、跨工作区删除变更仅在获准的隔离测试环境执行；否则标未测。
-不得将Mock成功写为真实服务成功；未测项不能默认通过。
-TODO：记录真实工具名/描述样本与实际结果，留存脱敏截图。当前没有新的真实验收结果。
+First confirm the deployed version and scope, and use at least two connections that already have authorization; execute the side-effect-free parts of T01–T04, T07, T08, and T12. Failures, 429s, credential invalidation, and cross-workspace deletion/changes are only performed in an approved isolated test environment; otherwise mark them as not tested.
+Do not write a Mock success as a real service success; untested items must not be treated as passing by default.
+TODO: record real tool name/description samples and actual results, and keep redacted screenshots. There are currently no new real acceptance results.
 
-## 插件市场回归交接
+## Plugin Marketplace Regression Handoff
 
-由市场任务执行五词：mcp、MCP连接器、连接器、mcp server、连接管理。另测空查询默认排序，记录语言、分类、排序、每页数量、插件市场版本、时间。以列表实际顺序计数，瀑布流不能只凭卡片纵坐标判定名次。历史#1/#5不可作为未来保证；宣传描述变更不承诺默认排名提升。
-
+The marketplace task executes five terms: mcp, MCP连接器, 连接器, mcp server, 连接管理. Also test the empty-query default sort, and record the language, category, sort, per-page count, plugin marketplace version, and time. Count according to the actual order of the list; a masonry layout must not be ranked based solely on a card's vertical coordinate. Historical #1/#5 cannot serve as a future guarantee; a promotional description change promises no default ranking improvement.

@@ -1,20 +1,19 @@
-# 用户引导差距
+# User Guidance Gap
 
-日期：2026-09-13。基于0.2.45已核实内容，只提建议，未修改公共文件。
+Date: 2026-09-13. Based on the verified content of 0.2.45; suggestions only, and no public files were modified.
 
-| 位置 | 已有内容 | 差距与处理 |
+| Location | Existing content | Gap and handling |
 |---|---|---|
-| README.md 开头简介 | 超百个、授权、协议支持 | 首屏收益不足；统一宣传源负责人提供最终中英文简介，避免在本任务重复定稿 |
-| README.md “工具查找与故障处理” | 新工具页与退避简述 | 增加清晰步骤和手册链接；五分钟措辞改为到期且依赖页面连接 |
-| README.en.md 同名英文段落 | 英文功能概述 | 与中文同步范围、缓存和参数裁剪边界 |
-| 两份 README “使用” | 市场、连接、管理 | 加工具页入口；区分目录搜索与已连接工具搜索 |
-| docs/USER-GUIDE.md 第5节 | 单连接详情、Prompt、工具缓存与对话搜索 | 缺独立工具工作台教程；在第6节前插入5.1至5.4，不移动其余编号 |
-| README “界面与演示” | 四张旧素材 | 当前素材说明标记0.2.37，不能称其为0.2.45工具页截图；新素材验收前保留旧图并准确注明 |
-| README 比较表 | 泛称普通配置面板的能力 | 建议改为自身能力清单，避免未经逐项证实的竞品泛化 |
+| README.md opening introduction | Over one hundred, authorization, protocol support | The hero benefit is insufficient; the unified promotion source owner provides the final Chinese/English descriptions, to avoid finalizing a copy twice in this task |
+| README.md "Tool discovery and troubleshooting" | A brief description of the new tools page and backoff | Add clear steps and a manual link; change the five-minute wording to "becomes due" and note that it depends on the page connection |
+| README.md corresponding English section | English feature overview | Sync the scope, cache, and parameter redaction boundaries with the Chinese version |
+| Both READMEs "Usage" | Marketplace, connection, management | Add a tools page entry point; distinguish catalog search from connected-tool search |
+| docs/USER-GUIDE.md section 5 | Single connection details, Prompts, tool cache, and conversation search | Missing a standalone tool workspace tutorial; insert 5.1 through 5.4 before section 6, without renumbering the rest |
+| README "Interface and demo" | Four old assets | The current asset notes are marked 0.2.37 and cannot be called 0.2.45 tools page screenshots; keep the old images with accurate labeling until the new assets pass acceptance |
+| README comparison table | Capabilities of an ordinary configuration panel, described generically | Recommended to change to a list of its own capabilities, to avoid unverified sweeping generalizations about competitors |
 
-## 集成边界
+## Integration Boundaries
 
-建议文本见 README-PATCH.md。集成人先核对公共文件最新状态，再按标题锚点合并，不能用旧行号强行覆盖。marketing/metadata.json、市场YAML、package description由统一文案负责人协调一次更新。
-新截图尚未采集，因此不增加失效图片链接、不改 screenshots.json、不替换旧哈希。
-本任务不修改运行代码、不重新发布npm；是否文档补丁发版由归口决定。
-
+The suggested text is in README-PATCH.md. The integrator should first verify the latest state of the public files, then merge by heading anchor; do not force an overwrite using old line numbers. marketing/metadata.json, the marketplace YAML, and the package description should be updated once, coordinated by the unified copy owner.
+The new screenshots have not been captured yet, so do not add dead image links, do not change screenshots.json, and do not replace old hashes.
+This task does not modify running code and does not republish to npm; whether to release the documentation patch is decided by the central session.

@@ -1,34 +1,34 @@
-# 跨连接找工具，并在发现失败后恢复
+# Finding tools across connections, and recovering after discovery fails
 
-返回[首次成功统一入口](README.md)。
+Back to the [first-success unified entry point](README.md).
 
-适用场景：你已连接多个 MCP Server，想按任务找工具、看参数；或某条连接的最近发现失败，但仍需要判断工具曾经有哪些。本文不演示执行真实业务工具。
+When this applies: you have connected multiple MCP Servers and want to find tools by task and inspect their parameters; or a connection's most recent discovery failed but you still need to determine what tools it once had. This document does not demonstrate executing real business tools.
 
-## 先定位正确的工具
+## First locate the right tool
 
-1. 在 DSH 选中目标 Workspace，再打开“MCP连接器 → 工具”。未选 Workspace 时仅能看到全局连接；项目连接不会越界显示。
-2. 输入工具名或描述中的关键词。精确工具名优先；同名结果仍需核对连接、服务和来源。
-3. 使用“连接”“服务”“发现状态”筛选。若结果为空，先清除筛选，再确认连接已启用、范围正确且至少成功发现过一次。
-4. 点击“参数详情”：先看类型、必填、枚举和可展开的嵌套摘要；复杂规则可打开“原始 Schema（安全缓存）”。它仍经过安全裁剪和容量限制，不是服务端完整原文。
+1. Select the target Workspace in DSH, then open "MCP Connector → Tools". Without a selected Workspace you only see global connections; project connections do not leak across boundaries.
+2. Enter a keyword from the tool name or description. An exact tool name takes priority; results with the same name still require checking the connection, service and source.
+3. Use the "Connection", "Service" and "Discovery status" filters. If results are empty, clear the filters first, then confirm the connection is enabled, the scope is correct, and at least one discovery has succeeded.
+4. Click "Parameter details": start with the type, required flag, enums and the expandable nested summary; for complex rules, open the "Raw schema (safe cache)". It is still safely truncated and size-limited, and is not the server's complete original text.
 
-工具页搜索的是**当前范围内已启用连接的最后成功安全缓存**，不是整个市场中未安装连接器的工具。搜索/筛选不请求目标服务，也不执行目标工具。
+The Tools page searches the **last successful safe cache of enabled connections in the current scope** — not the tools of uninstalled connectors across the whole Market. Searching/filtering does not request the target service and does not execute the target tool.
 
-## 最近发现失败时怎么做
+## What to do when the most recent discovery failed
 
-1. 看结果上的连接器/连接/服务来源、最近发现状态和“最后成功缓存时间”。超过 24 小时的缓存会标记陈旧；缓存能看不代表服务当前可调用。
-2. 展开“连接状态与故障处理”，先阅读失败阶段、稳定 code 和建议。`状态未知` 不等于连接成功。
-3. 根据建议使用“检查连接”或“重新发现工具”。前者检查单连接健康；后者重新获取该连接的工具元数据，二者都不是目标工具试运行，也不保证自动修复。
-4. 若遇 429/限流，等待显示的重试时间，不要连续点击。工具页手动动作不能绕过有效限流；鉴权失败需更新凭据或重新授权。
-5. 修复后再次观察发现状态与时间；最后再通过正常 DSH 会话调用一个获准的只读工具，确认真实业务路径。
+1. Look at the connector/connection/service source on the result, the most recent discovery status and the "last successful cache time". A cache older than 24 hours is marked stale; being able to read the cache does not mean the service is callable right now.
+2. Expand "Connection status and troubleshooting" and read the failure stage, the stable code and the suggestion first. `Status unknown` does not mean the connection succeeded.
+3. Follow the suggestion and use "Check connection" or "Rediscover tools". The former checks the health of a single connection; the latter re-fetches that connection's tool metadata. Neither is a dry run of the target tool, and neither guarantees an automatic fix.
+4. On 429/rate limiting, wait for the displayed retry time and do not click repeatedly. Manual actions on the Tools page cannot bypass valid rate limits; an authentication failure requires updating credentials or reauthorizing.
+5. After fixing it, observe the discovery status and time again; finally, invoke an approved read-only tool in a normal DSH session to confirm the real business path.
 
-后台发现最多并行处理两条连接。健康连接是**五分钟后到期**，不是精确每五分钟或永久实时轮询；普通失败指数退避，鉴权失败暂停自动重试。页面状态通知不等于持续健康探针。
+Background discovery handles at most two connections in parallel. A healthy connection expires **after five minutes** — it is not exact five-minute polling nor permanent real-time polling; ordinary failures use exponential backoff, and authentication failures pause automatic retries. A page status notification is not a continuous health probe.
 
-## 可复核的首次成功标准
+## A reviewable standard for first success
 
-| 层次 | 你应看到什么 |
+| Layer | What you should see |
 |---|---|
-| 连接 | “已安装”中对应连接存在，范围与启停状态正确 |
-| 发现/注册 | 工具页出现预期工具、来源和最近成功时间；必要时核对 Host 工具注册 |
-| 调用 | 正常会话中通过 Host 审批链完成一个服务商许可的只读调用并得到预期结果 |
+| Connection | The matching connection exists in "Installed", with the correct scope and enabled state |
+| Discovery / registration | The expected tool, its source and the last success time appear on the Tools page; verify Host tool registration if necessary |
+| Invocation | A provider-permitted read-only call completes through the Host approval chain in a normal session and returns the expected result |
 
-不要用缓存搜索结果代替调用验收，也不要在公开反馈中粘贴真实参数、结果或凭据。进一步诊断见[用户手册：工具工作台](../USER-GUIDE.md#51-工具工作台统一查找工具)。
+Do not substitute cached search results for invocation acceptance, and do not paste real parameters, results or credentials into public feedback. For further diagnostics, see the [user guide: tool workbench](../USER-GUIDE.md).
