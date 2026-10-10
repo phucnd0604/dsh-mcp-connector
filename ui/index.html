@@ -1752,7 +1752,7 @@
     },
     async changeInjectionMode(key, mode, select) {
       const previous = mode === 'session' ? 'always' : 'session';
-      if (mode === 'session' && !confirm('Enabling per session does not disconnect the MCP connection, but it hides this connection's business tools by default in every session.\n\nYou will then need to explicitly select tools in a conversation to activate them temporarily, for up to 30 minutes. Continue?')) {
+      if (mode === 'session' && !confirm('Enabling per session does not disconnect the MCP connection, but it hides the business tools of this connection by default in every session.\n\nYou will then need to explicitly select tools in a conversation to activate them temporarily, for up to 30 minutes. Continue?')) {
         select.value = previous;
         return;
       }

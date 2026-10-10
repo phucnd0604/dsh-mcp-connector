@@ -1,11 +1,27 @@
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { compileFunction } from 'node:vm';
 
 const normalizeLineEndings = (source) => source.replace(/\r\n?/g, '\n');
 const uiSource = normalizeLineEndings(await readFile(new URL('../ui/index.html', import.meta.url), 'utf8'));
 const clientSource = normalizeLineEndings(await readFile(new URL('../lib/client.js', import.meta.url), 'utf8'));
 const harnessSource = normalizeLineEndings(await readFile(new URL('../scripts/ui-harness.mjs', import.meta.url), 'utf8'));
+
+// The page is one inline <script> block. A single malformed string literal — for
+// example an unescaped apostrophe in copy such as "this connection's tools" —
+// makes the whole block fail to parse, which silently blanks the panel instead
+// of throwing. Assert the block compiles so that class of copy edit cannot ship.
+test('the inline UI script parses as valid JavaScript', () => {
+  const blocks = [...uiSource.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  assert.ok(blocks.length > 0, 'ui/index.html should contain at least one inline script block');
+  for (const [, source] of blocks) {
+    assert.doesNotThrow(
+      () => compileFunction(source, [], { filename: 'ui/index.html' }),
+      'the inline UI script must parse; an unescaped quote in UI copy breaks the entire panel',
+    );
+  }
+});
 
 test('guidance does not append API Key, JSON or URL advice to authorization and local launch errors', () => {
   const start = uiSource.indexOf('  function guidanceFor(');
