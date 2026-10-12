@@ -21,7 +21,7 @@ updated so no Chinese reaches the published artifact.
 | Check | Result |
 |---|---|
 | `npm run check` | **exit 0** |
-| `npm test` | **333 tests, 330 pass, 0 fail** |
+| `npm test` | **335 tests, 332 pass, 0 fail** |
 | Chinese lines left in `lib/` | **3, all intentional** (see §4) |
 
 ### The 3 intentionally-Chinese lines in `lib/`
@@ -120,6 +120,30 @@ Playwright `browser_take_screenshot` with an explicit `filename` writes outside 
 omit `filename` to get the image returned inline.
 
 ---
+
+## 8. Upstream-update guard (added after the translation)
+
+This fork must never be overwritten by an upstream release, so the update check refuses
+packages published from a repository this fork does not track.
+
+- `lib/version-status.js` now points `GITHUB_LATEST_RELEASE_URL` / `GITHUB_RELEASES_URL` at
+  `phucnd0604/dsh-mcp-connector` instead of `duhu2000`.
+- New `isUpstreamPackage(metadata)` + `UPSTREAM_REPOSITORY_HOSTS`. When npm reports a newer
+  version whose `repository` names a tracked upstream repo, the result carries
+  `blockedByUpstream: true`, `updateAvailable: false` and `latestVersion: null`, and a warning
+  is logged. The update button is therefore never offered.
+- **Why this was needed:** npm is the authority for `updateAvailable` (see the comment above
+  `updateAvailable`). `registry.npmjs.org/dsh-mcp-connector` is the UPSTREAM package, so changing
+  only the GitHub URL would not have prevented an upstream release from being offered.
+- Detection is affirmative: only a package that explicitly names a tracked upstream repo is
+  refused. A package with no `repository` field is allowed through, because the registry omits
+  it on older packages and refusing those would break updates for an unrelated reason.
+- Covered by two tests in `test/version-status.test.mjs`: an upstream release is refused, and a
+  release published by the fork itself is still offered.
+
+Verified against live registry data: `dsh-mcp-connector@0.2.70` has
+`repository.url = git+https://github.com/duhu2000/dsh-mcp-connector.git` and is correctly
+detected as upstream.
 
 ## 8. Remaining optional work (not blocking)
 

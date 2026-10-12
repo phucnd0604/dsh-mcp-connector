@@ -120,3 +120,43 @@ test('版本源均不可用时仍返回本地安装版本', async () => {
   assert.equal(status.status, 'unavailable');
   assert.equal(warnings.length, 1);
 });
+
+test('update coming from the upstream repository is refused so a fork is never overwritten', async () => {
+  const service = createVersionStatusService({
+    installedVersion: '0.2.23',
+    fetchImpl: async (url) => {
+      if (url === NPM_LATEST_URL) {
+        return jsonResponse({
+          version: '0.2.71',
+          repository: { url: 'git+https://github.com/duhu2000/dsh-mcp-connector.git' },
+        });
+      }
+      throw new Error('no release');
+    },
+  });
+  const status = await service.check();
+  assert.equal(status.updateAvailable, false, 'upstream version must not be offered as an update');
+  assert.equal(status.latestVersion, null);
+  assert.equal(status.blockedByUpstream, true);
+  service.dispose();
+});
+
+test('an update published by the fork itself is still offered', async () => {
+  const service = createVersionStatusService({
+    installedVersion: '0.2.23',
+    fetchImpl: async (url) => {
+      if (url === NPM_LATEST_URL) {
+        return jsonResponse({
+          version: '0.2.71',
+          repository: { url: 'git+https://github.com/phucnd0604/dsh-mcp-connector.git' },
+        });
+      }
+      throw new Error('no release');
+    },
+  });
+  const status = await service.check();
+  assert.equal(status.updateAvailable, true);
+  assert.equal(status.latestVersion, '0.2.71');
+  assert.equal(status.blockedByUpstream, false);
+  service.dispose();
+});
