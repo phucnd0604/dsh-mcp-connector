@@ -145,7 +145,44 @@ Verified against live registry data: `dsh-mcp-connector@0.2.70` has
 `repository.url = git+https://github.com/duhu2000/dsh-mcp-connector.git` and is correctly
 detected as upstream.
 
-## 8. Remaining optional work (not blocking)
+## 9. Installing this fork into DSH — READ BEFORE EVERY INSTALL
+
+**A `pnpm install` will NOT pick up new commits, and it prints `Already up to date` while doing so.**
+This is a known pnpm behaviour for git-hosted (`github:`) dependencies, documented by DSH as
+"The github dependency lock-cache pitfall". It is not a bug in this fork and not something that
+can be pinned away.
+
+After pushing a new commit to the fork, run in the profile directory:
+
+```powershell
+cd $env:DSH_HOME\profiles\desktop
+pnpm update dsh-mcp-connector
+# MANDATORY verification - the message above is misleading:
+Select-String -Path node_modules\.pnpm\lock.yaml -Pattern 'codeload.*mcp-connector'
+```
+
+The lockfile must show the 40-character commit you just pushed. Then restart DSH.
+
+**Never trust `pnpm install` alone, and never trust git status.** "The code is correct in git"
+does not mean "the code that is running is that code". This repo shipped an English
+translation that was never actually installed: the profile kept resolving `206484e` (the
+pre-translation commit) and the panel stayed Chinese while `ddd3a4a` sat on `phucn/main`.
+
+Quick check that the *running* build is the translated one:
+
+```powershell
+$p = "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\dsh-mcp-connector\lib\tools.js"
+node -e "const fs=require('fs');const m=fs.readFileSync(process.argv[1],'utf8').match(/[\u4e00-\u9fff]/g);console.log('CJK chars:', m?m.length:0)" $p
+```
+
+Expected: `0`. A non-zero count means the pre-translation build is still installed.
+
+The installed copy has **3** Chinese lines in `lib/` (mcp-http.js:78, mcp-validation.js:170,
+schema.js:306) — the same three intentional keeps described in section 2.
+
+---
+
+## 10. Remaining optional work (not blocking)
 
 1. `docs/` still contains Chinese design documents and `CHANGELOG.md` is Chinese. These are
    historical/developer docs, not shipped UI, and `npm run check` does not guard them.
