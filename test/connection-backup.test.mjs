@@ -27,7 +27,7 @@ function record(overrides = {}) {
   };
 }
 
-test('脱敏导出不包含凭据、OAuth Grant、stdio 参数或本地路径', () => {
+test('redacted export excludes credentials, OAuth grants, stdio args and local paths', () => {
   const records = [
     record({
       key: 'http',
@@ -68,11 +68,11 @@ test('脱敏导出不包含凭据、OAuth Grant、stdio 参数或本地路径', 
   assert.equal(exported.connections[1].command, REDACTED_LOCAL_VALUE);
 });
 
-test('脱敏导出可回填凭据后再次导入，未回填时整体拒绝', () => {
+test('redacted export can be refilled and imported again; without refill the whole import is rejected', () => {
   const exported = exportRedactedConnections([
     record({ auth: { mode: 'api-key', apiKeyHeader: 'X-Api-Key', apiKeyValue: 'original-secret' } }),
   ]);
-  assert.throws(() => normalizeJsonImport(exported), /脱敏导出仍有 1 个待补值/);
+  assert.throws(() => normalizeJsonImport(exported), /the redacted export still has 1 value\(s\) to fill in/);
 
   exported.connections[0].apiKeyValue = 'replacement-secret';
   const { records } = normalizeJsonImport(exported);
@@ -84,7 +84,7 @@ test('脱敏导出可回填凭据后再次导入，未回填时整体拒绝', ()
   });
 });
 
-test('脱敏导出保留局域网 HTTP 的显式授权标记', () => {
+test('redacted export preserves the explicit authorization flag for LAN HTTP', () => {
   const exported = exportRedactedConnections([
     record({ url: 'http://192.168.31.138:8188/mcp', allowInsecurePrivateNetwork: true }),
   ]);
@@ -94,14 +94,14 @@ test('脱敏导出保留局域网 HTTP 的显式授权标记', () => {
   assert.equal(records[0].url, 'http://192.168.31.138:8188/mcp');
 });
 
-test('脱敏导出保留不含凭据的工具注入模式', () => {
+test('redacted export preserves credential-free tool injection modes', () => {
   const exported = exportRedactedConnections([record({ injectionMode: 'session' })]);
   assert.equal(exported.connections[0].injectionMode, 'session');
   const { records } = normalizeJsonImport(exported);
   assert.equal(records[0].injectionMode, 'session');
 });
 
-test('快照公开摘要只暴露恢复范围与 OAuth 可恢复性', () => {
+test('snapshot public summary exposes only restore scope and OAuth restorability', () => {
   const snapshot = {
     key: 'snapshot-1',
     createdAt: 1,
@@ -120,7 +120,7 @@ test('快照公开摘要只暴露恢复范围与 OAuth 可恢复性', () => {
   assert.deepEqual(unresolvedRedactions({ a: REDACTED_VALUE, b: [REDACTED_LOCAL_VALUE] }), ['$.a', '$.b[0]']);
 });
 
-test('快照表保持 storage domain v1 兼容并只保留最新 20 个', async () => {
+test('snapshot table stays compatible with storage domain v1 and keeps only the latest 20', async () => {
   const spec = defineConnectorDomain();
   assert.equal(spec.version, 1);
   assert.ok(spec.tables.snapshots);

@@ -198,7 +198,7 @@ test('fetchRemoteCatalogWithFallback 主源 304 时不请求备用源', async ()
   }
 });
 
-test('readLimitedJson 拒绝超限目录响应', async () => {
+test('readLimitedJson rejects an oversized catalog response', async () => {
   const response = new Response(JSON.stringify({ value: '0123456789' }), { headers: { 'content-type': 'application/json' } });
-  await assert.rejects(() => readLimitedJson(response, 5), /超过 5 bytes/);
+  await assert.rejects(() => readLimitedJson(response, 5), /exceeds 5 bytes/);
 });

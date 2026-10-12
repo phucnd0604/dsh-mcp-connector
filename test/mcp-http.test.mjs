@@ -15,7 +15,7 @@ function jsonResponse(value, { status = 200, headers = {} } = {}) {
   });
 }
 
-test('tools/list 拒绝服务端重复返回同一分页游标', async () => {
+test('tools/list rejects a server that repeats the same pagination cursor', async () => {
   let listRequests = 0;
   const fetchImpl = async (_url, options) => {
     if (options.method === 'DELETE') return new Response(undefined, { status: 204 });
@@ -38,7 +38,7 @@ test('tools/list 拒绝服务端重复返回同一分页游标', async () => {
 
   await assert.rejects(
     listMcpTools(record, { fetchImpl }),
-    /重复分页游标/,
+    /returned a duplicate pagination cursor/,
   );
   assert.equal(listRequests, 2);
 });

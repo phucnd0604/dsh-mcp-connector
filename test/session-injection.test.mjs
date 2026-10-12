@@ -45,13 +45,13 @@ function sessionHost(initialNames) {
   };
 }
 
-test('injectionMode 旧连接默认 always，未知值拒绝', () => {
+test('injectionMode defaults legacy connections to always and rejects unknown values', () => {
   assert.equal(normalizeInjectionMode(), 'always');
   assert.equal(normalizeInjectionMode('session'), 'session');
-  assert.throws(() => normalizeInjectionMode('keyword'), /不支持/);
+  assert.throws(() => normalizeInjectionMode('keyword'), /Unsupported tool injection mode/);
 });
 
-test('按会话连接默认隐藏，精确激活仅影响当前 Agent', () => {
+test('Session-scoped connections are hidden by default and an exact activation affects only the current Agent', () => {
   const read = 'mcp__acme__read';
   const write = 'mcp__acme__write';
   const always = 'mcp__global__search';
@@ -77,7 +77,7 @@ test('按会话连接默认隐藏，精确激活仅影响当前 Agent', () => {
   });
   assert.equal(preview.baseRevision, 0);
   assert.equal(preview.nextInferenceBoundary, true);
-  assert.equal(controller.status(first).activeCount, 0, 'preview 不修改状态');
+  assert.equal(controller.status(first).activeCount, 0, 'preview does not modify state');
 
   const activated = controller.activate(first, {
     connectionKey: 'acme', publicNames: [read], ttlMinutes: 5,
@@ -89,20 +89,20 @@ test('按会话连接默认隐藏，精确激活仅影响当前 Agent', () => {
 
   const guard = [...host.guards][0];
   assert.equal(guard({ name: read, agent: first }), undefined);
-  assert.match(guard({ name: write, agent: first }), /未在当前会话激活/);
-  assert.match(guard({ name: read, agent: second }), /未在当前会话激活/);
-  assert.match(guard({ name: read }), /需要当前会话/);
+  assert.match(guard({ name: write, agent: first }), /is not activated in the current session/);
+  assert.match(guard({ name: read, agent: second }), /is not activated in the current session/);
+  assert.match(guard({ name: read }), /must be explicitly activated in the current session/);
   assert.equal(guard({ name: always }), undefined);
 
   clock += 5 * 60_000 + 1;
   controller.refresh();
   assert.deepEqual([...host.denied(first)].sort(), [read, write]);
   assert.equal(controller.status(first).activeCount, 0);
-  assert.equal(controller.status(first).revision, 2, '过期是一次显式状态变更');
+  assert.equal(controller.status(first).revision, 2, 'expiry is one explicit state change');
   controller.dispose();
 });
 
-test('激活需要确认和最新 revision，且不能越过作用域或治理拒绝', () => {
+test('Activation requires confirmation and the latest revision and cannot bypass scope or governance denial', () => {
   const allowed = 'mcp__acme__read';
   const governed = 'mcp__acme__delete';
   const host = sessionHost([allowed, governed]);
@@ -118,20 +118,20 @@ test('激活需要确认和最新 revision，且不能越过作用域或治理�
 
   assert.throws(() => controller.previewActivation(agent, {
     connectionKey: 'acme', publicNames: [allowed],
-  }), /不属于当前工作区/);
+  }), /does not belong to the current workspace/);
   visible = true;
   assert.throws(() => controller.previewActivation(agent, {
     connectionKey: 'acme', publicNames: [governed],
-  }), /治理策略拒绝/);
+  }), /is denied by the governance policy/);
   assert.throws(() => controller.previewActivation(agent, {
     connectionKey: 'acme', publicNames: ['mcp__acme__unknown'],
-  }), /尚未观察/);
+  }), /has not observed the tool/);
   const preview = controller.previewActivation(agent, {
     connectionKey: 'acme', publicNames: [allowed],
   });
   assert.throws(() => controller.activate(agent, {
     connectionKey: 'acme', publicNames: [allowed], expectedRevision: 0,
-  }), /明确确认/);
+  }), /must come from an explicit user confirmation/);
   assert.throws(() => controller.activate(agent, {
     connectionKey: 'acme', publicNames: [allowed], expectedRevision: 9, confirmed: true,
   }), /revision=0/);
@@ -144,7 +144,7 @@ test('激活需要确认和最新 revision，且不能越过作用域或治理�
   controller.dispose();
 });
 
-test('tools/change 新工具保持隐藏、消失工具清理激活，不同 restriction 始终取交集', () => {
+test('A new tools/change tool stays hidden, a vanished tool clears the activation, and different restrictions always intersect', () => {
   const read = 'mcp__acme__read';
   const write = 'mcp__acme__write';
   const host = sessionHost([read]);
@@ -156,21 +156,21 @@ test('tools/change 新工具保持隐藏、消失工具清理激活，不同 res
   controller.activate(agent, {
     connectionKey: 'acme', publicNames: [read], expectedRevision: 0, confirmed: true,
   });
-  assert.deepEqual([...host.denied(agent)], [read], '释放会话层不能释放上游拒绝');
+  assert.deepEqual([...host.denied(agent)], [read], 'releasing the session layer must not release the upstream denial');
 
   host.setNames([read, write]);
-  assert.deepEqual([...host.denied(agent)].sort(), [read, write], '新工具不继承旧激活');
+  assert.deepEqual([...host.denied(agent)].sort(), [read, write], 'a new tool does not inherit an old activation');
   upstreamDeny();
   assert.deepEqual([...host.denied(agent)], [write]);
 
   host.setNames([write]);
   const status = controller.status(agent);
   assert.equal(status.activeCount, 0);
-  assert.equal(status.revision, 2, '已消失的精确工具激活被清理');
+  assert.equal(status.revision, 2, 'the activation of the vanished exact tool was cleared');
   controller.dispose();
 });
 
-test('Agent disposed 立即清理 restriction 与内存激活', () => {
+test('Agent disposed immediately clears the restriction and the in-memory activation', () => {
   const read = 'mcp__acme__read';
   const host = sessionHost([read]);
   const agent = host.makeAgent('agent');
@@ -186,6 +186,6 @@ test('Agent disposed 立即清理 restriction 与内存激活', () => {
   assert.equal(agent.restrictions.size, 0);
   assert.throws(() => controller.activate(agent, {
     connectionKey: 'acme', publicNames: [read], expectedRevision: 1, confirmed: true,
-  }), /revision=0/, '销毁后不继承原会话 revision');
+  }), /revision=0/, 'a disposed Agent does not inherit the original session revision');
   controller.dispose();
 });

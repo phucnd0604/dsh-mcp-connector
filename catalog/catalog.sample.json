@@ -21,7 +21,7 @@
         "mode": "oauth2-pkce",
         "issuer": "https://agent.qcc.com",
         "scope": "mcp:tools",
-        "clientName": "DeepSeek Harness - MCP 连接器",
+        "clientName": "DeepSeek Harness - MCP Connector",
         "tokenEndpointAuthMethod": "none",
         "grantSharing": "issuer"
       },
@@ -65,7 +65,7 @@
         "mode": "oauth2-pkce",
         "issuer": "https://agent.qcc.com",
         "scope": "mcp:tools",
-        "clientName": "DeepSeek Harness - MCP 连接器",
+        "clientName": "DeepSeek Harness - MCP Connector",
         "tokenEndpointAuthMethod": "none",
         "grantSharing": "issuer"
       },
@@ -101,7 +101,7 @@
       "auth": {
         "mode": "api-key",
         "apiKeyHeader": "X-Api-Key",
-        "clientName": "DeepSeek Harness - MCP 连接器"
+        "clientName": "DeepSeek Harness - MCP Connector"
       },
       "servers": [
         {
@@ -127,7 +127,7 @@
       "homepage": "https://example.com/mcp",
       "auth": {
         "mode": "bearer",
-        "clientName": "DeepSeek Harness - MCP 连接器"
+        "clientName": "DeepSeek Harness - MCP Connector"
       },
       "servers": [
         {

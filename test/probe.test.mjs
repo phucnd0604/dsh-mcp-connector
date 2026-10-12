@@ -10,25 +10,25 @@ async function listen(handler) {
   return { server, base: `http://127.0.0.1:${server.address().port}` };
 }
 
-test('registry 校验拒绝重复 serverName 与未知字段夹带的凭据', () => {
+test('registry validation rejects duplicate serverName and credentials smuggled in unknown fields', () => {
   const server = { serverKey: 'main', url: 'https://mcp.example.com/stream', serverName: 'shared' };
   assert.throws(() => validateRegistryDescriptors([
     { id: 'a', name: 'A', servers: [server] },
     { id: 'b', name: 'B', servers: [{ ...server, serverKey: 'other' }] },
-  ]), /重复 serverName/);
+  ]), /Duplicate serverName/);
   assert.throws(() => validateRegistryDescriptors([
     { id: 'a', name: 'A', token: 'must-not-enter-registry', servers: [server] },
-  ]), /禁止携带凭证/);
+  ]), /must not carry credentials or secrets/);
 });
 
-test('stdio registry 校验通过但探针绝不执行本地命令', async () => {
+test('stdio registry validation passes but the probe never runs local commands', async () => {
   const report = await probeConnector({
     id: 'stdio-safe', name: 'Stdio Safe', icon: '🔌', auth: { mode: 'none' },
     servers: [{ serverKey: 'main', transport: 'stdio', command: 'definitely-do-not-run', args: ['--danger'], serverName: 'stdio-safe' }],
   });
   assert.equal(report.status, 'pass');
   assert.equal(report.servers[0].transport, 'stdio');
-  assert.match(report.servers[0].skipped, /不会执行|不会.*命令/);
+  assert.match(report.servers[0].skipped, /does not run local commands/);
 });
 
 test('探针展开 fetch cause 并输出安全的 DNS 分类', () => {

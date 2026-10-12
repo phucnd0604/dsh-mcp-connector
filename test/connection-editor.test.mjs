@@ -65,11 +65,11 @@ test('删除敏感字段可清除它，serverName 和市场连接身份不可编
   assert.equal(next.auth, undefined);
 
   document.connections[0].serverName = 'other';
-  assert.throws(() => normalizeConnectionReconfiguration(httpRecord, document), /serverName 是连接身份/);
+  assert.throws(() => normalizeConnectionReconfiguration(httpRecord, document), /serverName is the connection identity/);
   assert.equal(connectionConfigurationEditable({ ...httpRecord, connectorId: 'market-demo' }), false);
   assert.throws(
     () => editableConnectionConfiguration({ ...httpRecord, connectorId: 'market-demo' }),
-    /市场连接器请使用配置或重新授权入口/,
+    /use the configure or reauthorize entry for Market connectors/,
   );
 });
 
@@ -105,9 +105,9 @@ test('stdio 参数、环境变量与本地路径默认保留，也可以整体�
 
 test('无法对应原值的保留标记与多连接提交会被拒绝', () => {
   const invalid = { connections: [{ name: 'Demo', serverName: 'demo', transport: 'streamable-http', url: 'https://example.com/mcp', headers: { New: KEEP_EXISTING_VALUE } }] };
-  assert.throws(() => normalizeConnectionReconfiguration(httpRecord, invalid), /没有可保留的原值/);
+  assert.throws(() => normalizeConnectionReconfiguration(httpRecord, invalid), /has no original value to keep/);
   assert.throws(
     () => normalizeConnectionReconfiguration(httpRecord, { connections: [invalid.connections[0], invalid.connections[0]] }),
-    /只能提交当前这一条 connection/,
+    /can only submit the single current (valid )?connection/,
   );
 });

@@ -19,7 +19,7 @@ function rule(scope, effect, connectorId, serverName, toolName) {
   };
 }
 
-test('三层策略按 Tool > Server > Connection 解析，物理停用不可覆盖', () => {
+test('The three-layer policy resolves Tool > Server > Connection and a physical disable cannot be overridden', () => {
   const rules = [
     rule('connection', 'deny', 'acme'),
     rule('server', 'allow', 'acme', 'search'),
@@ -30,11 +30,11 @@ test('三层策略按 Tool > Server > Connection 解析，物理停用不可覆�
   assert.equal(resolveGovernancePolicy({ connectorId: 'acme', serverName: 'billing', toolName: 'read' }, rules).source, 'connection');
   assert.deepEqual(
     resolveGovernancePolicy({ connectorId: 'acme', serverName: 'search', toolName: 'read', connectionEnabled: false }, rules),
-    { effect: 'deny', source: 'lifecycle', sourceLabel: '连接已停用', ruleId: null },
+    { effect: 'deny', source: 'lifecycle', sourceLabel: 'Connection disabled', ruleId: null },
   );
 });
 
-test('MCP public tool name 与 Host 公开的规范化和哈希契约一致', () => {
+test('The MCP public tool name matches the normalization and hash contract published by the Host', () => {
   assert.equal(publicToolName('acme', 'search'), 'mcp__acme__search');
   assert.equal(publicToolName('acme', '搜索 公司'), 'mcp__acme________4222021ed6dd');
   const long = publicToolName('acme', 'x'.repeat(80));
@@ -42,7 +42,7 @@ test('MCP public tool name 与 Host 公开的规范化和哈希契约一致', ()
   assert.match(long, /^mcp__acme__x+_[a-f0-9]{12}$/);
 });
 
-test('策略变更可先预览、按 revision 提交并回滚，重启可恢复', async () => {
+test('A policy change can be previewed, committed by revision and rolled back, and survives a restart', async () => {
   let persisted;
   const store = {
     async get() { return persisted; },
@@ -55,12 +55,12 @@ test('策略变更可先预览、按 revision 提交并回滚，重启可恢复'
   const preview = service.preview(mutation);
   assert.equal(preview.baseRevision, 0);
   assert.equal(preview.changed, true);
-  assert.equal(service.snapshot().rules.length, 0, 'preview 不写状态');
+  assert.equal(service.snapshot().rules.length, 0, 'preview does not write state');
 
   const applied = await service.apply(mutation, { expectedRevision: 0 });
   assert.equal(applied.document.revision, 1);
   assert.equal(applied.document.rules[0].effect, 'deny');
-  await assert.rejects(service.apply({ ...mutation, effect: 'allow' }, { expectedRevision: 0 }), /请重新预览/);
+  await assert.rejects(service.apply({ ...mutation, effect: 'allow' }, { expectedRevision: 0 }), /preview it again/);
 
   const restarted = new GovernancePolicyService(store);
   await restarted.load();
@@ -71,7 +71,7 @@ test('策略变更可先预览、按 revision 提交并回滚，重启可恢复'
   assert.deepEqual(rolledBack.document.rules, []);
 });
 
-test('策略持久化失败时不改变内存规则或执行结果', async () => {
+test('A governance persistence failure changes neither the in-memory rules nor the execution result', async () => {
   const service = new GovernancePolicyService({
     async get() { return null; },
     async put() { throw new Error('disk full'); },
@@ -84,7 +84,7 @@ test('策略持久化失败时不改变内存规则或执行结果', async () =>
   assert.deepEqual(service.snapshot().rules, []);
 });
 
-test('工具删除或重命名只把旧规则标成 stale，不误命中新工具', () => {
+test('A deleted or renamed tool only marks the old rule stale and never hits the new tool', () => {
   const rules = [rule('tool', 'deny', 'acme', 'search', 'old_name')];
   const records = [{ connectorId: 'acme', serverName: 'search', enabled: true }];
   const unknown = inspectGovernanceRules(rules, records, new Map());
@@ -151,7 +151,7 @@ function governanceHost(initialNames, initialAgents = [], { emitFromSchemas = fa
   };
 }
 
-test('Host controller 对多 Server 真正收窄 Agent schema 并以 guard 拒绝执行，新工具同步继承策略', () => {
+test('The Host controller really narrows the Agent schema across Servers and denies execution with guard; new tools inherit the policy', () => {
   const s1Read = publicToolName('search', 'read');
   const s1Write = publicToolName('search', 'write');
   const s2List = publicToolName('billing', 'list');
@@ -169,7 +169,7 @@ test('Host controller 对多 Server 真正收窄 Agent schema 并以 guard 拒�
   assert.deepEqual([...host.denied(firstAgent)].sort(), [s1Write, s2List].sort());
   const guard = [...host.guards][0];
   assert.equal(guard({ name: s1Read }), undefined);
-  assert.match(guard({ name: s1Write }), /连接策略拒绝/);
+  assert.match(guard({ name: s1Write }), /was denied by Connection policy/);
   assert.equal(guard({ name: 'unrelated' }), undefined);
 
   rules = [...rules, rule('server', 'allow', 'acme', 'billing')];
@@ -191,7 +191,7 @@ test('Host controller 对多 Server 真正收窄 Agent schema 并以 guard 拒�
   assert.equal(secondAgent.restrictions.size, 0);
 });
 
-test('治理同步忽略 schemas 与 restrict 同步触发的嵌套 tools/change，避免永久重扫', () => {
+test('Governance sync ignores nested tools/change triggered by schemas and restrict so it does not rescan forever', () => {
   const deniedTool = publicToolName('search', 'write');
   const host = governanceHost([deniedTool], [], { emitFromSchemas: true });
   const agent = host.makeAgent('nested-change');
@@ -206,6 +206,6 @@ test('治理同步忽略 schemas 与 restrict 同步触发的嵌套 tools/change
   assert.deepEqual([...host.denied(agent)], [deniedTool]);
 
   host.emit('tools/change');
-  assert.equal(host.schemaReads(), 2, '独立的后续变更仍应触发一次同步');
+  assert.equal(host.schemaReads(), 2, 'an independent later change should still trigger exactly one sync');
   controller.dispose();
 });

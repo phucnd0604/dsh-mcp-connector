@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { classifyConnectionError, validateConnectionRecord } from '../lib/mcp-validation.js';
 
-test('CLI 授权诊断优先于 Host 通用初始化错误，未知原因不猜测', () => {
+test('The CLI authorization diagnostic takes priority over the generic Host initialization error and does not guess unknown reasons', () => {
   const wrapped = new Error('initial tool synchronization failed', {
     cause: new Error('[CLI_AUTH_REQUIRED] authenticated=false'),
   });
@@ -39,7 +39,7 @@ function bearerRecord(url, token) {
   };
 }
 
-test('MCP 连接校验通过 initialize 鉴权后才返回成功', async () => {
+test('MCP connection validation reports success only after the initialize authentication succeeds', async () => {
   let seenAuthorization;
   const { server, url } = await listen(async (req, res) => {
     seenAuthorization = req.headers.authorization;
@@ -63,7 +63,7 @@ test('MCP 连接校验通过 initialize 鉴权后才返回成功', async () => {
   }
 });
 
-test('MCP 连接校验将 401 分类为凭据错误', async () => {
+test('MCP connection validation classifies 401 as a credential error', async () => {
   const { server, url } = await listen(async (req, res) => {
     for await (const _chunk of req) {}
     res.writeHead(401); res.end();
@@ -72,7 +72,7 @@ test('MCP 连接校验将 401 分类为凭据错误', async () => {
     const result = await validateConnectionRecord(bearerRecord(url, 'wrong-key'), { timeoutMs: 2000 });
     assert.equal(result.ok, false);
     assert.equal(result.kind, 'auth');
-    assert.match(result.message, /无效|权限/);
+    assert.match(result.message, /invalid|permission/);
     assert.doesNotMatch(result.message, /wrong-key/);
   } finally {
     await new Promise((resolve) => server.close(resolve));

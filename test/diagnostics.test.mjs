@@ -10,27 +10,27 @@ const record = {
   enabled: true,
 };
 
-test('没有主动检查结果时诚实返回 unknown', () => {
+test('Returns unknown honestly when there is no proactive check result', () => {
   const summary = buildHealthSummary({
     connectorId: 'demo', records: [record], results: [], checkedAt: null,
   });
   assert.equal(summary.connectionState, 'unknown');
-  assert.equal(summary.label, '状态未知');
+  assert.equal(summary.label, 'Status unknown');
   assert.equal(summary.checkedAt, null);
   assert.equal(summary.lastSuccessfulAt, null);
   assert.deepEqual(summary.diagnostic, {
     state: 'unknown',
     stage: 'host-observation',
-    stageLabel: 'Host 状态观测',
+    stageLabel: 'Host status observation',
     code: 'not-checked',
-    message: '已保存配置，但本进程尚未观察到可用性检查结果',
-    action: '运行健康检查以确认连接状态',
+    message: 'The configuration is saved, but this process has not observed an availability check result yet',
+    action: 'Run the health check to confirm the connection status',
     checkedAt: null,
     lastSuccessfulAt: null,
   });
 });
 
-test('Host 无法确认 stdio 注册状态时保持 unknown', () => {
+test('Stays unknown when the Host cannot confirm the stdio registration status', () => {
   const summary = buildHealthSummary({
     connectorId: 'demo',
     records: [record],
@@ -47,10 +47,10 @@ test('Host 无法确认 stdio 注册状态时保持 unknown', () => {
   assert.equal(summary.connectionState, 'unknown');
   assert.equal(summary.diagnostic.stage, 'host-observation');
   assert.equal(summary.diagnostic.code, 'host-status-unavailable');
-  assert.match(summary.diagnostic.action, /升级|重启/);
+  assert.match(summary.diagnostic.action, /upgrade|restart/i);
 });
 
-test('失败诊断包含阶段、稳定代码、建议并保留最近成功时间', () => {
+test('Failure diagnostics carry the stage, stable code, guidance and keep the last successful time', () => {
   const healthy = buildHealthSummary({
     connectorId: 'demo',
     records: [record],
@@ -69,11 +69,11 @@ test('失败诊断包含阶段、稳定代码、建议并保留最近成功时�
   assert.equal(failed.diagnostic.stage, 'authentication');
   assert.equal(failed.diagnostic.code, 'auth');
   assert.equal(failed.diagnostic.lastSuccessfulAt, 100);
-  assert.match(failed.diagnostic.action, /重新授权|更新凭据/);
+  assert.match(failed.diagnostic.action, /Reauthorize or update the credentials/);
   assert.equal(failed.results[0].diagnostic.lastSuccessfulAt, 100);
 });
 
-test('多 Server 有成功也有失败时摘要为 degraded', () => {
+test('The summary is degraded when several Servers have both successes and failures', () => {
   const second = { ...record, key: 'demo-second', serverKey: 'second', serverName: 'demo-second' };
   const summary = buildHealthSummary({
     connectorId: 'demo',

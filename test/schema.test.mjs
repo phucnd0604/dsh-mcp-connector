@@ -13,7 +13,7 @@ import { resourceMetadataUrlFallback } from '../lib/oauth.js';
 import { normalizeConnectionDisplayName } from '../lib/util.js';
 import { buildEntryConfig } from '../lib/mcp-provision.js';
 
-test('Zod 4.1 兼容：非空 env、headers 与 credentialBindings 可在 domain open 前解析', () => {
+test('Zod 4.1 compatible: non-empty env, headers and credentialBindings parse before domain open', () => {
   const server = serverRefSchema.parse({
     serverKey: 'stdio',
     command: 'vendor-mcp',
@@ -43,7 +43,7 @@ test('Zod 4.1 兼容：非空 env、headers 与 credentialBindings 可在 domain
   assert.deepEqual(record.headers, { 'X-Region': 'cn' });
 });
 
-test('normalizeConnectorDescriptor 补齐默认值', () => {
+test('normalizeConnectorDescriptor fills in defaults', () => {
   const d = normalizeConnectorDescriptor({
     id: 'acme',
     name: 'ACME',
@@ -56,14 +56,14 @@ test('normalizeConnectorDescriptor 补齐默认值', () => {
   assert.equal(d.featured, false);
   assert.equal(d.auth.mode, 'oauth2-pkce');
   assert.equal(d.auth.scope, 'mcp:tools');
-  assert.equal(d.auth.clientName, 'DeepSeek Harness - MCP 连接器');
+  assert.equal(d.auth.clientName, 'DeepSeek Harness - MCP Connector');
   assert.equal(d.servers[0].transport, 'streamable-http');
   assert.equal(d.probeStatus, 'unverified');
   assert.deepEqual(d.promptVariables, []);
   assert.deepEqual(d.toolsSnapshot, []);
 });
 
-test('normalizeConnectorDescriptor 接受参数化 Prompt 与工具快照', () => {
+test('normalizeConnectorDescriptor accepts parameterized prompts and tool snapshots', () => {
   const d = normalizeConnectorDescriptor({
     id: 'templated', name: 'Templated',
     auth: {
@@ -97,11 +97,11 @@ test('normalizeConnectorDescriptor 接受参数化 Prompt 与工具快照', () =
   assert.equal(d.toolsSnapshot[0].tools[0].name, 'search');
 });
 
-test('normalizeConnectorDescriptor 拒绝缺 servers 的描述', () => {
+test('normalizeConnectorDescriptor rejects a descriptor without servers', () => {
   assert.throws(() => normalizeConnectorDescriptor({ id: 'x', name: 'X' }), /servers/);
 });
 
-test('auditDescriptor 拒绝目录携带密钥类头', () => {
+test('auditDescriptor rejects secret-like headers in the catalog', () => {
   assert.throws(
     () =>
       auditDescriptor(
@@ -113,11 +113,11 @@ test('auditDescriptor 拒绝目录携带密钥类头', () => {
           ],
         }),
       ),
-    /密钥类头/,
+    /must not carry secret-like headers/,
   );
 });
 
-test('normalizeJsonImport: mcpServers 格式 + Bearer 提升', () => {
+test('normalizeJsonImport: mcpServers format + Bearer promotion', () => {
   const { records, skipped } = normalizeJsonImport({
     mcpServers: {
       'my-vendor': {
@@ -138,15 +138,15 @@ test('normalizeJsonImport: mcpServers 格式 + Bearer 提升', () => {
   assert.equal('Authorization' in r.headers, false);
 });
 
-test('连接显示名去除首尾空格并拒绝空值、控制字符与超长值', () => {
+test('connection display name trims and rejects empty, control characters and overlong values', () => {
   assert.equal(normalizeConnectionDisplayName('  生产数据  '), '生产数据');
-  assert.throws(() => normalizeConnectionDisplayName('  '), /不能为空/);
-  assert.throws(() => normalizeConnectionDisplayName('生产\n数据'), /控制字符/);
+  assert.throws(() => normalizeConnectionDisplayName('  '), /cannot be empty/);
+  assert.throws(() => normalizeConnectionDisplayName('生产\n数据'), /control characters/);
   assert.throws(() => normalizeConnectionDisplayName('x'.repeat(81)), /80/);
   assert.equal(normalizeConnectionDisplayName('📦'.repeat(80)), '📦'.repeat(80));
 });
 
-test('normalizeJsonImport: connections 格式 api-key', () => {
+test('normalizeJsonImport: connections format api-key', () => {
   const { records } = normalizeJsonImport({
     connections: [
       { name: '地图', url: 'https://mcp.example.com/stream', serverName: 'geo', authMode: 'api-key', apiKeyHeader: 'X-Key', apiKeyValue: 'v1' },
@@ -157,7 +157,7 @@ test('normalizeJsonImport: connections 格式 api-key', () => {
   assert.equal(records[0].auth.apiKeyValue, 'v1');
 });
 
-test('连接记录和导入支持 always/session 注入模式', () => {
+test('connection record and import support always/session injection modes', () => {
   const legacy = normalizeConnectionRecord({
     key: 'legacy', connectorId: 'legacy', kind: 'manual', name: 'Legacy',
     transport: 'streamable-http', url: 'https://example.com/mcp', serverName: 'legacy',
@@ -174,7 +174,7 @@ test('连接记录和导入支持 always/session 注入模式', () => {
   assert.equal(buildManualRecord({ name: 'Always', url: 'https://example.com/mcp' }).injectionMode, 'always');
 });
 
-test('normalizeJsonImport: 局域网 HTTP 必须按条目显式授权', () => {
+test('normalizeJsonImport: LAN HTTP requires per-entry explicit authorization', () => {
   assert.throws(
     () => normalizeJsonImport({ mcpServers: { lan: { url: 'http://192.168.31.138:8188/mcp' } } }),
     /explicit confirmation/,
@@ -191,7 +191,7 @@ test('normalizeJsonImport: 局域网 HTTP 必须按条目显式授权', () => {
   assert.equal(records[0].allowInsecurePrivateNetwork, true);
 });
 
-test('normalizeJsonImport: stdio 透传 + 缺 url 跳过', () => {
+test('normalizeJsonImport: stdio passthrough + missing url skipped', () => {
   const { records, skipped } = normalizeJsonImport({
     mcpServers: {
       local: { command: 'npx', args: ['-y', 'x'], env: { LOG_LEVEL: 'info' }, cwd: '/tmp' },
@@ -206,17 +206,17 @@ test('normalizeJsonImport: stdio 透传 + 缺 url 跳过', () => {
   assert.deepEqual(records[0].args, ['-y', 'x']);
   assert.deepEqual(records[0].env, { LOG_LEVEL: 'info' });
   assert.equal(records[0].cwd, '/tmp');
-  assert.ok(skipped.some((s) => s.includes('缺 url')));
+  assert.ok(skipped.some((s) => s.includes('missing url')));
 });
 
-test('normalizeJsonImport: 全部跳过时抛错', () => {
+test('normalizeJsonImport: throws when everything is skipped', () => {
   assert.throws(
     () => normalizeJsonImport({ mcpServers: { local: { type: 'stdio' } } }),
-    /没有可导入的连接/,
+    /no importable connections/,
   );
 });
 
-test('stdio 描述校验、SSE 归一化与目录 env 密钥审计', () => {
+test('stdio descriptor validation, SSE normalization and catalog env secret audit', () => {
   const descriptor = normalizeConnectorDescriptor({
     id: 'local-tools', name: 'Local Tools', auth: { mode: 'none' },
     servers: [{ serverKey: 'main', transport: 'stdio', command: 'npx', args: ['-y', 'server'], serverName: 'local-tools' }],
@@ -225,17 +225,17 @@ test('stdio 描述校验、SSE 归一化与目录 env 密钥审计', () => {
   assert.equal(descriptor.servers[0].url, undefined);
   assert.throws(() => normalizeConnectorDescriptor({
     id: 'bad', name: 'Bad', servers: [{ serverKey: 'main', transport: 'stdio', serverName: 'bad' }],
-  }), /command 必填/);
+  }), /command is required/);
   assert.equal(normalizeConnectorDescriptor({
     id: 'legacy', name: 'Legacy', servers: [{ serverKey: 'main', transport: 'sse', url: 'https://mcp.example.com/sse', serverName: 'legacy' }],
   }).servers[0].transport, 'streamable-http');
   assert.throws(() => auditDescriptor(normalizeConnectorDescriptor({
     id: 'secret-env', name: 'Secret env', auth: { mode: 'none' },
     servers: [{ serverKey: 'main', transport: 'stdio', command: 'npx', env: { GITHUB_TOKEN: 'x' }, serverName: 'secret-env' }],
-  })), /env.*密钥类变量/);
+  })), /env.*must not carry secret-like variables/);
 });
 
-test('stdio 市场凭据仅声明字段和 env 绑定，支持多字段且拒绝错误引用', () => {
+test('stdio marketplace credentials declare only fields and env bindings, multi-field supported, bad references rejected', () => {
   const raw = {
     id: 'stdio-credential', name: 'Stdio Credential',
     auth: {
@@ -262,14 +262,14 @@ test('stdio 市场凭据仅声明字段和 env 绑定，支持多字段且拒绝
 
   const unknown = structuredClone(raw);
   unknown.servers[0].credentialBindings.VENDOR_API_TOKEN = 'missing';
-  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(unknown)), /未知凭据字段/);
+  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(unknown)), /unknown credential field/);
 
   const staticSecret = structuredClone(raw);
   staticSecret.servers[0].env.VENDOR_API_TOKEN = 'must-not-be-in-catalog';
-  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(staticSecret)), /env.*密钥类变量/);
+  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(staticSecret)), /env.*must not carry secret-like variables/);
 });
 
-test('OAuth stdio 只允许把同连接器 HTTP resource 的 Token 注入声明的环境变量', () => {
+test('OAuth stdio may only inject tokens into declared env vars from an HTTP resource of the same connector', () => {
   const raw = {
     id: 'oauth-stdio', name: 'OAuth stdio',
     auth: { mode: 'oauth2-pkce', issuer: 'https://agent.example.com' },
@@ -288,18 +288,18 @@ test('OAuth stdio 只允许把同连接器 HTTP resource 的 Token 注入声明�
 
   const missingBinding = structuredClone(raw);
   delete missingBinding.servers[1].oauthTokenEnv;
-  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(missingBinding)), /oauthResource 和 oauthTokenEnv/);
+  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(missingBinding)), /must declare oauthResource and oauthTokenEnv/);
 
   const foreignResource = structuredClone(raw);
   foreignResource.servers[1].oauthResource = 'https://other.example.com/mcp';
-  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(foreignResource)), /同一连接器的 HTTP resource/);
+  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(foreignResource)), /an HTTP resource of the same connector/);
 
   const conflictingBinding = structuredClone(raw);
   conflictingBinding.servers[1].credentialBindings = { DOCUMENT_AUTHORIZATION: 'credential' };
-  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(conflictingBinding)), /不能同时声明 credentialBindings/);
+  assert.throws(() => auditDescriptor(normalizeConnectorDescriptor(conflictingBinding)), /must not declare credentialBindings at the same time/);
 });
 
-test('旧 connection record 的 SSE 归一化，stdio 字段保留', () => {
+test('legacy connection record: SSE normalized, stdio fields preserved', () => {
   const base = { key: 'x', connectorId: 'x', kind: 'json', name: 'X', serverName: 'x', createdAt: 1, updatedAt: 1 };
   assert.equal(normalizeConnectionRecord({ ...base, transport: 'sse', url: 'https://mcp.example.com/sse' }).transport, 'streamable-http');
   const stdio = normalizeConnectionRecord({ ...base, transport: 'stdio', command: 'uvx', args: ['server'], env: { MODE: 'test' } });
@@ -338,7 +338,7 @@ test('buildManualRecord: bearer / api-key / none', () => {
   assert.equal(none.auth, undefined);
 });
 
-test('buildManualRecord: 局域网 HTTP 默认拒绝，仅显式授权的私有 IP 字面量放行', () => {
+test('buildManualRecord: LAN HTTP rejected by default, only explicitly authorized private IP literals allowed', () => {
   assert.throws(() => buildManualRecord({ name: 'LAN', url: 'http://192.168.31.138:8188/mcp' }), /explicit confirmation/);
   const lan = buildManualRecord({
     name: 'LAN',
@@ -355,12 +355,12 @@ test('buildManualRecord: 局域网 HTTP 默认拒绝，仅显式授权的私有 
   assert.throws(() => buildManualRecord({ name: 'A', url: 'ftp://x/stream' }), /protocol|invalid url/);
 });
 
-test('buildManualRecord: serverName 归一化', () => {
+test('buildManualRecord: serverName normalization', () => {
   const r = buildManualRecord({ name: 'My DB', url: 'https://mcp.example.com/stream', serverName: 'My-DB 2' });
   assert.equal(r.serverName, 'my-db-2');
 });
 
-test('buildManualRecord: stdio 不要求 URL 并透传本机进程字段', () => {
+test('buildManualRecord: stdio needs no URL and passes through local process fields', () => {
   const record = buildManualRecord({
     name: 'Local MCP', transport: 'stdio', command: 'npx', args: ['-y', 'server'],
     envJson: { SERVICE_TOKEN: 'local-only' }, cwd: '/tmp',
@@ -370,10 +370,10 @@ test('buildManualRecord: stdio 不要求 URL 并透传本机进程字段', () =>
   assert.equal(record.command, 'npx');
   assert.deepEqual(record.args, ['-y', 'server']);
   assert.deepEqual(record.env, { SERVICE_TOKEN: 'local-only' });
-  assert.throws(() => buildManualRecord({ name: 'Bad', transport: 'stdio' }), /command 必填/);
+  assert.throws(() => buildManualRecord({ name: 'Bad', transport: 'stdio' }), /command is required/);
 });
 
-test('buildEntryConfig: stdio 仅透传进程字段，不混入 HTTP headers', () => {
+test('buildEntryConfig: stdio passes through process fields only, no HTTP headers mixed in', () => {
   const config = buildEntryConfig({
     transport: 'stdio', serverName: 'local', command: 'uvx', args: ['server'],
     env: { MODE: 'test' }, cwd: '/tmp', headers: { Authorization: 'should-not-pass' },
@@ -388,7 +388,7 @@ test('buildEntryConfig: stdio 仅透传进程字段，不混入 HTTP headers', (
   assert.equal(strict.failOnStartupError, true);
 });
 
-test('buildEntryConfig: OAuth stdio 仅在运行时注入 Bearer Token', () => {
+test('buildEntryConfig: OAuth stdio injects the Bearer token at runtime only', () => {
   const record = {
     transport: 'stdio', serverName: 'document-local', command: 'npx', args: ['-y', 'document-mcp'],
     env: { LOG_LEVEL: 'info' }, oauthTokenEnv: 'DOCUMENT_AUTHORIZATION',
@@ -402,7 +402,7 @@ test('buildEntryConfig: OAuth stdio 仅在运行时注入 Bearer Token', () => {
   assert.deepEqual(record.env, { LOG_LEVEL: 'info' }, '运行时注入不得污染持久化 record');
 });
 
-test('OAuth protected resource metadata fallback 保留 MCP 路径', () => {
+test('OAuth protected resource metadata fallback preserves the MCP path', () => {
   assert.equal(
     resourceMetadataUrlFallback('https://agent.example.com/mcp/company/stream'),
     'https://agent.example.com/mcp/.well-known/oauth-protected-resource/company/stream',

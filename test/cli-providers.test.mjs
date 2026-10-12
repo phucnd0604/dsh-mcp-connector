@@ -234,9 +234,9 @@ test('CLI 成功输出如意外含 Token 也不返回 Host', async () => {
   assert.match(result.content[0].text, /REDACTED/);
 });
 
-test('缺失 CLI 命令返回可操作诊断', async () => {
+test('A missing CLI command returns an actionable diagnostic', async () => {
   await assert.rejects(
     runCliProcess('definitely-missing-dws-command-for-test', [], { timeoutMs: 1000 }),
-    /请先完成安装和 OAuth 登录/,
+    /complete the installation and the OAuth login first/,
   );
 });

@@ -150,9 +150,9 @@ test('configure 无顶层 anyOf 时仍拒绝缺失参数且不创建连接、快
     await apply(ctx, baseConfig());
     const before = JSON.stringify([...tables].map(([name, table]) => [name, [...table.entries()]]));
     for (const [args, message] of [
-      [{}, /name 必填/],
+      [{}, /name is required/],
       [{ name: 'Missing URL' }, /invalid url/],
-      [{ name: 'Missing command', transport: 'stdio' }, /command 必填/],
+      [{ name: 'Missing command', transport: 'stdio' }, /command is required/],
       [{ connectorId: 'nonexistent-issue-89' }, /does not exist/],
     ]) {
       const result = await tools.defs.get('mcp_connector_configure').execute(args);
@@ -502,8 +502,8 @@ test('OAuth DCR 403 明确识别客户端准入阶段，不误导用户重试浏
     assert.equal(result.detail.stage, 'client-registration');
     assert.equal(result.detail.code, 'oauth-dcr-forbidden');
     assert.equal(result.detail.httpStatus, 403);
-    assert.match(result.message, /客户端注册被服务商拒绝/);
-    assert.match(result.message, /尚未进入浏览器授权/);
+    assert.match(result.message, /client registration was rejected by the service provider/);
+    assert.match(result.message, /before browser authorization started/);
     assert.doesNotMatch(JSON.stringify({ result, logs }), /client is not on the approved catalog/);
     assert.equal(logs.some((line) => line.includes('opening authorization page:')), false);
   } finally {
@@ -1272,7 +1272,7 @@ test('自定义 configure + JSON 导入 + 无中断重命名 + 停用/断开', {
       key: 'json-vendor', json: JSON.stringify(updatedDocument),
     });
     assert.equal(identityChange.ok, false);
-    assert.match(identityChange.message, /serverName 是连接身份/);
+    assert.match(identityChange.message, /serverName is the connection identity/);
 
     const beforeRenameConfig = structuredClone(loader.entries.get('mcp-json-vendor').options.config);
     const renamed = await tools.defs.get('mcp_connector_rename').execute({ key: 'json-vendor', name: '  生产数据  ' });
@@ -1477,7 +1477,7 @@ test('stdio 市场连接、自定义配置与 JSON 导入均透传给 dsh-mcp-cl
     const pendingHealth = await tools.defs.get('mcp_connector_health_check').execute({ connectorId: 'local-market' });
     assert.equal(pendingHealth.detail.items[0].connectionState, 'unknown');
     assert.equal(pendingHealth.detail.items[0].diagnostic.code, 'host-tools-pending');
-    assert.match(pendingHealth.detail.items[0].diagnostic.action, /Host 日志|重新检查/);
+    assert.match(pendingHealth.detail.items[0].diagnostic.action, /Host logs|check again/);
     const pendingTools = await tools.defs.get('mcp_connector_tools_list').execute({ connectorId: 'local-market' });
     assert.equal(pendingTools.ok, false);
     assert.equal(pendingTools.detail.servers[0].errorKind, 'startup');
@@ -1957,7 +1957,7 @@ test('历史凭据失效导致所有 Server 失败时 toolsList 明确返回不�
     assert.equal(listed.ok, false);
     assert.equal(listed.detail.availableServers, 0);
     assert.equal(listed.detail.failedServers, 1);
-    assert.match(listed.detail.servers[0].error, /凭据无效|权限/);
+    assert.match(listed.detail.servers[0].error, /invalid|permission/);
     assert.equal(listed.detail.connectionState, 'reauth');
     assert.equal(listed.detail.diagnostic.stage, 'authentication');
     assert.ok(Number.isInteger(listed.detail.lastSuccessfulAt));
@@ -1966,7 +1966,7 @@ test('历史凭据失效导致所有 Server 失败时 toolsList 明确返回不�
     assert.equal(health.detail.items[0].connectionState, 'reauth');
     const catalog = await tools.defs.get('mcp_connector_catalog').execute({ keyword: 'Wind Expired' });
     assert.equal(catalog.detail.items[0].connectionState, 'reauth');
-    assert.equal(catalog.detail.items[0].connectionLabel, '需重新授权');
+    assert.equal(catalog.detail.items[0].connectionLabel, 'Reauthorization required');
     assert.equal(catalog.detail.items[0].diagnostic.code, 'auth');
     assert.equal(catalog.detail.items[0].lastSuccessfulAt, listed.detail.lastSuccessfulAt);
     const status = await tools.defs.get('mcp_connector_status').execute({});
@@ -2108,14 +2108,14 @@ test('治理策略经对话工具预览后在 Host guard 生效，并在重启�
   assert.equal(applied.detail.revision, 1);
   const firstGuard = [...first.tools.guards][0];
   assert.equal(firstGuard({ name: 'mcp__acme-search__read' }), undefined);
-  assert.match(firstGuard({ name: 'mcp__acme-search__remove' }), /Tool 策略拒绝/);
+  assert.match(firstGuard({ name: 'mcp__acme-search__remove' }), /denied by Tool policy/);
 
   for (const dispose of [...first.disposers].reverse()) dispose();
   const second = makePluginContext({ shared });
   await apply(second.ctx, baseConfig({ persistSecrets: false }));
   second.tools.register({ name: 'mcp__acme-search__remove', description: '', parameters: {} });
   const secondGuard = [...second.tools.guards][0];
-  assert.match(secondGuard({ name: 'mcp__acme-search__remove' }), /Tool 策略拒绝/, '重启后恢复执行拒绝');
+  assert.match(secondGuard({ name: 'mcp__acme-search__remove' }), /denied by Tool policy/, '重启后恢复执行拒绝');
 
   const restored = await second.tools.defs.get('mcp_connector_policy').execute({
     action: 'rollback', rollbackRevision: 0, expectedRevision: 1,

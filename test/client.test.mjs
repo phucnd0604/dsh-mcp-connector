@@ -188,18 +188,18 @@ function mutableSettingsScope(initial) {
   return { scope, writes };
 }
 
-test('客户端声明新会话所需服务', async () => {
+test('the client declares the services required to start a new session', async () => {
   const plugin = await loadClient();
   assert.deepEqual(plugin.inject, ['slots', 'sessions', 'workspaces', 'conversation']);
 });
 
-test('客户端入口不依赖 Host 版本特有的 Store、Runtime 或 UI Primitives 模块', async () => {
+test('the client entry does not depend on Host-version-specific Store, Runtime or UI Primitives modules', async () => {
   await assert.doesNotReject(() => loadClient());
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /require\("@deepseek-ai\/dsh-client-(?:store|runtime|ui-primitives|ui-settings)/);
 });
 
-test('内置弹框 Store 实现标准快照、订阅与动作 contract', async () => {
+test('the built-in dialog Store implements the standard snapshot, subscribe and action contract', async () => {
   const plugin = await loadClient();
   const { ctx, registrations } = clientContext();
   plugin.apply(ctx);
@@ -236,7 +236,7 @@ test('partial optional settings services do not block the connector UI', async (
   }
 });
 
-test('设置 scope 控制侧边栏可见性并注册同一弹框的快捷入口', async () => {
+test('the settings scope controls sidebar visibility and registers a shortcut entry for the same dialog', async () => {
   const plugin = await loadClient();
   const settings = mutableSettingsScope({
     status: 'ready',
@@ -264,9 +264,9 @@ test('设置 scope 控制侧边栏可见性并注册同一弹框的快捷入口'
   assert.equal(bindSpec.decode({}), undefined);
   const overlay = registrations.get('shell.overlay');
   const settingsCard = registrations.get('settings.plugin.item');
-  assert.ok(settingsCard, '应在原生插件配置页注册 MCP连接器卡片');
+  assert.ok(settingsCard, 'the MCP Connector card must be registered on the native plugin settings page');
   assert.equal(settingsCard.options.key, 'mcp-connector');
-  assert.equal(settingsCard.options.store, overlay.options.store, '快捷按钮必须复用现有弹框 Store');
+  assert.equal(settingsCard.options.store, overlay.options.store, 'the shortcut button must reuse the existing dialog Store');
 
   const store = overlay.options.store.create();
   assert.equal(store.getSnapshot().sidebarVisible, false);
@@ -278,10 +278,10 @@ test('设置 scope 控制侧边栏可见性并注册同一弹框的快捷入口'
   });
   assert.equal(store.getSnapshot().sidebarVisible, true);
   settings.scope.publish({ status: 'unavailable', writable: false, mode: 'memory' });
-  assert.equal(store.getSnapshot().sidebarVisible, true, '不可用时应 fail-open');
+  assert.equal(store.getSnapshot().sidebarVisible, true, 'it should fail-open when unavailable');
 });
 
-test('设置卡片可隐藏入口、恢复默认并直接打开现有弹框', async () => {
+test('the settings card can hide the entry, reset the default and open the existing dialog directly', async () => {
   const settings = mutableSettingsScope({
     status: 'ready',
     value: { showSidebarEntry: true },
@@ -331,8 +331,8 @@ test('设置卡片可隐藏入口、恢复默认并直接打开现有弹框', as
   visit(tree);
 
   const toggle = descendants.find((node) => node.type === 'input' && node.props?.role === 'switch');
-  const reset = descendants.find((node) => node.type === 'button' && node.props?.children === '恢复默认');
-  const open = descendants.find((node) => node.type === 'button' && node.props?.children === '打开 MCP连接器');
+  const reset = descendants.find((node) => node.type === 'button' && node.props?.children === 'Reset to default');
+  const open = descendants.find((node) => node.type === 'button' && node.props?.children === 'Open MCP Connector');
   assert.ok(toggle);
   assert.ok(reset);
   assert.ok(open);
@@ -349,7 +349,7 @@ test('设置卡片可隐藏入口、恢复默认并直接打开现有弹框', as
   assert.equal(opens, 1);
 });
 
-test('隐藏状态不创建侧边栏 Portal 或观察器', async () => {
+test('the hidden state creates no sidebar Portal or observer', async () => {
   let observers = 0;
   const plugin = await loadClient({
     jsxRuntime: {
@@ -380,7 +380,7 @@ test('隐藏状态不创建侧边栏 Portal 或观察器', async () => {
   assert.equal(observers, 0);
 });
 
-test('侧栏入口使用公开插槽托管，并具备工作区上方 Portal 与底部降级', async () => {
+test('the sidebar entry is hosted by public slots, with a Portal above the workspace and a footer fallback', async () => {
   let hookState = null;
   let topMount = null;
   let portal = null;
@@ -436,7 +436,7 @@ test('侧栏入口使用公开插槽托管，并具备工作区上方 Portal 与
   const { ctx, registrations } = clientContext();
   plugin.apply(ctx);
   const entry = registrations.get('sidebar.footer.action');
-  assert.ok(entry, '应使用公开 footer list slot 托管入口生命周期');
+  assert.ok(entry, 'the entry lifecycle must be hosted by the public footer list slot');
 
   const props = {
     wide: true,
@@ -444,29 +444,29 @@ test('侧栏入口使用公开插槽托管，并具备工作区上方 Portal 与
     actions: { open() {} },
   };
   const fallback = entry.component(props);
-  assert.equal(fallback.props['aria-label'], 'MCP连接器', '首次定位前应保留 footer 降级入口');
-  assert.equal(fallback.props['data-placement'], 'footer', '降级入口只应样式化自身，不能接管宿主槽位');
+  assert.equal(fallback.props['aria-label'], 'MCP Connector', 'the footer fallback entry must be kept before the first location attempt');
+  assert.equal(fallback.props['data-placement'], 'footer', 'the fallback entry should only style itself and must not take over the Host slot');
   assert.equal(fallback.props.children[0].props.className, 'mcpConnectorLauncherIcon');
   assert.equal(fallback.props.children[0].props['aria-hidden'], true);
   assert.equal(fallback.props.children[1].props.className, 'mcpConnectorLauncherLabel');
-  assert.equal(fallback.props.children[1].props.children, 'MCP连接器');
+  assert.equal(fallback.props.children[1].props.children, 'MCP Connector');
   assert.equal(topMount.dataset.mcpConnectorTopMount, 'true');
-  assert.equal(topMount.nextSibling, workspaceSlot, '挂载点应紧邻工作区 slot 之前');
+  assert.equal(topMount.nextSibling, workspaceSlot, 'the mount point should sit immediately before the workspace slot');
 
   entry.component(props);
-  assert.equal(portal.target, topMount, '定位成功后应 Portal 到顶部挂载点');
+  assert.equal(portal.target, topMount, 'after a successful location it should Portal into the top mount point');
   assert.equal(portal.node.props.className, 'mcpConnectorTopEntry');
   assert.equal(portal.node.props.children.props['data-placement'], 'top');
   entry.component({ ...props, wide: false });
   const collapsed = portal.node.props.children;
-  assert.equal(collapsed.props['aria-label'], 'MCP连接器');
-  assert.equal(collapsed.props.children[1], null, '折叠侧栏仅显示图标但保留可访问名称');
+  assert.equal(collapsed.props['aria-label'], 'MCP Connector');
+  assert.equal(collapsed.props.children[1], null, 'the collapsed sidebar shows only the icon but keeps the accessible name');
 
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
-  assert.doesNotMatch(source, /hHd-Xa_/, '不得依赖 DSH 构建生成的 CSS 类名');
+  assert.doesNotMatch(source, /hHd-Xa_/, 'it must not depend on DSH build-generated CSS class names');
 });
 
-test('DSH 0.2 优先注册 main 与原生 panellist，不创建 footer 降级入口', async () => {
+test('DSH 0.2 registers main and the native panellist first and creates no footer fallback entry', async () => {
   const plugin = await loadClient({
     jsxRuntime: {
       jsx(type, props) { return { type, props }; },
@@ -483,15 +483,15 @@ test('DSH 0.2 优先注册 main 与原生 panellist，不创建 footer 降级入
   const main = registrations.get('main');
   const entry = registrations.get('sidebar.panellist');
   const overlay = registrations.get('shell.overlay');
-  assert.ok(main, '应注册原生 main 面板');
-  assert.ok(entry, '应注册原生 panellist 行');
-  assert.equal(registrations.has('sidebar.footer.action'), false, '新宿主不应注册 footer 降级入口');
-  assert.ok(registrationOrder.indexOf('main') < registrationOrder.indexOf('sidebar.panellist'), 'main 必须先于可点击的行注册');
+  assert.ok(main, 'the native main panel must be registered');
+  assert.ok(entry, 'the native panellist row must be registered');
+  assert.equal(registrations.has('sidebar.footer.action'), false, 'a new Host must not register the footer fallback entry');
+  assert.ok(registrationOrder.indexOf('main') < registrationOrder.indexOf('sidebar.panellist'), 'main must be registered before the clickable row');
   assert.equal(entry.options.id, 'mcp-connector');
   assert.equal(entry.options.order, 40);
-  assert.equal(entry.options.label, 'MCP连接器');
+  assert.equal(entry.options.label, 'MCP Connector');
   assert.equal(main.options.key, 'mcp-connector');
-  assert.equal(main.options.store, overlay.options.store, '原生面板与设置弹框应共用市场 Store');
+  assert.equal(main.options.store, overlay.options.store, 'the native panel and the settings dialog must share the market Store');
   assert.equal(main.options.inject().presentation, 'panel');
 
   const icon = entry.component({ size: 18, active: true });
@@ -502,7 +502,7 @@ test('DSH 0.2 优先注册 main 与原生 panellist，不创建 footer 降级入
   assert.equal(icon.props['aria-hidden'], 'true');
 });
 
-test('原生 main 直接渲染共享市场主体，不创建模态 Portal', async () => {
+test('the native main renders the shared market body directly and creates no modal Portal', async () => {
   let portals = 0;
   const selections = [];
   const jsxRuntime = {
@@ -542,12 +542,12 @@ test('原生 main 直接渲染共享市场主体，不创建模态 Portal', asyn
   assert.equal(tree.props.style.height, '100%');
   const header = tree.props.children[0];
   const close = header.props.children[1];
-  assert.equal(close.props['aria-label'], '返回会话');
+  assert.equal(close.props['aria-label'], 'Back to session');
   close.props.onClick();
   assert.deepEqual(selections, [null]);
 });
 
-test('原生入口隐藏时先退回会话并注销行，重新开启后恢复', async () => {
+test('hiding the native entry first returns to the session and unregisters the row, and re-enabling restores it', async () => {
   const settings = mutableSettingsScope({
     status: 'ready',
     value: { showSidebarEntry: true },
@@ -581,9 +581,9 @@ test('原生入口隐藏时先退回会话并注销行，重新开启后恢复',
     user: { showSidebarEntry: false },
     revision: 2,
   });
-  assert.deepEqual(selections, [null], '隐藏当前面板前应退回会话');
+  assert.deepEqual(selections, [null], 'it must return to the session before hiding the current panel');
   assert.equal(registrations.has('sidebar.panellist'), false);
-  assert.ok(registrations.has('main'), 'main 页面保留，避免席位生命周期抖动');
+  assert.ok(registrations.has('main'), 'the main page is kept to avoid slot lifecycle churn');
 
   settings.scope.publish({
     ...settings.scope.getSnapshot(),
@@ -591,11 +591,11 @@ test('原生入口隐藏时先退回会话并注销行，重新开启后恢复',
     user: { showSidebarEntry: true },
     revision: 3,
   });
-  assert.ok(registrations.has('sidebar.panellist'), '重新开启后应恢复原生行');
+  assert.ok(registrations.has('sidebar.panellist'), 'the native row must be restored after re-enabling');
   assert.equal(registrations.has('sidebar.footer.action'), false);
 });
 
-test('原生席位延迟到达时原子替换 footer 降级入口', async () => {
+test('a late native slot atomically replaces the footer fallback entry', async () => {
   const plugin = await loadClient();
   const layout = {
     panelInfo: { getSnapshot: () => ({ activePanelId: null }) },
@@ -603,34 +603,34 @@ test('原生席位延迟到达时原子替换 footer 降级入口', async () => 
   };
   const { ctx, registrations, slotControls } = clientContext({ layout });
   plugin.apply(ctx);
-  assert.ok(registrations.has('sidebar.footer.action'), '旧宿主起始使用降级入口');
+  assert.ok(registrations.has('sidebar.footer.action'), 'an old Host starts with the fallback entry');
 
   slotControls.declare('main');
-  assert.ok(registrations.has('sidebar.footer.action'), '仅 main 到达时不能提前移除可用入口');
+  assert.ok(registrations.has('sidebar.footer.action'), 'the usable entry must not be removed early when only main arrives');
   slotControls.declare('sidebar.panellist');
   assert.equal(registrations.has('sidebar.footer.action'), false);
   assert.ok(registrations.has('sidebar.panellist'));
 
   slotControls.remove('sidebar.panellist');
   assert.equal(registrations.has('sidebar.panellist'), false);
-  assert.ok(registrations.has('sidebar.footer.action'), '原生席位移除后应恢复降级入口');
+  assert.ok(registrations.has('sidebar.footer.action'), 'the fallback entry must be restored after the native slot is removed');
 });
 
-test('侧栏入口与面板标题图标同为单色线性 SVG，源码中不存在任何 emoji', async () => {
+test('the sidebar entry and the panel title icons are both monochrome line SVG, with no emoji in the source', async () => {
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
-  // 字面量 emoji 与转义写法都要拦截：\u{1F9E9} 这类转义不会被字面量 grep 命中。
-  assert.doesNotMatch(source, /🧩/, '不得再使用彩色 emoji 作图标');
-  assert.doesNotMatch(source, /\\u\{1F[0-9A-Fa-f]{3}\}/, '不得用 \\u{...} 转义 emoji 作图标');
-  assert.doesNotMatch(source, /[\u{1F000}-\u{1FAFF}]/u, '客户端源码不得直接出现 emoji 字符');
+  // Both literal emoji and escaped forms must be blocked: \u{1F9E9} escapes are not caught by a literal grep.
+  assert.doesNotMatch(source, /🧩/, 'colour emoji must no longer be used as icons');
+  assert.doesNotMatch(source, /\\u\{1F[0-9A-Fa-f]{3}\}/, 'must not use \\u{...} escaped emoji as icons');
+  assert.doesNotMatch(source, /[\u{1F000}-\u{1FAFF}]/u, 'emoji characters must not appear directly in the client source');
 
   const icon = (className, span = 900) => {
     const marker = source.indexOf(`className: "${className}"`);
-    assert.ok(marker > -1, `应保留 ${className} 图标容器`);
+    assert.ok(marker > -1, `the ${className} icon container must be kept`);
     const block = source.slice(marker, marker + span);
-    assert.match(block, /viewBox: "0 0 16 16"/, `${className} 应与宿主图标一致使用 16×16 viewBox`);
-    assert.match(block, /fill: "none"/, `${className} 应为描边绘制`);
-    assert.match(block, /stroke: "currentColor"/, `${className} 应继承文字颜色，随明暗主题适配`);
-    assert.match(block, /strokeLinejoin: "round"|strokeLinecap: "round"/, `${className} 应使用圆角端点`);
+    assert.match(block, /viewBox: "0 0 16 16"/, `${className} should use a 16x16 viewBox consistent with the Host icon`);
+    assert.match(block, /fill: "none"/, `${className} should be drawn as a stroke`);
+    assert.match(block, /stroke: "currentColor"/, `${className} should inherit the text colour and follow the light/dark theme`);
+    assert.match(block, /strokeLinejoin: "round"|strokeLinecap: "round"/, `${className} should use rounded line endpoints`);
     return block;
   };
   icon('mcpConnectorLauncherIcon');
@@ -638,13 +638,13 @@ test('侧栏入口与面板标题图标同为单色线性 SVG，源码中不存�
 
   const sidebarCss = source.split('const sidebarCss = `')[1].split('`;')[0];
   const overlayCss = source.split('const overlayCss = `')[1].split('`;')[0];
-  assert.match(sidebarCss, /\.mcpConnectorLauncherIcon > svg \{[\s\S]*?width: 18px;[\s\S]*?height: 18px;/, '入口图标尺寸应由样式定义');
-  assert.match(overlayCss, /\.mcpConnectorMarketIcon > svg \{[\s\S]*?width: 18px;[\s\S]*?height: 18px;/, '面板标题图标尺寸应由样式定义');
-  assert.doesNotMatch(sidebarCss, /font-size: 18px/, 'emoji 字号样式应移除');
-  assert.doesNotMatch(source, /style: \{ fontSize: 22 \}/, '面板标题的 emoji 字号内联样式应移除');
+  assert.match(sidebarCss, /\.mcpConnectorLauncherIcon > svg \{[\s\S]*?width: 18px;[\s\S]*?height: 18px;/, 'the entry icon size should be defined by the styles');
+  assert.match(overlayCss, /\.mcpConnectorMarketIcon > svg \{[\s\S]*?width: 18px;[\s\S]*?height: 18px;/, 'the panel title icon size should be defined by the styles');
+  assert.doesNotMatch(sidebarCss, /font-size: 18px/, 'the emoji font-size style should be removed');
+  assert.doesNotMatch(source, /style: \{ fontSize: 22 \}/, 'the panel title emoji font-size inline style should be removed');
 });
 
-test('侧栏入口悬停不描边，键盘焦点仍可见，布局不使用负边距或文本空格对齐（#86）', async () => {
+test('the sidebar entry has no hover outline, keeps the keyboard focus visible, and the layout uses no negative margins or text-space alignment (#86)', async () => {
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
   const css = source.split('const sidebarCss = `')[1].split('`;')[0];
   const rule = (selector) => css.slice(css.indexOf(selector + ' {')).split('}')[0];
@@ -658,24 +658,24 @@ test('侧栏入口悬停不描边，键盘焦点仍可见，布局不使用负�
   assert.match(rule('.mcpConnectorLauncherIcon'), /flex: 0 0 20px/);
 });
 
-test('侧栏样式不改写宿主 footer 槽位或其它插件的 flex 布局（#124）', async () => {
+test('the sidebar styles do not rewrite the Host footer slot or the flex layout of other plugins (#124)', async () => {
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
   const css = source.split('const sidebarCss = `')[1].split('`;')[0];
   const rule = (selector) => css.slice(css.indexOf(selector + ' {')).split('}')[0];
-  assert.doesNotMatch(css, /\[data-slot=["']sidebar\.footer\.action["']\]/, '不得覆盖宿主 display: contents 锚点');
-  assert.doesNotMatch(css, /sidebar\.footer\.action[\s\S]*?>\s*\*/, '不得重置同槽位第三方插件子项');
+  assert.doesNotMatch(css, /\[data-slot=["']sidebar\.footer\.action["']\]/, 'it must not override the Host display: contents anchor');
+  assert.doesNotMatch(css, /sidebar\.footer\.action[\s\S]*?>\s*\*/, 'it must not reset third-party plugin children in the same slot');
   const fallbackRule = rule('.mcpConnectorLauncher[data-placement="footer"]');
   assert.match(fallbackRule, /flex: 1 1 0/);
   assert.match(fallbackRule, /max-width: 100%/);
   assert.doesNotMatch(fallbackRule, /!important/);
 });
 
-test('示例 Prompt 写入新会话草稿后再导航', async () => {
+test('the sample Prompt is written into the new session draft before navigation', async () => {
   const plugin = await loadClient();
   const { ctx, registrations, calls } = clientContext();
   plugin.apply(ctx);
   const overlay = registrations.get('shell.overlay');
-  assert.ok(overlay, '应注册连接器弹框');
+  assert.ok(overlay, 'the connector dialog must be registered');
   const props = overlay.options.inject();
   await props.startPromptSession('查询企查查的对外投资布局');
   assert.deepEqual(calls, [
@@ -685,7 +685,7 @@ test('示例 Prompt 写入新会话草稿后再导航', async () => {
   ]);
 });
 
-test('DSH 0.1.2 仅提供 uiWorkspace 时可创建 Prompt 会话', async () => {
+test('DSH 0.1.2 can create a Prompt session when only uiWorkspace is provided', async () => {
   const plugin = await loadClient();
   const { ctx, registrations, calls } = clientContext({ workspaceNavigation: 'ui' });
   plugin.apply(ctx);
@@ -698,7 +698,7 @@ test('DSH 0.1.2 仅提供 uiWorkspace 时可创建 Prompt 会话', async () => {
   ]);
 });
 
-test('工作区导航桥均不可用时使用 sessions.create 安全降级', async () => {
+test('it safely degrades to sessions.create when no workspace navigation bridge is available', async () => {
   const plugin = await loadClient();
   const { ctx, registrations, calls } = clientContext({ workspaceNavigation: 'sessions' });
   plugin.apply(ctx);
@@ -711,18 +711,18 @@ test('工作区导航桥均不可用时使用 sessions.create 安全降级', asy
   ]);
 });
 
-test('所有会话创建能力均不可用时返回可操作错误', async () => {
+test('it returns an actionable error when no session creation capability is available', async () => {
   const plugin = await loadClient();
   const { ctx, registrations } = clientContext({ workspaceNavigation: 'none' });
   plugin.apply(ctx);
   const props = registrations.get('shell.overlay').options.inject();
   await assert.rejects(
     () => props.startPromptSession('示例'),
-    /没有可用的工作区会话创建能力/,
+    /cannot create a workspace session/,
   );
 });
 
-test('市场 iframe 可读取当前 Workspace 作为项目连接作用域', async () => {
+test('the market iframe can read the current Workspace as the project connection scope', async () => {
   const plugin = await loadClient();
   const { ctx, registrations } = clientContext({ workspaceId: 'workspace-scope' });
   plugin.apply(ctx);
@@ -737,7 +737,7 @@ test('市场 iframe 可读取当前 Workspace 作为项目连接作用域', asyn
   }]);
 });
 
-test('没有当前会话时仍向市场提供全部 Workspace 供用户显式选择', async () => {
+test('with no current session it still offers every Workspace to the market for explicit selection', async () => {
   const plugin = await loadClient();
   const { ctx, registrations } = clientContext({
     workspaceId: null,
@@ -756,15 +756,15 @@ test('没有当前会话时仍向市场提供全部 Workspace 供用户显式选
   ]);
 });
 
-test('没有工作空间时给出明确错误，不静默失败', async () => {
+test('it gives a clear error when there is no workspace instead of failing silently', async () => {
   const plugin = await loadClient();
   const { ctx, registrations } = clientContext({ workspaceId: null });
   plugin.apply(ctx);
   const props = registrations.get('shell.overlay').options.inject();
-  await assert.rejects(() => props.startPromptSession('示例'), /请先选择一个工作空间/);
+  await assert.rejects(() => props.startPromptSession('示例'), /Select a workspace before using the sample prompt/);
 });
 
-test('市场弹框具备主题与键盘可访问性样式', async () => {
+test('the market dialog has theme and keyboard accessibility styles', async () => {
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
   assert.match(source, /prefers-color-scheme: dark/);
   assert.match(source, /aria-modal/);
@@ -776,7 +776,7 @@ test('市场弹框具备主题与键盘可访问性样式', async () => {
   assert.match(source, /addEventListener\("keydown", onKeyDown, true\)/);
 });
 
-test('从设置快捷打开时弹框 Portal 到 body 并高于 DSH 设置层', async () => {
+test('opening the dialog from settings Portals to body and sits above the DSH settings layer', async () => {
   const body = {};
   let portal;
   const jsxRuntime = {
@@ -815,11 +815,11 @@ test('从设置快捷打开时弹框 Portal 到 body 并高于 DSH 设置层', a
   });
 
   assert.equal(rendered, portal);
-  assert.equal(portal.target, body, '必须逃出 shell.overlay 的 z-index:20 堆叠上下文');
-  assert.ok(portal.node.props.style.zIndex > 1000, '必须高于 DSH Settings 的 z-index:1000');
+  assert.equal(portal.target, body, 'it must escape the shell.overlay z-index:20 stacking context');
+  assert.ok(portal.node.props.style.zIndex > 1000, 'it must sit above the DSH Settings z-index:1000');
 });
 
-test('版本检查支持强制刷新且不会被旧缓存隐藏 Provider 更新', async () => {
+test('the version check supports a forced refresh and a stale cache cannot hide a Provider update', async () => {
   for (const failed of [false, true]) {
     const state = [
       { installedVersion: '0.2.54', latestVersion: '0.2.54', updateAvailable: false, checkedAt: '2026-09-22T00:00:00Z' },
@@ -856,21 +856,21 @@ test('版本检查支持强制刷新且不会被旧缓存隐藏 Provider 更新'
       for (const child of Array.isArray(children) ? children : [children]) visit(child);
     }
     visit(tree);
-    assert.ok(nodes.some((node) => node.props?.children === '一键更新到 v0.2.56'));
-    const button = nodes.find((node) => node.props?.children === '检查更新');
+    assert.ok(nodes.some((node) => node.props?.children === 'Update in one click to v0.2.56'));
+    const button = nodes.find((node) => node.props?.children === 'Check for updates');
     assert.equal(button.props.disabled, false);
-    assert.match(button.props.title, /上次检查/);
+    assert.match(button.props.title, /Last checked/);
     button.props.onClick();
     assert.equal(refresh, 1);
-    assert.equal(nodes.some((node) => node.props?.children === '暂时无法确认 npm 最新版本，请重试'), failed);
+    assert.equal(nodes.some((node) => node.props?.children === 'The latest npm version cannot be confirmed right now. Please retry'), failed);
   }
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
   assert.match(source, /params: \{ force \}/);
   assert.match(source, /check\(true\)/);
-  assert.equal(source.match(/\[open, versionCheckRequest\]/g).length, 2, '手动刷新同步重查版本和 Provider');
+  assert.equal(source.match(/\[open, versionCheckRequest\]/g).length, 2, 'a manual refresh re-checks both the version and the Provider');
 });
 
-test('市场标题展示安装版本，并通过 Provider 适配层一键更新', async () => {
+test('the market title shows the installed version and offers a one-click update through the Provider adapter', async () => {
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
   assert.match(source, /method: "versionStatus"/);
   assert.match(source, /VERSION_CHECK_INTERVAL_MS = 6 \* 60 \* 60 \* 1e3/);
@@ -892,26 +892,26 @@ test('市场标题展示安装版本，并通过 Provider 适配层一键更新'
 	assert.match(source, /DOWNGRADE_DETECTED/);
 	assert.match(source, /RESOLVED_VERSION_MISMATCH/);
 	assert.match(source, /provider\.restart\(capabilities\)/);
-  assert.match(source, /一键更新到 v/);
-  assert.match(source, /正在更新/);
+  assert.match(source, /Update in one click to v/);
+  assert.match(source, /Updating/);
   assert.match(source, /failure\?\.retryable/);
 	assert.match(source, /capabilities\?\.restart\?\.supported === true/);
-  assert.match(source, /请重启 DSH Desktop/);
+  assert.match(source, /Please restart DSH Desktop/);
   assert.match(source, /window\.location\.reload\(\)/);
-	assert.doesNotMatch(source, /"\/dsh-market\/update"/, '不得调用 Market 未版本化的私有更新接口');
-	assert.doesNotMatch(source, /const MARKET_(?:UPDATES|OPERATIONS|ROLLBACK|RESTART)_URL/, 'UI 不应硬编码 Provider 操作端点');
-  assert.match(source, /新版本处于发布安全等待期（约 24 小时）/);
-  assert.match(source, /立即更新（跳过等待）/);
+	assert.doesNotMatch(source, /"\/dsh-market\/update"/, 'it must not call the Market unversioned private update endpoint');
+	assert.doesNotMatch(source, /const MARKET_(?:UPDATES|OPERATIONS|ROLLBACK|RESTART)_URL/, 'the UI must not hard-code Provider operation endpoints');
+  assert.match(source, /The new release is still in its safety wait period \(about 24 hours\)/);
+  assert.match(source, /Update now \(skip the wait\)/);
   assert.match(source, /manualUpgradeCommand/);
   assert.match(source, /--config\.minimumReleaseAge=0/);
-  assert.match(source, /复制升级命令/);
+  assert.match(source, /Copy upgrade command/);
   assert.match(source, /\[data-slot="sidebar\.settings"\]/);
   assert.match(source, /\^\(\\u63d2\\u4ef6\\u5e02\\u573a\|Plugin Market\|Plugin Marketplace\)\$/);
   assert.match(source, /window\.open\(NPM_PACKAGE_URL, "_blank", "noopener,noreferrer"\)/);
-  assert.doesNotMatch(source, /registry\.npmjs\.org/, '客户端不应跨域请求版本源');
+  assert.doesNotMatch(source, /registry\.npmjs\.org/, 'the client must not request the version source cross-origin');
 });
 
-test('DSH Desktop 设置中没有插件市场时回退到 npm 更新说明', async () => {
+test('it falls back to npm update instructions when the DSH Desktop settings have no plugin market', async () => {
   let settingsClicks = 0;
   const opened = [];
   const settingsTrigger = { click() { settingsClicks += 1; } };
@@ -946,7 +946,7 @@ test('DSH Desktop 设置中没有插件市场时回退到 npm 更新说明', asy
   ]]);
 });
 
-test('客户端独立拒绝 Provider 降级、错误目标和无效成功结果', async () => {
+test('the client independently rejects a Provider downgrade, a wrong target and an invalid success result', async () => {
   const plugin = await loadClient({
     sourceTransform(source) {
       return source.replace(
@@ -965,14 +965,14 @@ test('客户端独立拒绝 Provider 降级、错误目标和无效成功结果'
     state: 'succeeded', beforeVersion: '0.2.24', installedVersion: '0.2.23',
   }, '0.2.25'), {
     code: 'DOWNGRADE_DETECTED',
-    message: '更新服务将插件从 v0.2.24 降级到 v0.2.23',
+    message: 'The update service downgraded the plugin from v0.2.24 to v0.2.23',
     retryable: false,
   });
   assert.deepEqual(verify({
     state: 'succeeded', beforeVersion: '0.2.24', installedVersion: '0.2.26',
   }, '0.2.25'), {
     code: 'RESOLVED_VERSION_MISMATCH',
-    message: '预期安装 v0.2.25，更新服务实际安装了 v0.2.26',
+    message: 'Expected v0.2.25 to be installed, but the update service installed v0.2.26',
     retryable: true,
   });
   assert.equal(verify({
@@ -981,7 +981,7 @@ test('客户端独立拒绝 Provider 降级、错误目标和无效成功结果'
   assert.equal(verify({ state: 'succeeded', beforeVersion: '0.2.24' }, '0.2.25').code, 'INVALID_UPDATE_RESULT');
 });
 
-test('更新失败文案区分发布安全等待和镜像同步', async () => {
+test('the update failure copy distinguishes the release safety wait from mirror sync', async () => {
   const plugin = await loadClient({
     sourceTransform(source) {
       return source.replace(
@@ -991,12 +991,12 @@ test('更新失败文案区分发布安全等待和镜像同步', async () => {
     },
   });
   const label = plugin.__testUpdateFailureLabel;
-  assert.equal(label({ code: 'RELEASE_TOO_FRESH' }), '新版本处于发布安全等待期（约 24 小时）');
-  assert.equal(label({ code: 'MIRROR_SYNC_PENDING' }), '镜像尚未同步完整安装包');
+  assert.equal(label({ code: 'RELEASE_TOO_FRESH' }), 'The new release is still in its safety wait period (about 24 hours)');
+  assert.equal(label({ code: 'MIRROR_SYNC_PENDING' }), 'The mirror has not synced the full package yet');
   assert.equal(label({ code: 'UNKNOWN', message: '镜像返回的安装包尚不可用' }), '镜像返回的安装包尚不可用');
 });
 
-test('磁盘版本高于运行版本时识别为等待重启，不重复提示安装', async () => {
+test('a disk version higher than the running version is recognised as pending restart, without repeating the install prompt', async () => {
   const plugin = await loadClient({
     sourceTransform(source) {
       return source.replace(
@@ -1017,18 +1017,18 @@ test('磁盘版本高于运行版本时识别为等待重启，不重复提示�
   assert.equal(pending(
     { installedVersion: '0.2.30' },
     { installedVersion: '0.2.31', latestVersion: '0.2.32', updateAvailable: true },
-  ), null, '仍有更高版本时应继续展示一键更新');
+  ), null, 'the one-click update must still be shown while a higher version exists');
   assert.equal(pending(
     { installedVersion: 'invalid' },
     { installedVersion: '0.2.31', updateAvailable: false },
   ), null);
 
   const source = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8');
-  assert.match(source, /v\$\{activationPendingVersion\} 已安装，重启后生效/);
+  assert.match(source, /v\$\{activationPendingVersion\} is installed and takes effect after a restart/);
   assert.match(source, /pendingActivationVersion\(versionStatus, providerUpdateCheck\)/);
 });
 
-test('已安装的新版本在旧进程中渲染重启提示而非升级命令', async () => {
+test('a newly installed version renders a restart hint in the old process instead of an upgrade command', async () => {
   const state = [
     { installedVersion: '0.2.30', latestVersion: '0.2.31', updateAvailable: true },
     'ready',
@@ -1082,13 +1082,13 @@ test('已安装的新版本在旧进程中渲染重启提示而非升级命令',
     for (const child of Array.isArray(children) ? children : [children]) visit(child);
   };
   visit(tree);
-  assert.ok(descendants.some((node) => node.props?.children === 'v0.2.31 已安装，重启后生效'));
-  assert.ok(descendants.some((node) => node.props?.children === '请重启 DSH'));
+  assert.ok(descendants.some((node) => node.props?.children === 'v0.2.31 is installed and takes effect after a restart'));
+  assert.ok(descendants.some((node) => node.props?.children === 'Please restart DSH'));
   assert.equal(descendants.some((node) => node.type === 'code'), false);
-  assert.equal(descendants.some((node) => node.props?.children === '复制升级命令'), false);
+  assert.equal(descendants.some((node) => node.props?.children === 'Copy upgrade command'), false);
 });
 
-test('能力探测通过后渲染一键更新，并使用 Provider 广告的同源端点', async () => {
+test('after capability detection passes it renders a one-click update and uses the same-origin endpoint advertised by the Provider', async () => {
   const requests = [];
   const effects = [];
   const state = [];
@@ -1208,20 +1208,20 @@ test('能力探测通过后渲染一键更新，并使用 Provider 广告的同�
   effects.length = 0;
   let tree = render();
   const update = descendants(tree).find((node) => node.type === 'button'
-    && node.props?.children === '一键更新到 v0.2.25');
-  assert.ok(update, '探测到 v1 后应在当前页面提供一键更新');
+    && node.props?.children === 'Update in one click to v0.2.25');
+  assert.ok(update, 'after detecting v1 the one-click update must be available in the current page');
   update.props.onClick();
   await new Promise((resolve) => setImmediate(resolve));
 
   effects.length = 0;
   tree = render();
-  assert.ok(descendants(tree).some((node) => node.props?.children === '正在更新 25%'));
+  assert.ok(descendants(tree).some((node) => node.props?.children === 'Updating 25%'));
 	const mutation = requests.find(([url, method]) => url === '/test-update-provider/v1/updates' && method === 'POST');
-  assert.ok(mutation, '点击后应调用 Provider 广告的更新入口');
+  assert.ok(mutation, 'the click must call the update endpoint advertised by the Provider');
   assert.deepEqual(JSON.parse(mutation[2]), { packageName: 'dsh-mcp-connector' });
 });
 
-test('Provider 广告跨源端点时拒绝一键更新并安全降级', async () => {
+test('it rejects the one-click update and degrades safely when the Provider advertises a cross-origin endpoint', async () => {
   const requests = [];
   const copied = [];
   const effects = [];
@@ -1321,8 +1321,8 @@ test('Provider 广告跨源端点时拒绝一键更新并安全降级', async ()
   assert.ok(descendants(tree).some((node) => node.type === 'code'
     && node.props?.children === command));
   const copyButton = descendants(tree).find((node) => node.type === 'button'
-    && node.props?.children === '复制升级命令');
-  assert.ok(copyButton, '无可信 Provider 时应提供升级命令复制按钮');
+    && node.props?.children === 'Copy upgrade command');
+  assert.ok(copyButton, 'without a trusted Provider an upgrade command copy button must be offered');
   copyButton.props.onClick();
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(copied, [command]);
@@ -1330,6 +1330,6 @@ test('Provider 广告跨源端点时拒绝一键更新并安全降级', async ()
   effects.length = 0;
   tree = render();
   assert.ok(descendants(tree).some((node) => node.type === 'button'
-    && node.props?.children === '已复制'));
+    && node.props?.children === 'Copied'));
   assert.equal(requests.some((url) => url.startsWith('https://evil.example/')), false);
 });
