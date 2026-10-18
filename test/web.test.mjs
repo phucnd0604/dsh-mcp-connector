@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mountWebRoutes, isTrustedWebRequest, resolveUiFile, splitUiPath } from '../lib/web.js';
+import { mountWebRoutes, isTrustedWebRequest, resolveTrustedHosts, resolveUiFile, splitUiPath } from '../lib/web.js';
 import { StatusEventHub } from '../lib/status-events.js';
 
 /* ───────────────────────── fake http 对象 ───────────────────────── */
@@ -41,11 +41,12 @@ function fakeReq({ method = 'GET', url = '/', headers = {}, body } = {}) {
   return req;
 }
 
-function makeWctx() {
+function makeWctx(overrides = {}) {
   const routes = new Map();
   return {
     routes,
     webRuntime: { trustedHosts: [] },
+    ...overrides,
     webServer: {
       register(route) {
         routes.set(route.path, route);
@@ -90,6 +91,44 @@ test('fence：跨站 / 外部域名拒绝', () => {
   assert.equal(isTrustedWebRequest({ headers: { host: 'evil.example.com' } }), false);
   assert.equal(isTrustedWebRequest({ headers: { host: '127.0.0.1:62929', origin: 'http://evil.example.com' } }), false);
   assert.equal(isTrustedWebRequest({ headers: {} }), false);
+});
+
+test('trustedHosts: ưu tiên webRuntime (DSH 0.2.0-rc.x), chỉ khi thiếu service mới fallback sang connection (0.2.1-rc.2)', () => {
+  assert.deepEqual(resolveTrustedHosts({ webRuntime: { trustedHosts: ['a.example.com'] }, connection: { trustedHosts: ['b.example.com'] } }), ['a.example.com']);
+  assert.deepEqual(resolveTrustedHosts({ webRuntime: { trustedHosts: [] }, connection: { trustedHosts: ['b.example.com'] } }), []);
+  assert.deepEqual(resolveTrustedHosts({ webRuntime: { trustedHosts: undefined }, connection: { trustedHosts: ['b.example.com'] } }), []);
+  assert.deepEqual(resolveTrustedHosts({ webRuntime: { trustedHosts: 'b.example.com' }, connection: { trustedHosts: ['c.example.com'] } }), []);
+  assert.deepEqual(resolveTrustedHosts({ webRuntime: {}, connection: { trustedHosts: ['b.example.com'] } }), []);
+  assert.deepEqual(resolveTrustedHosts({ connection: { trustedHosts: ['b.example.com'] } }), ['b.example.com']);
+  assert.deepEqual(resolveTrustedHosts({ webRuntime: undefined, connection: { trustedHosts: ['b.example.com'] } }), ['b.example.com']);
+  assert.deepEqual(resolveTrustedHosts({}), []);
+  assert.deepEqual(resolveTrustedHosts(undefined), []);
+  assert.deepEqual(resolveTrustedHosts({ get webRuntime() { throw new Error('service absent'); } }), []);
+});
+
+test('api route: khi DSH 0.2.1-rc.2 chỉ có connection.trustedHosts thì domain tin cậy ngoài loopback vẫn được phép, domain khác vẫn bị chặn', async () => {
+  const wctx = makeWctx({ webRuntime: undefined, connection: { trustedHosts: ['dsh.example.com'] } });
+  mountWebRoutes(wctx, api, { logger: { warn() {} } });
+  const route = wctx.routes.get('/mcp-connector/api');
+  assert.ok(route, 'api route đã đăng ký');
+
+  const allowed = new FakeRes();
+  await route.handler(fakeReq({
+    method: 'POST',
+    url: '/mcp-connector/api',
+    headers: { host: 'dsh.example.com', origin: 'http://dsh.example.com', 'content-type': 'application/json' },
+    body: JSON.stringify({ method: 'catalog', params: {} }),
+  }), allowed);
+  assert.equal(allowed.status, 200);
+
+  const denied = new FakeRes();
+  await route.handler(fakeReq({
+    method: 'POST',
+    url: '/mcp-connector/api',
+    headers: { host: 'evil.example.com', origin: 'http://evil.example.com', 'content-type': 'application/json' },
+    body: JSON.stringify({ method: 'catalog', params: {} }),
+  }), denied);
+  assert.equal(denied.status, 403);
 });
 
 test('api 路由：method 白名单调度 + 非 POST/未知方法', async () => {

@@ -72,7 +72,14 @@ function makeToolsRegistry() {
   };
 }
 
-function makePluginContext({ shared, loaderHooks, workspaces, withWeb = false } = {}) {
+/* Service sets of the DSH builds this plugin supports. DSH 0.2.1-rc.2 dropped the webRuntime
+ * service — the host keeps the validated trusted hosts on `connection` instead — so a host that
+ * provides only webServer/connection must still get the whole web half. */
+const HOST_SERVICES_DSH_020 = ['webServer', 'webRuntime'];
+const HOST_SERVICES_DSH_021 = ['webServer', 'connection'];
+const HOST_SERVICES_WEB_SERVER_ONLY = ['webServer'];
+
+function makePluginContext({ shared, loaderHooks, workspaces, withWeb = false, hostServices = HOST_SERVICES_DSH_021 } = {}) {
   const logs = [];
   const loader = makeLoader(loaderHooks);
   const tools = makeToolsRegistry();
@@ -102,9 +109,15 @@ function makePluginContext({ shared, loaderHooks, workspaces, withWeb = false } 
     },
   };
   const routes = new Map();
+  // Mirrors cordis injection: the callback runs only once every requested dependency is
+  // provided by the host, so requiring a service the host dropped (webRuntime in DSH
+  // 0.2.1-rc.2) silently disables the whole web half — routes never mount.
   if (withWeb) ctx.inject = (dependencies, callback) => {
-    if (dependencies.includes('webServer')) callback({
-      webRuntime: {}, webServer: { register(route) { routes.set(route.path, route.handler); return () => routes.delete(route.path); } },
+    if (!dependencies.every((name) => hostServices.includes(name))) return;
+    callback({
+      ...(hostServices.includes('webRuntime') ? { webRuntime: { trustedHosts: [] } } : {}),
+      ...(hostServices.includes('connection') ? { connection: { trustedHosts: [] } } : {}),
+      webServer: { register(route) { routes.set(route.path, route.handler); return () => routes.delete(route.path); } },
     });
   };
   async function webCall(method, params = {}) {
@@ -114,7 +127,7 @@ function makePluginContext({ shared, loaderHooks, workspaces, withWeb = false } 
     await routes.get('/mcp-connector/api')(req, { writeHead() {}, end(body) { output = JSON.parse(body); } });
     return output;
   }
-  return { ctx, loader, tools, domain, tables, logs, disposers, webCall };
+  return { ctx, loader, tools, domain, tables, logs, disposers, routes, webCall };
 }
 
 function baseConfig(overrides = {}) {
@@ -281,6 +294,39 @@ test('工具浏览 API：分页与筛选、无 Workspace 仅全局、只读搜�
     assert.equal(requests.length, count);
     assert.ok(!requests.some((request) => request.method === 'tools/call'));
   } finally { disposers.forEach((dispose) => dispose()); await new Promise((resolve) => server.close(resolve)); }
+});
+
+test('host chỉ cấp webServer (0.2.1-rc.2 bỏ webRuntime) vẫn mount UI, API và SSE - hồi quy panel trắng', async () => {
+  const { ctx, routes, webCall, disposers } = makePluginContext({ withWeb: true, hostServices: HOST_SERVICES_WEB_SERVER_ONLY });
+  const { apply } = await import('../lib/index.js');
+  try {
+    await apply(ctx, baseConfig());
+    assert.ok(routes.has('/mcp-connector/ui'), 'thiếu route UI: iframe của panel sẽ trắng ngay');
+    assert.ok(routes.has('/mcp-connector/api'), 'thiếu route API: header panel sẽ báo không xác nhận được phiên bản npm');
+    assert.ok(routes.has('/mcp-connector/events'), 'thiếu route SSE: sự kiện trạng thái không được đẩy');
+    assert.equal((await webCall('status', {})).ok, true);
+  } finally { disposers.forEach((dispose) => dispose()); }
+});
+
+test('host kiểu DSH 0.2.1-rc.2 (webServer + connection, không có webRuntime) vẫn mount đủ ba route', async () => {
+  const { ctx, routes, disposers } = makePluginContext({ withWeb: true, hostServices: HOST_SERVICES_DSH_021 });
+  const { apply } = await import('../lib/index.js');
+  try {
+    await apply(ctx, baseConfig());
+    assert.ok(routes.has('/mcp-connector/ui'));
+    assert.ok(routes.has('/mcp-connector/api'));
+    assert.ok(routes.has('/mcp-connector/events'));
+  } finally { disposers.forEach((dispose) => dispose()); }
+});
+
+test('host còn cấp webRuntime (DSH 0.2.0-rc.x) giữ nguyên hành vi mount', async () => {
+  const { ctx, routes, disposers } = makePluginContext({ withWeb: true, hostServices: HOST_SERVICES_DSH_020 });
+  const { apply } = await import('../lib/index.js');
+  try {
+    await apply(ctx, baseConfig());
+    assert.ok(routes.has('/mcp-connector/api'));
+    assert.ok(routes.has('/mcp-connector/ui'));
+  } finally { disposers.forEach((dispose) => dispose()); }
 });
 
 test('自定义 stdio 在 Host 注册工具后自动入缓存，停用即不可搜索', async () => {
